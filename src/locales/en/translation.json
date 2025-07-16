@@ -1,0 +1,454 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "search": "Search",
+    "filter": "Filter",
+    "noResults": "No results found",
+    "close": "Close",
+    "continue": "Continue",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "retry": "Retry",
+    "refresh": "Refresh",
+    "pleaseWait": "Please wait...",
+    "authenticating": "Authenticating...",
+    "pageLoading": "Page loading...",
+    "appLoading": "Application loading...",
+    "backToHome": "Back to Home",
+    "clearFilters": "Clear Filters",
+    "allCategories": "All Categories",
+    "viewMode": "View Mode",
+    "components": "Components",
+    "noComponentsFound": "No components found",
+    "changeSearchCriteria": "Try changing your search criteria"
+  },
+  "demo": {
+    "button": {
+      "description": "Interactive button component with various variants and sizes",
+      "variantDescription": "Button appearance variant",
+      "sizeDescription": "Button size",
+      "fullWidthDescription": "Makes button full width",
+      "disabledDescription": "Disables the button"
+    },
+    "checkbox": {
+      "description": "Checkbox component used for selection operations",
+      "selectedLabel": "Selected Checkbox",
+      "unselectedLabel": "Not Selected",
+      "disabledLabel": "Disabled",
+      "checkedDescription": "Is checkbox checked (controlled)",
+      "defaultCheckedDescription": "Default checked state (uncontrolled)",
+      "disabledDescription": "Is checkbox disabled",
+      "onCheckedChangeDescription": "Function called when selection state changes"
+    },
+    "switch": {
+      "description": "Toggle switch component used for on/off operations",
+      "notificationsLabel": "Notifications",
+      "emailUpdatesLabel": "Email Updates",
+      "disabledLabel": "Disabled",
+      "checkedDescription": "Is switch on (controlled)",
+      "defaultCheckedDescription": "Default on state (uncontrolled)",
+      "disabledDescription": "Is switch disabled",
+      "onCheckedChangeDescription": "Function called when state changes"
+    },
+    "select": {
+      "description": "Dropdown component used for selecting from options",
+      "countryPlaceholder": "Select country",
+      "turkey": "Turkey",
+      "usa": "United States",
+      "germany": "Germany",
+      "france": "France",
+      "valueDescription": "Selected value (controlled)",
+      "defaultValueDescription": "Default selected value (uncontrolled)",
+      "onValueChangeDescription": "Function called when value changes"
+    },
+    "loading": {
+      "description": "Loading animations in various styles",
+      "spinnerLabel": "Spinner",
+      "dotsLabel": "Dots",
+      "pulseLabel": "Pulse",
+      "sizeDescription": "Spinner size",
+      "variantDescription": "Spinner color variant",
+      "textDescription": "Text to show with spinner"
+    },
+    "skeleton": {
+      "description": "Placeholder components for content loading state",
+      "widthDescription": "Skeleton width",
+      "heightDescription": "Skeleton height",
+      "variantDescription": "Skeleton shape",
+      "linesDescription": "Number of lines for text skeleton"
+    },
+    "textarea": {
+      "description": "Multi-line text input component",
+      "basicPlaceholder": "Basic textarea...",
+      "counterPlaceholder": "With character counter...",
+      "maxLengthDescription": "Maximum character count",
+      "showCountDescription": "Show character counter",
+      "autoResizeDescription": "Auto-resize based on content size",
+      "errorDescription": "Error state"
+    },
+    "accordion": {
+      "description": "Component used for expandable and collapsible content sections",
+      "featuresTitle": "Features",
+      "featuresContent": "This component is easily customizable and developed according to accessible design principles.",
+      "usageTitle": "Usage",
+      "usageContent": "Can be used in various scenarios such as form fields, settings menu, and FAQ sections.",
+      "typeDescription": "Allows one or multiple items to be open at once",
+      "defaultValueDescription": "Values of items that are open by default",
+      "collapsibleDescription": "Allows closing of open item (for type=\"single\")"
+    },
+    "alertDialog": {
+      "description": "Alert dialog component used to get user confirmation or convey important information",
+      "deleteAccountButton": "Delete Account",
+      "confirmationMessage": "Are you sure you want to perform this operation?",
+      "operationConfirmed": "Operation confirmed!",
+      "clickToSeeExample": "Click to see example dialog",
+      "openDescription": "Is dialog open (controlled)",
+      "onOpenChangeDescription": "Function called when dialog state changes"
+    },
+    "avatar": {
+      "description": "Component used for displaying user profile pictures with fallback support",
+      "defaultLabel": "Default",
+      "colorfulLabel": "Colorful",
+      "iconLabel": "Icon",
+      "srcDescription": "Avatar image URL",
+      "altDescription": "Image alt text",
+      "fallbackDescription": "Content to show when image fails to load"
+    },
+    "card": {
+      "description": "Card component used for grouping and organizing content",
+      "cardTitle": "Card Title",
+      "cardDescription": "This is an example card description.",
+      "cardContent": "Card content goes here. Text, images, buttons and other components can be added.",
+      "cancelButton": "Cancel",
+      "saveButton": "Save",
+      "variantDescription": "Card appearance variant",
+      "sizeDescription": "Card padding size",
+      "hoverDescription": "Hover effect type"
+    },
+    "commandMenu": {
+      "description": "Command menu with keyboard shortcuts for quick search and command execution",
+      "searchPlaceholder": "Search commands...",
+      "createNewFile": "Create New File",
+      "openSettings": "Open Settings",
+      "openDescription": "Is command menu open (for dialog mode)",
+      "onOpenChangeDescription": "Function called when open state changes",
+      "valueDescription": "Value of selected item"
+    },
+    "dataTable": {
+      "description": "Advanced data table with sorting, filtering and pagination features",
+      "searchPlaceholder": "Search...",
+      "nameColumn": "Name",
+      "emailColumn": "Email",
+      "roleColumn": "Role",
+      "adminUser": "John Doe",
+      "adminEmail": "john@example.com",
+      "adminRole": "Admin",
+      "regularUser": "Jane Smith",
+      "regularEmail": "jane@example.com",
+      "regularRole": "User",
+      "columnsDescription": "Table column definitions",
+      "dataDescription": "Table data",
+      "searchKeyDescription": "Column key to search in",
+      "searchPlaceholderDescription": "Search input placeholder text"
+    },
+    "dialog": {
+      "description": "Dialog component used for opening modal windows",
+      "openButton": "Open Dialog",
+      "editProfileTitle": "Edit Profile",
+      "editProfileDescription": "You can update your profile information here. Click save button to save changes.",
+      "nameLabel": "Name",
+      "clickToSeeModal": "Click to see modal dialog",
+      "openDescription": "Is dialog open (controlled)",
+      "onOpenChangeDescription": "Function called when dialog state changes",
+      "modalDescription": "Modal behavior (closes when backdrop is clicked)"
+    },
+    "dragDropList": {
+      "description": "List component where you can reorder items with drag and drop functionality",
+      "item1": "Item 1",
+      "item2": "Item 2",
+      "item3": "Item 3",
+      "customizedItem": "Customized Item",
+      "customizedLabel": "Customized"
+    },
+    "dropdown": {
+      "description": "Radix UI based accessible dropdown menu component",
+      "optionsButton": "Options",
+      "accountOperations": "Account Operations",
+      "profile": "Profile",
+      "settings": "Settings",
+      "billing": "Billing",
+      "logout": "Logout",
+      "openDescription": "Dropdown open state (controlled)",
+      "onOpenChangeDescription": "Function called when open state changes",
+      "modalDescription": "Enable modal behavior"
+    },
+    "fileUpload": {
+      "description": "Advanced file upload component with drag and drop support",
+      "dropzoneText": "Drag files here or",
+      "browseText": "Browse Files",
+      "filesSelected": "{{count}} files selected",
+      "onChangeDescription": "Function called when file selection changes",
+      "valueDescription": "Selected files",
+      "multipleDescription": "Allow multiple file selection",
+      "acceptDescription": "Accepted file types",
+      "maxSizeDescription": "Maximum file size (MB)",
+      "maxFilesDescription": "Maximum number of files"
+    },
+    "input": {
+      "description": "Advanced input component with various variants and icon support",
+      "basicPlaceholder": "Basic input",
+      "searchPlaceholder": "Search...",
+      "emailPlaceholder": "Your email address",
+      "errorPlaceholder": "Invalid input",
+      "errorMessage": "This field is required",
+      "variantDescription": "Input appearance variant",
+      "inputSizeDescription": "Input size",
+      "startIconDescription": "Icon to show at the beginning of input",
+      "endIconDescription": "Icon to show at the end of input",
+      "errorDescription": "Error message"
+    },
+    "label": {
+      "description": "Accessible label component for form fields",
+      "basicLabel": "Basic Label",
+      "relatedInput": "Related input",
+      "requiredField": "Required Field",
+      "requiredPlaceholder": "This field is required",
+      "disabledLabel": "Disabled",
+      "disabledPlaceholder": "Disabled input",
+      "htmlForDescription": "ID value of the related input element",
+      "requiredDescription": "Shows required field mark (*)",
+      "classNameDescription": "Additional CSS classes"
+    },
+    "pageHeader": {
+      "description": "Comprehensive page header component including page title, breadcrumb, actions and tab navigation",
+      "projectManagement": "Project Management",
+      "projectDescription": "Manage and track all your projects",
+      "homepage": "Home",
+      "projects": "Projects",
+      "projectDetail": "Project Detail",
+      "help": "Help",
+      "newProject": "New Project",
+      "overview": "Overview",
+      "tasks": "Tasks",
+      "documents": "Documents",
+      "titleDescription": "Page title",
+      "subtitleDescription": "Page description",
+      "breadcrumbsDescription": "Breadcrumb navigation items",
+      "actionsDescription": "Page action buttons",
+      "tabsDescription": "Tab navigation items",
+      "activeTabDescription": "Active tab value",
+      "onTabChangeDescription": "Tab change function",
+      "stickyDescription": "Stay fixed at top when scrolling the page",
+      "backButtonDescription": "Show back button"
+    },
+    "form": {
+      "description": "Comprehensive form management system with React Hook Form integration",
+      "emailPlaceholder": "example@email.com",
+      "nameLabel": "Full Name",
+      "namePlaceholder": "Enter your first and last name",
+      "messageLabel": "Message",
+      "messagePlaceholder": "Write your message...",
+      "submitButton": "Submit",
+      "formDescription": "React Hook Form instance",
+      "onSubmitDescription": "Form submission function",
+      "classNameDescription": "CSS classes for form container"
+    },
+    "clickToSeeExample": "Click to see example dialog",
+    "clickToSeeModal": "Click to see modal dialog",
+    "dialogWillOpen": "Dialog will open!",
+    "formSubmittedSuccessfully": "Form Submitted Successfully",
+    "dataProcessedSuccessfully": "Your data has been processed successfully."
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "forgotPassword": "Forgot Password",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "username": "Username",
+    "rememberMe": "Remember Me",
+    "welcomeBack": "Welcome back!",
+    "loginSuccess": "Successfully logged in",
+    "logoutSuccess": "Successfully logged out",
+    "loginFailed": "Login failed",
+    "alreadyLoggedIn": "You are already logged in as {{name}}",
+    "pleaseLogin": "Please log in to continue",
+    "dontHaveAccount": "Don't have an account?",
+    "signUpHere": "Sign up here",
+    "invalidCredentials": "Invalid email or password",
+    "sessionExpired": "Your session has expired",
+    "tokenRefreshFailed": "Token refresh failed",
+    "accountLocked": "Your account is locked",
+    "tooManyAttempts": "Too many failed attempts",
+    "loginFormSubmitted": "Login form submitted",
+    "alreadyAuthenticated": "Already authenticated, redirecting",
+    "safelyLoggedOut": "You have been safely logged out"
+  },
+  "navigation": {
+    "home": "Home",
+    "profile": "Profile",
+    "settings": "Settings",
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "components": "Components",
+    "about": "About",
+    "contact": "Contact",
+    "pricing": "Pricing",
+    "notifications": "Notifications",
+    "help": "Help",
+    "support": "Support",
+    "privacy": "Privacy",
+    "terms": "Terms of Service",
+    "cookies": "Cookie Policy",
+    "quickLinks": "Quick Links",
+    "legal": "Legal",
+    "madeWith": "Made with ❤️ in Turkey",
+    "language": "Language Selection"
+  },
+  "pages": {
+    "home": {
+      "title": "Welcome to Starkon Template",
+      "subtitle": "Comprehensive component library designed for modern React applications. Radix UI based, accessible and customizable components.",
+      "getStarted": "Get Started",
+      "learnMore": "Learn More",
+      "goToDashboard": "Go to Dashboard",
+      "features": {
+        "title": "Features",
+        "subtitle": "Build modern applications with Starkon Template",
+        "modern": {
+          "title": "Modern Design",
+          "description": "Create modern and elegant interfaces with sea blue theme"
+        },
+        "performance": {
+          "title": "Performance",
+          "description": "Build fast applications with optimized components"
+        },
+        "customizable": {
+          "title": "Customizable",
+          "description": "All components can be customized according to your needs"
+        }
+      },
+      "footer": {
+        "copyright": "© 2024 Starkon Template. All rights reserved."
+      }
+    },
+    "dashboard": {
+      "welcome": "Welcome, {{name}}!",
+      "description": "This page can only be viewed by logged-in users.",
+      "viewProfile": "View Profile",
+      "logout": "Logout",
+      "userInfoNotLoaded": "User information could not be loaded"
+    },
+    "components": {
+      "title": "Components",
+      "searchPlaceholder": "Search components... (Button, Input, Card...)",
+      "showcase": "Component Showcase",
+      "count": "Components ({{count}})"
+    },
+    "notFound": {
+      "title": "404",
+      "heading": "Page Not Found",
+      "description": "The page you're looking for doesn't exist or has been removed.",
+      "goHome": "Go to Homepage",
+      "goBack": "Go Back"
+    },
+    "about": {
+      "title": "About Us",
+      "content": "Learn more about Starkon Template and our mission."
+    },
+    "contact": {
+      "title": "Contact",
+      "content": "Get in touch with our team."
+    },
+    "pricing": {
+      "title": "Pricing",
+      "content": "Choose the plan that's right for you."
+    },
+    "profile": {
+      "title": "Profile",
+      "content": "Manage your profile information."
+    },
+    "settings": {
+      "title": "Settings",
+      "content": "Configure your application preferences."
+    },
+    "users": {
+      "title": "Users",
+      "content": "Manage system users."
+    },
+    "register": {
+      "title": "Register",
+      "content": "Create a new account."
+    },
+    "forgotPassword": {
+      "title": "Forgot Password",
+      "content": "Reset your password."
+    }
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Please enter a valid email address",
+    "minLength": "Must be at least {{min}} characters",
+    "maxLength": "Must be at most {{max}} characters",
+    "passwordMatch": "Passwords must match",
+    "invalidFormat": "Invalid format",
+    "passwordComplexity": "Password must contain at least one uppercase, lowercase, number and special character",
+    "emailDomainNotAllowed": "This email domain is not supported",
+    "phoneFormat": "Enter a valid phone number",
+    "passwordWeak": "Password is too weak",
+    "passwordMedium": "Password strength is medium",
+    "passwordStrong": "Password is strong",
+    "invalidType": "Expected {{expected}} type, received {{received}}",
+    "minValue": "Must be at least {{min}}",
+    "maxValue": "Must be at most {{max}}",
+    "minItems": "Must contain at least {{min}} items",
+    "maxItems": "Can contain at most {{max}} items",
+    "url": "Enter a valid URL",
+    "uuid": "Enter a valid UUID",
+    "pattern": "Invalid format",
+    "mustBe": "Must be {{value}}",
+    "unknownKeys": "Unknown fields: {{keys}}",
+    "invalidOption": "Invalid option",
+    "invalidDate": "Invalid date",
+    "custom": "Invalid value",
+    "invalid": "Invalid value"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "toggle": "Toggle Theme"
+  },
+  "components": {
+    "button": {
+      "loadingText": "Please wait..."
+    },
+    "dialog": {
+      "close": "Close"
+    },
+    "datePicker": {
+      "placeholder": "Select date...",
+      "today": "Today"
+    },
+    "navbar": {
+      "searchPlaceholder": "Search...",
+      "notifications": "Notifications",
+      "noNotifications": "No new notifications",
+      "viewAllNotifications": "View all notifications"
+    }
+  },
+  "errors": {
+    "unauthorized": "You must log in to access this page",
+    "sessionExpired": "Your session has expired, please log in again",
+    "invalidToken": "Invalid token, please log in again"
+  }
+}

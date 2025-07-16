@@ -1,0 +1,454 @@
+{
+  "common": {
+    "loading": "Yükleniyor...",
+    "error": "Bir hata oluştu",
+    "success": "Başarılı",
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "edit": "Düzenle",
+    "delete": "Sil",
+    "search": "Ara",
+    "filter": "Filtrele",
+    "noResults": "Sonuç bulunamadı",
+    "close": "Kapat",
+    "continue": "Devam Et",
+    "back": "Geri",
+    "next": "İleri",
+    "previous": "Önceki",
+    "retry": "Tekrar Dene",
+    "refresh": "Yenile",
+    "pleaseWait": "Lütfen bekleyin...",
+    "authenticating": "Kimlik doğrulanıyor...",
+    "pageLoading": "Sayfa yükleniyor...",
+    "appLoading": "Uygulama yükleniyor...",
+    "backToHome": "Ana Sayfaya Dön",
+    "clearFilters": "Filtreleri Temizle",
+    "allCategories": "Tüm Kategoriler",
+    "viewMode": "Görünüm Modu",
+    "components": "Bileşenler",
+    "noComponentsFound": "Hiç bileşen bulunamadı",
+    "changeSearchCriteria": "Arama kriterlerinizi değiştirip tekrar deneyin"
+  },
+  "demo": {
+    "button": {
+      "description": "Farklı varyant ve boyutlarda etkileşimli buton bileşeni",
+      "variantDescription": "Buton görünüm varyantı",
+      "sizeDescription": "Buton boyutu",
+      "fullWidthDescription": "Butonu tam genişlik yapar",
+      "disabledDescription": "Butonu devre dışı bırakır"
+    },
+    "checkbox": {
+      "description": "Seçim yapma işlemleri için kullanılan onay kutusu bileşeni",
+      "selectedLabel": "Seçili Checkbox",
+      "unselectedLabel": "Seçili Değil",
+      "disabledLabel": "Devre Dışı",
+      "checkedDescription": "Checkbox seçili mi (controlled)",
+      "defaultCheckedDescription": "Varsayılan seçili durumu (uncontrolled)",
+      "disabledDescription": "Checkbox devre dışı mı",
+      "onCheckedChangeDescription": "Seçim durumu değiştiğinde çağırılan fonksiyon"
+    },
+    "switch": {
+      "description": "Açma/kapama işlemleri için kullanılan toggle switch bileşeni",
+      "notificationsLabel": "Bildirimler",
+      "emailUpdatesLabel": "Email Güncellemeleri",
+      "disabledLabel": "Devre Dışı",
+      "checkedDescription": "Switch açık mı (controlled)",
+      "defaultCheckedDescription": "Varsayılan açık durumu (uncontrolled)",
+      "disabledDescription": "Switch devre dışı mı",
+      "onCheckedChangeDescription": "Durum değiştiğinde çağırılan fonksiyon"
+    },
+    "select": {
+      "description": "Seçenekler arasından seçim yapmak için kullanılan dropdown bileşeni",
+      "countryPlaceholder": "Ülke seçin",
+      "turkey": "Türkiye",
+      "usa": "Amerika",
+      "germany": "Almanya",
+      "france": "Fransa",
+      "valueDescription": "Seçili değer (controlled)",
+      "defaultValueDescription": "Varsayılan seçili değer (uncontrolled)",
+      "onValueChangeDescription": "Değer değiştiğinde çağırılan fonksiyon"
+    },
+    "loading": {
+      "description": "Çeşitli stillerde yükleme animasyonları",
+      "spinnerLabel": "Spinner",
+      "dotsLabel": "Dots",
+      "pulseLabel": "Pulse",
+      "sizeDescription": "Spinner boyutu",
+      "variantDescription": "Spinner renk varyantı",
+      "textDescription": "Spinner ile birlikte gösterilecek metin"
+    },
+    "skeleton": {
+      "description": "İçerik yükleme durumu için placeholder bileşenleri",
+      "widthDescription": "Skeleton genişliği",
+      "heightDescription": "Skeleton yüksekliği",
+      "variantDescription": "Skeleton şekli",
+      "linesDescription": "Text skeleton için satır sayısı"
+    },
+    "textarea": {
+      "description": "Çok satırlı metin girişi bileşeni",
+      "basicPlaceholder": "Temel textarea...",
+      "counterPlaceholder": "Karakter sayacı ile...",
+      "maxLengthDescription": "Maksimum karakter sayısı",
+      "showCountDescription": "Karakter sayacını göster",
+      "autoResizeDescription": "İçerik boyutuna göre otomatik yeniden boyutlandır",
+      "errorDescription": "Hata durumu"
+    },
+    "accordion": {
+      "description": "Genişletilebilir ve daraltılabilir içerik bölümleri için kullanılan bileşen",
+      "featuresTitle": "Özellikler",
+      "featuresContent": "Bu bileşen kolayca özelleştirilebilir ve erişilebilir tasarım prensiplerine uygun olarak geliştirilmiştir.",
+      "usageTitle": "Kullanım",
+      "usageContent": "Form alanları, ayarlar menüsü ve SSS bölümleri gibi çeşitli senaryolarda kullanılabilir.",
+      "typeDescription": "Tek seferde bir veya birden fazla öğenin açık olmasına izin verir",
+      "defaultValueDescription": "Varsayılan olarak açık olan öğelerin değerleri",
+      "collapsibleDescription": "Açık öğenin kapatılmasına izin verir (type=\"single\" için)"
+    },
+    "alertDialog": {
+      "description": "Kullanıcıdan onay almak veya önemli bilgileri iletmek için kullanılan uyarı dialog bileşeni",
+      "deleteAccountButton": "Hesabı Sil",
+      "confirmationMessage": "Bu işlemi gerçekleştirmek istediğinizden emin misiniz?",
+      "operationConfirmed": "İşlem onaylandı!",
+      "clickToSeeExample": "Tıklayarak örnek dialog'u görün",
+      "openDescription": "Dialog açık mı (controlled)",
+      "onOpenChangeDescription": "Dialog durumu değiştiğinde çağırılan fonksiyon"
+    },
+    "avatar": {
+      "description": "Kullanıcı profil resmi gösterimi için kullanılan bileşen, fallback desteği ile",
+      "defaultLabel": "Varsayılan",
+      "colorfulLabel": "Renkli",
+      "iconLabel": "Icon",
+      "srcDescription": "Avatar resim URL'si",
+      "altDescription": "Resim alternatif metni",
+      "fallbackDescription": "Resim yüklenemediğinde gösterilecek içerik"
+    },
+    "card": {
+      "description": "İçerik gruplamak ve organize etmek için kullanılan kart bileşeni",
+      "cardTitle": "Kart Başlığı",
+      "cardDescription": "Bu bir örnek kart açıklamasıdır.",
+      "cardContent": "Kart içeriği burada yer alır. Metin, resim, buton ve diğer bileşenler eklenebilir.",
+      "cancelButton": "İptal",
+      "saveButton": "Kaydet",
+      "variantDescription": "Kart görünüm varyantı",
+      "sizeDescription": "Kart padding boyutu",
+      "hoverDescription": "Hover efekti türü"
+    },
+    "commandMenu": {
+      "description": "Klavye kısayolları ile hızlı arama ve komut çalıştırma menüsü",
+      "searchPlaceholder": "Komut ara...",
+      "createNewFile": "Yeni Dosya Oluştur",
+      "openSettings": "Ayarları Aç",
+      "openDescription": "Command menu açık mı (dialog modu için)",
+      "onOpenChangeDescription": "Açık durumu değiştiğinde çağırılan fonksiyon",
+      "valueDescription": "Seçili öğenin değeri"
+    },
+    "dataTable": {
+      "description": "Sıralama, filtreleme ve sayfalama özellikleri ile gelişmiş veri tablosu",
+      "searchPlaceholder": "Ara...",
+      "nameColumn": "İsim",
+      "emailColumn": "Email",
+      "roleColumn": "Rol",
+      "adminUser": "Ahmet Yılmaz",
+      "adminEmail": "ahmet@example.com",
+      "adminRole": "Admin",
+      "regularUser": "Zeynep Kaya",
+      "regularEmail": "zeynep@example.com",
+      "regularRole": "Kullanıcı",
+      "columnsDescription": "Tablo sütun tanımları",
+      "dataDescription": "Tablo verisi",
+      "searchKeyDescription": "Arama yapılacak sütun anahtarı",
+      "searchPlaceholderDescription": "Arama input placeholder metni"
+    },
+    "dialog": {
+      "description": "Modal pencere açmak için kullanılan dialog bileşeni",
+      "openButton": "Dialog Aç",
+      "editProfileTitle": "Profili Düzenle",
+      "editProfileDescription": "Profil bilgilerinizi buradan güncelleyebilirsiniz. Değişiklikleri kaydetmek için kaydet butonuna tıklayın.",
+      "nameLabel": "İsim",
+      "clickToSeeModal": "Tıklayarak modal dialog görebilirsiniz",
+      "openDescription": "Dialog açık mı (controlled)",
+      "onOpenChangeDescription": "Dialog durumu değiştiğinde çağırılan fonksiyon",
+      "modalDescription": "Modal davranışı (backdrop tıklanınca kapanır)"
+    },
+    "dragDropList": {
+      "description": "Sürükle-bırak özelliği ile öğeleri yeniden sıralayabileceğiniz liste bileşeni",
+      "item1": "Öğe 1",
+      "item2": "Öğe 2",
+      "item3": "Öğe 3",
+      "customizedItem": "Özelleştirilebilir Öğe",
+      "customizedLabel": "Özelleştirilmiş"
+    },
+    "dropdown": {
+      "description": "Radix UI tabanlı erişilebilir dropdown menü bileşeni",
+      "optionsButton": "Seçenekler",
+      "accountOperations": "Hesap İşlemleri",
+      "profile": "Profil",
+      "settings": "Ayarlar",
+      "billing": "Faturalandırma",
+      "logout": "Çıkış Yap",
+      "openDescription": "Dropdown açık durumu (controlled)",
+      "onOpenChangeDescription": "Açık durumu değiştiğinde çağırılan fonksiyon",
+      "modalDescription": "Modal davranışı etkinleştir"
+    },
+    "fileUpload": {
+      "description": "Sürükle-bırak desteği ile gelişmiş dosya yükleme bileşeni",
+      "dropzoneText": "Dosyaları buraya sürükleyin veya",
+      "browseText": "Dosya Seçin",
+      "filesSelected": "{{count}} dosya seçildi",
+      "onChangeDescription": "Dosya seçimi değiştiğinde çağırılan fonksiyon",
+      "valueDescription": "Seçili dosyalar",
+      "multipleDescription": "Birden fazla dosya seçimine izin ver",
+      "acceptDescription": "Kabul edilen dosya türleri",
+      "maxSizeDescription": "Maksimum dosya boyutu (MB)",
+      "maxFilesDescription": "Maksimum dosya sayısı"
+    },
+    "input": {
+      "description": "Çeşitli varyant ve ikon desteği ile gelişmiş input bileşeni",
+      "basicPlaceholder": "Temel input",
+      "searchPlaceholder": "Arama yapın...",
+      "emailPlaceholder": "E-posta adresiniz",
+      "errorPlaceholder": "Hatalı input",
+      "errorMessage": "Bu alan zorunludur",
+      "variantDescription": "Input görünüm varyantı",
+      "inputSizeDescription": "Input boyutu",
+      "startIconDescription": "Input başında gösterilecek ikon",
+      "endIconDescription": "Input sonunda gösterilecek ikon",
+      "errorDescription": "Hata mesajı"
+    },
+    "label": {
+      "description": "Form alanları için erişilebilir etiket bileşeni",
+      "basicLabel": "Temel Label",
+      "relatedInput": "İlgili input",
+      "requiredField": "Zorunlu Alan",
+      "requiredPlaceholder": "Bu alan zorunludur",
+      "disabledLabel": "Devre Dışı",
+      "disabledPlaceholder": "Devre dışı input",
+      "htmlForDescription": "İlgili input elementinin ID değeri",
+      "requiredDescription": "Zorunlu alan işareti (*) gösterir",
+      "classNameDescription": "Ek CSS sınıfları"
+    },
+    "pageHeader": {
+      "description": "Sayfa başlığı, breadcrumb, eylemler ve tab navigation içeren kapsamlı sayfa üst bileşeni",
+      "projectManagement": "Proje Yönetimi",
+      "projectDescription": "Tüm projelerinizi yönetin ve izleyin",
+      "homepage": "Ana Sayfa",
+      "projects": "Projeler",
+      "projectDetail": "Proje Detayı",
+      "help": "Yardım",
+      "newProject": "Yeni Proje",
+      "overview": "Genel Bakış",
+      "tasks": "Görevler",
+      "documents": "Belgeler",
+      "titleDescription": "Sayfa başlığı",
+      "subtitleDescription": "Sayfa açıklaması",
+      "breadcrumbsDescription": "Breadcrumb navigation öğeleri",
+      "actionsDescription": "Sayfa eylem butonları",
+      "tabsDescription": "Tab navigation öğeleri",
+      "activeTabDescription": "Aktif tab değeri",
+      "onTabChangeDescription": "Tab değişim fonksiyonu",
+      "stickyDescription": "Sayfada scroll ederken üstte sabit kalması",
+      "backButtonDescription": "Geri buton göster"
+    },
+    "form": {
+      "description": "React Hook Form entegrasyonlu kapsamlı form yönetim sistemi",
+      "emailPlaceholder": "ornek@email.com",
+      "nameLabel": "Ad Soyad",
+      "namePlaceholder": "Adınızı ve soyadınızı girin",
+      "messageLabel": "Mesaj",
+      "messagePlaceholder": "Mesajınızı yazın...",
+      "submitButton": "Gönder",
+      "formDescription": "React Hook Form instance",
+      "onSubmitDescription": "Form gönderme fonksiyonu",
+      "classNameDescription": "Form container için CSS sınıfları"
+    },
+    "clickToSeeExample": "Tıklayarak örnek dialog'u görün",
+    "clickToSeeModal": "Tıklayarak modal dialog görebilirsiniz",
+    "dialogWillOpen": "Dialog açılacak!",
+    "formSubmittedSuccessfully": "Form Başarıyla Gönderildi",
+    "dataProcessedSuccessfully": "Verileriniz başarıyla işleme alınmıştır."
+  },
+  "auth": {
+    "login": "Giriş Yap",
+    "logout": "Çıkış Yap",
+    "register": "Kayıt Ol",
+    "forgotPassword": "Şifremi Unuttum",
+    "email": "E-posta",
+    "password": "Şifre",
+    "confirmPassword": "Şifre Tekrar",
+    "username": "Kullanıcı Adı",
+    "rememberMe": "Beni Hatırla",
+    "welcomeBack": "Hoş geldiniz!",
+    "loginSuccess": "Başarıyla giriş yapıldı",
+    "logoutSuccess": "Başarıyla çıkış yapıldı",
+    "loginFailed": "Giriş başarısız",
+    "alreadyLoggedIn": "{{name}} olarak zaten giriş yapmışsınız",
+    "pleaseLogin": "Devam etmek için lütfen giriş yapın",
+    "dontHaveAccount": "Hesabınız yok mu?",
+    "signUpHere": "Kayıt olun",
+    "invalidCredentials": "E-posta veya şifre hatalı",
+    "sessionExpired": "Oturumunuz sona erdi",
+    "tokenRefreshFailed": "Token yenileme başarısız",
+    "accountLocked": "Hesabınız kilitlendi",
+    "tooManyAttempts": "Çok fazla başarısız deneme",
+    "loginFormSubmitted": "Giriş formu gönderildi",
+    "alreadyAuthenticated": "Zaten kimlik doğrulandı, yönlendiriliyor",
+    "safelyLoggedOut": "Güvenli bir şekilde çıkış yaptınız"
+  },
+  "navigation": {
+    "home": "Ana Sayfa",
+    "profile": "Profil",
+    "settings": "Ayarlar",
+    "dashboard": "Kontrol Paneli",
+    "users": "Kullanıcılar",
+    "components": "Bileşenler",
+    "about": "Hakkında",
+    "contact": "İletişim",
+    "pricing": "Fiyatlandırma",
+    "notifications": "Bildirimler",
+    "help": "Yardım",
+    "support": "Destek",
+    "privacy": "Gizlilik",
+    "terms": "Kullanım Şartları",
+    "cookies": "Çerez Politikası",
+    "quickLinks": "Hızlı Linkler",
+    "legal": "Yasal",
+    "madeWith": "Türkiye'de ❤️ ile yapıldı",
+    "language": "Dil Seçimi"
+  },
+  "pages": {
+    "home": {
+      "title": "Starkon Template'e Hoş Geldiniz",
+      "subtitle": "Modern React uygulamaları için tasarlanmış kapsamlı component kütüphanesi. Radix UI tabanlı, erişilebilir ve özelleştirilebilir komponentler.",
+      "getStarted": "Başlayın",
+      "learnMore": "Daha Fazla Bilgi",
+      "goToDashboard": "Dashboard'a Git",
+      "features": {
+        "title": "Özellikler",
+        "subtitle": "Starkon Template ile modern uygulamalar geliştirin",
+        "modern": {
+          "title": "Modern Tasarım",
+          "description": "Sea blue teması ile modern ve şık arayüzler oluşturun"
+        },
+        "performance": {
+          "title": "Performans",
+          "description": "Optimize edilmiş komponentler ile hızlı uygulamalar geliştirin"
+        },
+        "customizable": {
+          "title": "Özelleştirilebilir",
+          "description": "Tüm komponentler ihtiyaçlarınıza göre özelleştirilebilir"
+        }
+      },
+      "footer": {
+        "copyright": "© 2024 Starkon Template. Tüm hakları saklıdır."
+      }
+    },
+    "dashboard": {
+      "welcome": "Hoş Geldiniz, {{name}}!",
+      "description": "Bu sayfa sadece giriş yapmış kullanıcılar tarafından görülebilir.",
+      "viewProfile": "Profili Görüntüle",
+      "logout": "Çıkış Yap",
+      "userInfoNotLoaded": "Kullanıcı bilgileri yüklenemedi"
+    },
+    "components": {
+      "title": "Bileşenler",
+      "searchPlaceholder": "Bileşen ara... (Button, Input, Card...)",
+      "showcase": "Bileşen Vitrini",
+      "count": "Bileşenler ({{count}})"
+    },
+    "notFound": {
+      "title": "404",
+      "heading": "Sayfa Bulunamadı",
+      "description": "Aradığınız sayfa mevcut değil veya kaldırılmış olabilir.",
+      "goHome": "Ana Sayfaya Dön",
+      "goBack": "Geri Git"
+    },
+    "about": {
+      "title": "Hakkımızda",
+      "content": "Starkon Template ve misyonumuz hakkında daha fazla bilgi edinin."
+    },
+    "contact": {
+      "title": "İletişim",
+      "content": "Ekibimizle iletişime geçin."
+    },
+    "pricing": {
+      "title": "Fiyatlandırma",
+      "content": "Size uygun planı seçin."
+    },
+    "profile": {
+      "title": "Profil",
+      "content": "Profil bilgilerinizi yönetin."
+    },
+    "settings": {
+      "title": "Ayarlar",
+      "content": "Uygulama tercihlerinizi yapılandırın."
+    },
+    "users": {
+      "title": "Kullanıcılar",
+      "content": "Sistem kullanıcılarını yönetin."
+    },
+    "register": {
+      "title": "Kayıt Ol",
+      "content": "Yeni hesap oluşturun."
+    },
+    "forgotPassword": {
+      "title": "Şifremi Unuttum",
+      "content": "Şifrenizi sıfırlayın."
+    }
+  },
+  "validation": {
+    "required": "Bu alan zorunludur",
+    "email": "Lütfen geçerli bir e-posta adresi girin",
+    "minLength": "En az {{min}} karakter olmalıdır",
+    "maxLength": "En fazla {{max}} karakter olmalıdır",
+    "passwordMatch": "Şifreler eşleşmelidir",
+    "invalidFormat": "Geçersiz format",
+    "passwordComplexity": "Şifre en az bir büyük harf, küçük harf, rakam ve özel karakter içermelidir",
+    "emailDomainNotAllowed": "Bu e-posta domaini desteklenmiyor",
+    "phoneFormat": "Geçerli bir telefon numarası girin",
+    "passwordWeak": "Şifre çok zayıf",
+    "passwordMedium": "Şifre orta güçte",
+    "passwordStrong": "Şifre güçlü",
+    "invalidType": "{{expected}} tipinde değer bekleniyor, {{received}} alındı",
+    "minValue": "En az {{min}} olmalıdır",
+    "maxValue": "En fazla {{max}} olmalıdır",
+    "minItems": "En az {{min}} öğe içermelidir",
+    "maxItems": "En fazla {{max}} öğe içerebilir",
+    "url": "Geçerli bir URL girin",
+    "uuid": "Geçerli bir UUID girin",
+    "pattern": "Geçersiz format",
+    "mustBe": "{{value}} olmalıdır",
+    "unknownKeys": "Bilinmeyen alanlar: {{keys}}",
+    "invalidOption": "Geçersiz seçenek",
+    "invalidDate": "Geçersiz tarih",
+    "custom": "Geçersiz değer",
+    "invalid": "Geçersiz değer"
+  },
+  "theme": {
+    "light": "Açık",
+    "dark": "Koyu",
+    "system": "Sistem",
+    "toggle": "Tema Değiştir"
+  },
+  "components": {
+    "button": {
+      "loadingText": "Lütfen bekleyin..."
+    },
+    "dialog": {
+      "close": "Kapat"
+    },
+    "datePicker": {
+      "placeholder": "Tarih seçin...",
+      "today": "Bugün"
+    },
+    "navbar": {
+      "searchPlaceholder": "Arama yapın...",
+      "notifications": "Bildirimler",
+      "noNotifications": "Yeni bildirim yok",
+      "viewAllNotifications": "Tüm bildirimleri görüntüle"
+    }
+  },
+  "errors": {
+    "unauthorized": "Bu sayfaya erişim için giriş yapmalısınız",
+    "sessionExpired": "Oturumunuz sona erdi, lütfen tekrar giriş yapın",
+    "invalidToken": "Geçersiz token, lütfen tekrar giriş yapın"
+  }
+}

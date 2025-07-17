@@ -1,57 +1,46 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AxiosRequestConfig } from 'axios'
 
-// API Endpoints - Yeni task endpoints'leri eklendi
+// API Endpoints - ATS CV Backend API'ye uygun endpoints
 export const API_ENDPOINTS = {
   AUTH: {
-    LOGIN: '/auth/login',
-    REFRESH: '/auth/refresh',
-    LOGOUT: '/auth/logout',
     REGISTER: '/auth/register',
+    LOGIN: '/auth/login',
     VERIFY_EMAIL: '/auth/verify-email',
+    RESEND_VERIFICATION: '/auth/resend-verification',
+    REFRESH: '/auth/refresh',
     FORGOT_PASSWORD: '/auth/forgot-password',
     RESET_PASSWORD: '/auth/reset-password',
+    ME: '/auth/me',
+    PROFILE: '/auth/profile',
+    CHANGE_PASSWORD: '/auth/change-password',
+    LOGOUT: '/auth/logout',
   },
-  USER: {
-    PROFILE: '/user/profile',
-    UPDATE: '/user/update',
-    DELETE: '/user/delete',
-    UPLOAD_AVATAR: '/user/avatar',
-    CHANGE_PASSWORD: '/user/change-password',
+  CV: {
+    UPLOAD: '/cv/upload',
+    UPLOADS: '/cv/uploads',
+    GENERATE: '/cv/generate',
+    SAVE: '/cv/save',
+    SAVED: '/cv/saved',
+    DELETE_SAVED: (id: string) => `/cv/saved/${id}`,
+    DOWNLOAD_PDF: '/cv/download/pdf',
+    DOWNLOAD_DOCX: '/cv/download/docx',
   },
-  PROJECTS: {
-    LIST: '/projects',
-    CREATE: '/projects',
-    UPDATE: (id: string) => `/projects/${id}`,
-    DELETE: (id: string) => `/projects/${id}`,
-    GET_BY_ID: (id: string) => `/projects/${id}`,
+  COVER_LETTER: {
+    CATEGORIES: '/cover-letter/categories',
+    GENERATE: '/cover-letter/generate',
+    SAVE: '/cover-letter/save',
+    SAVED: '/cover-letter/saved',
+    DELETE_SAVED: (id: string) => `/cover-letter/saved/${id}`,
+    DOWNLOAD_PDF: '/cover-letter/download/pdf',
+    DOWNLOAD_DOCX: '/cover-letter/download/docx',
   },
-  COLUMNS: {
-    BY_PROJECT: (projectId: string) => `/columns/project/${projectId}`,
-    CREATE: (projectId: string) => `/columns/project/${projectId}`,
-    UPDATE: (id: string) => `/columns/${id}`,
-    DELETE: (id: string) => `/columns/${id}`,
+  CONTACT: {
+    SEND: '/contact/send',
+    LIMIT: '/contact/limit',
   },
-  TASKS: {
-    BY_PROJECT: (projectId: string) => `/tasks/project/${projectId}`,
-    CREATE: (projectId: string) => `/tasks/project/${projectId}`,
-    UPDATE: (id: string) => `/tasks/${id}`,
-    DELETE: (id: string) => `/tasks/${id}`,
-    GET_BY_ID: (id: string) => `/tasks/${id}`,
-    MOVE: (id: string) => `/tasks/${id}/move`,
-    UPLOAD_JSON: (projectId: string) => `/tasks/project/${projectId}/upload-json`,
-    TAGS: (projectId: string) => `/tasks/project/${projectId}/tags`,
-    CREATE_TAG: (projectId: string) => `/tasks/project/${projectId}/tags`,
-  },
-  POSTS: {
-    LIST: '/tasks',
-    CREATE: '/tasks',
-    UPDATE: '/tasks',
-    DELETE: '/tasks',
-  },
-  TAGS: {
-    UPDATE: (id: string) => `/tags/${id}`,
-    DELETE: (id: string) => `/tags/${id}`,
+  SYSTEM: {
+    HEALTH: '/health',
   },
 } as const
 
@@ -73,7 +62,7 @@ export const HTTP_STATUS = {
   GATEWAY_TIMEOUT: 504,
 } as const
 
-// Error Codes
+// Error Codes - ATS CV projesi için güncellendi
 export const ERROR_CODES = {
   TOKEN_EXPIRED: 'TOKEN_EXPIRED',
   INVALID_TOKEN: 'INVALID_TOKEN',
@@ -83,13 +72,15 @@ export const ERROR_CODES = {
   RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
   PERMISSION_DENIED: 'PERMISSION_DENIED',
   RESOURCE_NOT_FOUND: 'RESOURCE_NOT_FOUND',
-  TASK_NOT_FOUND: 'TASK_NOT_FOUND',
-  PROJECT_NOT_FOUND: 'PROJECT_NOT_FOUND',
-  COLUMN_NOT_FOUND: 'COLUMN_NOT_FOUND',
-  TAG_NOT_FOUND: 'TAG_NOT_FOUND',
-  ASSIGNEE_NOT_FOUND: 'ASSIGNEE_NOT_FOUND',
-  INVALID_TASK_DATA: 'INVALID_TASK_DATA',
-  INVALID_JSON_FORMAT: 'INVALID_JSON_FORMAT',
+  CV_NOT_FOUND: 'CV_NOT_FOUND',
+  CV_UPLOAD_FAILED: 'CV_UPLOAD_FAILED',
+  CV_GENERATION_FAILED: 'CV_GENERATION_FAILED',
+  COVER_LETTER_NOT_FOUND: 'COVER_LETTER_NOT_FOUND',
+  COVER_LETTER_GENERATION_FAILED: 'COVER_LETTER_GENERATION_FAILED',
+  EMAIL_NOT_VERIFIED: 'EMAIL_NOT_VERIFIED',
+  INVALID_CV_DATA: 'INVALID_CV_DATA',
+  INVALID_FILE_FORMAT: 'INVALID_FILE_FORMAT',
+  FILE_TOO_LARGE: 'FILE_TOO_LARGE',
 } as const
 
 // Request Timeout
@@ -98,63 +89,83 @@ export const REQUEST_TIMEOUT = {
   UPLOAD: 30000,
   DOWNLOAD: 60000,
   LONG_RUNNING: 120000,
-  BULK_OPERATIONS: 60000, // JSON upload için
+  CV_GENERATION: 60000,
+  COVER_LETTER_GENERATION: 60000,
 } as const
 
-// Task Priority Constants
-export const TASK_PRIORITY = {
-  LOW: 'LOW',
-  MEDIUM: 'MEDIUM',
-  HIGH: 'HIGH',
-  URGENT: 'URGENT',
+// CV Type Constants
+export const CV_TYPE = {
+  ATS_OPTIMIZED: 'ATS_OPTIMIZED',
+  CREATIVE: 'CREATIVE',
+  EXECUTIVE: 'EXECUTIVE',
+  ACADEMIC: 'ACADEMIC',
 } as const
 
-// Task Status Constants
-export const TASK_STATUS = {
-  TODO: 'TODO',
-  IN_PROGRESS: 'IN_PROGRESS',
-  DONE: 'DONE',
+// Cover Letter Category Constants
+export const COVER_LETTER_CATEGORY = {
+  SOFTWARE_DEVELOPER: 'SOFTWARE_DEVELOPER',
+  DATA_SCIENTIST: 'DATA_SCIENTIST',
+  MARKETING: 'MARKETING',
+  SALES: 'SALES',
+  FINANCE: 'FINANCE',
+  HUMAN_RESOURCES: 'HUMAN_RESOURCES',
+  GENERAL: 'GENERAL',
 } as const
 
-// User Role Constants
-export const USER_ROLE = {
-  DEVELOPER: 'DEVELOPER',
-  ADMIN: 'ADMIN',
-  PROJECT_ANALYST: 'PROJECT_ANALYST',
-  PRODUCT_OWNER: 'PRODUCT_OWNER',
+// Contact Message Type Constants
+export const CONTACT_TYPE = {
+  CONTACT: 'CONTACT',
+  SUPPORT: 'SUPPORT',
+  FEEDBACK: 'FEEDBACK',
+  BUG_REPORT: 'BUG_REPORT',
 } as const
 
-// Task Validation Rules
-export const TASK_VALIDATION = {
+// CV Validation Rules
+export const CV_VALIDATION = {
   TITLE: {
     MIN_LENGTH: 1,
     MAX_LENGTH: 200,
   },
-  DESCRIPTION: {
-    MAX_LENGTH: 1000,
+  CONTENT: {
+    MAX_LENGTH: 50000,
   },
-  TAG_NAME: {
+  POSITION_TITLE: {
     MIN_LENGTH: 1,
-    MAX_LENGTH: 30,
+    MAX_LENGTH: 100,
   },
-  COLUMN_NAME: {
+  COMPANY_NAME: {
     MIN_LENGTH: 1,
+    MAX_LENGTH: 100,
+  },
+  JOB_DESCRIPTION: {
+    MAX_LENGTH: 5000,
+  },
+  ADDITIONAL_REQUIREMENTS: {
+    MAX_LENGTH: 2000,
+  },
+  TARGET_KEYWORDS: {
+    MAX_COUNT: 20,
     MAX_LENGTH: 50,
   },
-  ESTIMATED_TIME: {
-    MIN: 1, // dakika
-  },
-  POSITION: {
-    MIN: 0,
+} as const
+
+// File Upload Validation
+export const FILE_VALIDATION = {
+  CV_UPLOAD: {
+    MAX_SIZE: 10 * 1024 * 1024, // 10MB
+    ALLOWED_TYPES: [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    ],
+    ALLOWED_EXTENSIONS: ['.pdf', '.doc', '.docx'],
   },
 } as const
 
 // Default Values
-export const TASK_DEFAULTS = {
-  PRIORITY: TASK_PRIORITY.MEDIUM,
-  STATUS: TASK_STATUS.TODO,
-  POSITION: 0,
-  COLUMN: 'Backlog',
+export const CV_DEFAULTS = {
+  TYPE: CV_TYPE.ATS_OPTIMIZED,
+  CATEGORY: COVER_LETTER_CATEGORY.GENERAL,
 } as const
 
 // Type Definitions
@@ -170,7 +181,7 @@ export interface ApiError {
   status: number
   code?: string
   details?: any
-  field?: string // Validation error için hangi alan
+  field?: string
 }
 
 export interface RefreshTokenResponse {
@@ -179,7 +190,7 @@ export interface RefreshTokenResponse {
   expiresIn: number
 }
 
-// Gelişmiş Request Config
+// Request Config
 export interface RequestConfig extends AxiosRequestConfig {
   skipAuth?: boolean
   skipErrorHandling?: boolean
@@ -196,166 +207,132 @@ export interface RequestConfig extends AxiosRequestConfig {
   timeout?: number
 }
 
-// Task specific request configs
-export interface TaskRequestConfig extends RequestConfig {
+// CV specific request configs
+export interface CVRequestConfig extends RequestConfig {
   validateBeforeSend?: boolean
   optimisticUpdate?: boolean
-  bulkOperation?: boolean
+  includeAnalytics?: boolean
 }
 
-// Utility Functions
-export const taskUtils = {
-  // Görev prioritysi için renk döndür
-  getPriorityColor: (priority: string): string => {
-    switch (priority) {
-      case TASK_PRIORITY.LOW:
+// Utility Functions for ATS CV project
+export const cvUtils = {
+  // CV tipi için renk döndür
+  getCVTypeColor: (type: string): string => {
+    switch (type) {
+      case CV_TYPE.ATS_OPTIMIZED:
         return '#10b981' // green
-      case TASK_PRIORITY.MEDIUM:
-        return '#f59e0b' // yellow
-      case TASK_PRIORITY.HIGH:
-        return '#f97316' // orange
-      case TASK_PRIORITY.URGENT:
-        return '#ef4444' // red
-      default:
-        return '#6b7280' // gray
-    }
-  },
-
-  // Görev durumu için renk döndür
-  getStatusColor: (status: string): string => {
-    switch (status) {
-      case TASK_STATUS.TODO:
-        return '#6b7280' // gray
-      case TASK_STATUS.IN_PROGRESS:
+      case CV_TYPE.CREATIVE:
+        return '#8b5cf6' // purple
+      case CV_TYPE.EXECUTIVE:
         return '#3b82f6' // blue
-      case TASK_STATUS.DONE:
-        return '#10b981' // green
+      case CV_TYPE.ACADEMIC:
+        return '#f59e0b' // yellow
       default:
         return '#6b7280' // gray
     }
   },
 
-  // Tahmini süreyi formatla (dakikadan saat:dakika formatına)
-  formatEstimatedTime: (minutes?: number): string => {
-    if (!minutes) return '-'
-
-    if (minutes < 60) {
-      return `${minutes}dk`
+  // Cover letter kategorisi için renk döndür
+  getCategoryColor: (category: string): string => {
+    switch (category) {
+      case COVER_LETTER_CATEGORY.SOFTWARE_DEVELOPER:
+        return '#3b82f6' // blue
+      case COVER_LETTER_CATEGORY.DATA_SCIENTIST:
+        return '#8b5cf6' // purple
+      case COVER_LETTER_CATEGORY.MARKETING:
+        return '#f97316' // orange
+      case COVER_LETTER_CATEGORY.SALES:
+        return '#ef4444' // red
+      case COVER_LETTER_CATEGORY.FINANCE:
+        return '#10b981' // green
+      case COVER_LETTER_CATEGORY.HUMAN_RESOURCES:
+        return '#ec4899' // pink
+      default:
+        return '#6b7280' // gray
     }
-
-    const hours = Math.floor(minutes / 60)
-    const remainingMinutes = minutes % 60
-
-    if (remainingMinutes === 0) {
-      return `${hours}sa`
-    }
-
-    return `${hours}sa ${remainingMinutes}dk`
   },
 
-  // Due date formatla
-  formatDueDate: (dueDate?: string): string => {
-    if (!dueDate) return '-'
+  // Dosya boyutunu formatla
+  formatFileSize: (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes'
 
-    const date = new Date(dueDate)
+    const k = 1024
+    const sizes = ['Bytes', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+  },
+
+  // Dosya tipini kontrol et
+  isValidFileType: (file: File): boolean => {
+    return FILE_VALIDATION.CV_UPLOAD.ALLOWED_TYPES.includes(
+      file.type as (typeof FILE_VALIDATION.CV_UPLOAD.ALLOWED_TYPES)[number],
+    )
+  },
+
+  // Dosya boyutunu kontrol et
+  isValidFileSize: (file: File): boolean => {
+    return file.size <= FILE_VALIDATION.CV_UPLOAD.MAX_SIZE
+  },
+
+  // Tarih formatla
+  formatDate: (date: string | Date): string => {
+    const d = new Date(date)
+    return d.toLocaleDateString('tr-TR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })
+  },
+
+  // Relative time formatla
+  formatRelativeTime: (date: string | Date): string => {
+    const d = new Date(date)
     const now = new Date()
-    const diffDays = Math.ceil((date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+    const diffMs = now.getTime() - d.getTime()
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
+    const diffMinutes = Math.floor(diffMs / (1000 * 60))
 
-    if (diffDays < 0) {
-      return `${Math.abs(diffDays)} gün gecikmeli`
-    } else if (diffDays === 0) {
-      return 'Bugün'
-    } else if (diffDays === 1) {
-      return 'Yarın'
-    } else if (diffDays <= 7) {
-      return `${diffDays} gün sonra`
+    if (diffDays > 0) {
+      return `${diffDays} gün önce`
+    } else if (diffHours > 0) {
+      return `${diffHours} saat önce`
+    } else if (diffMinutes > 0) {
+      return `${diffMinutes} dakika önce`
     } else {
-      return date.toLocaleDateString('tr-TR')
+      return 'Az önce'
     }
   },
 
-  // Task pozisyonunu hesapla
-  calculateNewPosition: (tasks: any[], targetColumnId: string, overIndex?: number): number => {
-    const columnTasks = tasks.filter((task) => task.columnId === targetColumnId).sort((a, b) => a.position - b.position)
-
-    if (columnTasks.length === 0) {
-      return 0
-    }
-
-    if (overIndex === undefined || overIndex >= columnTasks.length) {
-      // En sona ekle
-      return columnTasks[columnTasks.length - 1].position + 1000
-    }
-
-    if (overIndex === 0) {
-      // En başa ekle
-      return Math.max(0, columnTasks[0].position - 1000)
-    }
-
-    // Belirli pozisyona ekle
-    const prevTask = columnTasks[overIndex - 1]
-    const nextTask = columnTasks[overIndex]
-
-    return Math.floor((prevTask.position + nextTask.position) / 2)
-  },
-
-  // JSON validation
-  validateTaskJson: (json: any): { isValid: boolean; errors: string[] } => {
+  // CV içeriğini validate et
+  validateCVContent: (content: string): { isValid: boolean; errors: string[] } => {
     const errors: string[] = []
 
-    if (!json) {
-      errors.push('JSON verisi boş olamaz')
-      return { isValid: false, errors }
+    if (!content || content.trim().length === 0) {
+      errors.push('CV içeriği boş olamaz')
     }
 
-    let tasks = []
-
-    // JSON formatını normalize et
-    if (Array.isArray(json)) {
-      tasks = json
-    } else if (json.tasks && Array.isArray(json.tasks)) {
-      tasks = json.tasks
-    } else {
-      errors.push('JSON "tasks" dizisi içermeli veya doğrudan dizi formatında olmalı')
-      return { isValid: false, errors }
+    if (content.length > CV_VALIDATION.CONTENT.MAX_LENGTH) {
+      errors.push(`CV içeriği maksimum ${CV_VALIDATION.CONTENT.MAX_LENGTH} karakter olabilir`)
     }
 
-    if (tasks.length === 0) {
-      errors.push('En az bir görev bulunmalı')
-      return { isValid: false, errors }
+    return { isValid: errors.length === 0, errors }
+  },
+
+  // Target keywords validate et
+  validateTargetKeywords: (keywords: string[]): { isValid: boolean; errors: string[] } => {
+    const errors: string[] = []
+
+    if (keywords.length > CV_VALIDATION.TARGET_KEYWORDS.MAX_COUNT) {
+      errors.push(`Maksimum ${CV_VALIDATION.TARGET_KEYWORDS.MAX_COUNT} anahtar kelime eklenebilir`)
     }
 
-    // Her görevi validate et
-    tasks.forEach((task: any, index: number) => {
-      if (!task.title || typeof task.title !== 'string' || task.title.trim().length === 0) {
-        errors.push(`Görev ${index + 1}: Başlık zorunludur`)
-      }
-
-      if (task.title && task.title.length > TASK_VALIDATION.TITLE.MAX_LENGTH) {
-        errors.push(`Görev ${index + 1}: Başlık maksimum ${TASK_VALIDATION.TITLE.MAX_LENGTH} karakter olabilir`)
-      }
-
-      if (!task.columnName || typeof task.columnName !== 'string' || task.columnName.trim().length === 0) {
-        errors.push(`Görev ${index + 1}: Kolon adı zorunludur`)
-      }
-
-      if (task.priority && !Object.values(TASK_PRIORITY).includes(task.priority)) {
-        errors.push(`Görev ${index + 1}: Geçersiz öncelik değeri (${Object.values(TASK_PRIORITY).join(', ')})`)
-      }
-
-      if (task.status && !Object.values(TASK_STATUS).includes(task.status)) {
-        errors.push(`Görev ${index + 1}: Geçersiz durum değeri (${Object.values(TASK_STATUS).join(', ')})`)
-      }
-
-      if (task.estimatedTime && (!Number.isInteger(task.estimatedTime) || task.estimatedTime < 1)) {
-        errors.push(`Görev ${index + 1}: Tahmini süre pozitif tam sayı olmalı (dakika)`)
-      }
-
-      if (task.dueDate && task.dueDate !== null) {
-        const date = new Date(task.dueDate)
-        if (isNaN(date.getTime())) {
-          errors.push(`Görev ${index + 1}: Geçersiz tarih formatı (ISO 8601 kullanın)`)
-        }
+    keywords.forEach((keyword, index) => {
+      if (keyword.length > CV_VALIDATION.TARGET_KEYWORDS.MAX_LENGTH) {
+        errors.push(
+          `Anahtar kelime ${index + 1} maksimum ${CV_VALIDATION.TARGET_KEYWORDS.MAX_LENGTH} karakter olabilir`,
+        )
       }
     })
 

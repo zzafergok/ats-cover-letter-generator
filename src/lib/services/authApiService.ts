@@ -83,6 +83,63 @@ export interface CurrentUserResponse {
   user: User
 }
 
+export interface VerifyEmailRequest {
+  token: string
+}
+
+export interface ResendVerificationRequest {
+  email: string
+}
+
+export interface ForgotPasswordRequest {
+  email: string
+}
+
+export interface ResetPasswordRequest {
+  token: string
+  newPassword: string
+  confirmPassword: string
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string
+  newPassword: string
+  confirmPassword: string
+}
+
+export interface UpdateProfileRequest {
+  name?: string
+  email?: string
+}
+
+/**
+ * Kullanıcı kayıt işlemi
+ * @param userData - Kullanıcı kayıt bilgileri
+ * @returns Promise<RegisterResponse>
+ */
+export const registerUser = async (userData: RegisterCredentials): Promise<RegisterResponse> => {
+  try {
+    console.log('🔄 Register attempt for:', userData.email)
+
+    const config: RequestConfig = { skipAuth: true }
+    const response: any = await apiClient.post<RegisterResponse>(API_ENDPOINTS.AUTH.REGISTER, userData, config)
+
+    if (response.success && response.data) {
+      console.log('✅ Registration successful, email verification required')
+
+      if (process.env.NODE_ENV === 'development') {
+        debugTokenInfo()
+      }
+    }
+
+    return response
+  } catch (error) {
+    console.error('❌ Registration failed:', error)
+    clearTokens()
+    throw error
+  }
+}
+
 /**
  * Kullanıcı giriş işlemi
  * @param credentials - Kullanıcı giriş bilgileri
@@ -114,35 +171,56 @@ export const loginUser = async (credentials: LoginCredentials): Promise<LoginRes
 }
 
 /**
- * Kullanıcı kayıt işlemi
- * @param userData - Kullanıcı kayıt bilgileri
- * @returns Promise<RegisterResponse>
+ * Email doğrulama işlemi
+ * @param token - Email doğrulama token'ı
+ * @returns Promise<LoginResponse>
  */
-export const registerUser = async (userData: RegisterCredentials): Promise<RegisterResponse> => {
+export const verifyEmail = async (token: string): Promise<LoginResponse> => {
   try {
-    console.log('🔄 Register attempt for:', userData.email)
+    console.log('🔄 Email verification attempt with token')
 
     const config: RequestConfig = { skipAuth: true }
-    const response: any = await apiClient.post<RegisterResponse>(API_ENDPOINTS.AUTH.REGISTER, userData, config)
+    const verifyData: VerifyEmailRequest = { token }
+    const response: any = await apiClient.post<LoginResponse>(API_ENDPOINTS.AUTH.VERIFY_EMAIL, verifyData, config)
 
     if (response.success && response.data) {
-      // Register işleminde token'lar döndürülmüyorsa bu kısmı yorum satırına al
-      if (response.data.accessToken && response.data.refreshToken) {
-        setTokens(response.data.accessToken, response.data.refreshToken, response.data.expiresIn)
-        console.log('✅ Registration successful, tokens saved to sessionStorage')
-      } else {
-        console.log('✅ Registration successful, email verification required')
-      }
+      SessionTokenManager.setTokens(response.data.accessToken, response.data.refreshToken, response.data.expiresIn)
+
+      console.log('✅ Email verification successful, tokens saved')
 
       if (process.env.NODE_ENV === 'development') {
-        debugTokenInfo()
+        SessionTokenManager.debugInfo()
       }
     }
 
     return response
   } catch (error) {
-    console.error('❌ Registration failed:', error)
-    clearTokens()
+    console.error('❌ Email verification failed:', error)
+    throw error
+  }
+}
+
+/**
+ * Email doğrulama tekrar gönderme işlemi
+ * @param email - Kullanıcı email adresi
+ * @returns Promise<BasicResponse>
+ */
+export const resendVerification = async (email: string): Promise<BasicResponse> => {
+  try {
+    console.log('🔄 Resend verification attempt for:', email)
+
+    const config: RequestConfig = { skipAuth: true }
+    const resendData: ResendVerificationRequest = { email }
+    const response: any = await apiClient.post<BasicResponse>(
+      API_ENDPOINTS.AUTH.RESEND_VERIFICATION,
+      resendData,
+      config,
+    )
+
+    console.log('✅ Verification email resent successfully')
+    return response
+  } catch (error) {
+    console.error('❌ Resend verification failed:', error)
     throw error
   }
 }
@@ -195,31 +273,50 @@ export const refreshAccessToken = async (): Promise<string> => {
 }
 
 /**
- * Kullanıcı çıkış işlemi
- * @returns Promise<void>
+ * Şifre unutma işlemi
+ * @param email - Kullanıcı email adresi
+ * @returns Promise<BasicResponse>
  */
-export const logoutUser = async (): Promise<void> => {
+export const forgotPassword = async (email: string): Promise<BasicResponse> => {
   try {
-    console.log('🔄 Logout attempt...')
+    console.log('🔄 Forgot password attempt for:', email)
 
-    const refreshToken = SessionTokenManager.getAccessToken()
+    const config: RequestConfig = { skipAuth: true }
+    const forgotData: ForgotPasswordRequest = { email }
+    const response: any = await apiClient.post<BasicResponse>(API_ENDPOINTS.AUTH.FORGOT_PASSWORD, forgotData, config)
 
-    // API'ye logout request gönder (isteğe bağlı)
-    await apiClient.post(API_ENDPOINTS.AUTH.LOGOUT, { refreshToken })
-
-    console.log('✅ Logout successful')
+    console.log('✅ Password reset email sent successfully')
+    return response
   } catch (error) {
-    console.error('⚠️ Logout API call failed, but continuing with local cleanup:', error)
-  } finally {
-    // Her durumda local token'ları temizle
-    clearTokens()
+    console.error('❌ Forgot password failed:', error)
+    throw error
+  }
+}
+
+/**
+ * Şifre sıfırlama işlemi
+ * @param resetData - Şifre sıfırlama bilgileri
+ * @returns Promise<BasicResponse>
+ */
+export const resetPassword = async (resetData: ResetPasswordRequest): Promise<BasicResponse> => {
+  try {
+    console.log('🔄 Password reset attempt')
+
+    const config: RequestConfig = { skipAuth: true }
+    const response: any = await apiClient.post<BasicResponse>(API_ENDPOINTS.AUTH.RESET_PASSWORD, resetData, config)
+
+    console.log('✅ Password reset successful')
+    return response
+  } catch (error) {
+    console.error('❌ Password reset failed:', error)
+    throw error
   }
 }
 
 /**
  * Mevcut kullanıcı bilgilerini getir
- * @param _accessToken - Access token
- * @returns Promise<any> - Kullanıcı bilgileri
+ * @param accessToken - Access token (opsiyonel)
+ * @returns Promise<CurrentUserResponse> - Kullanıcı bilgileri
  */
 export const getCurrentUser = async (accessToken?: string): Promise<CurrentUserResponse> => {
   try {
@@ -237,7 +334,7 @@ export const getCurrentUser = async (accessToken?: string): Promise<CurrentUserR
       },
     }
 
-    const response: any = await apiClient.get<CurrentUserResponse>('/auth/me', config)
+    const response: any = await apiClient.get<CurrentUserResponse>(API_ENDPOINTS.AUTH.ME, config)
 
     console.log('✅ Current user fetched successfully')
     return response
@@ -248,42 +345,78 @@ export const getCurrentUser = async (accessToken?: string): Promise<CurrentUserR
 }
 
 /**
- * Email doğrulama işlemi
- * @param token - Email doğrulama token'ı
- * @returns Promise<LoginResponse>
+ * Kullanıcı profil güncelleme işlemi
+ * @param profileData - Güncellenecek profil bilgileri
+ * @returns Promise<CurrentUserResponse>
  */
-export const verifyEmail = async (token: string): Promise<LoginResponse> => {
+export const updateProfile = async (profileData: UpdateProfileRequest): Promise<CurrentUserResponse> => {
   try {
-    console.log('🔄 Email verification attempt with token')
+    console.log('🔄 Updating user profile...')
 
-    const config: RequestConfig = { skipAuth: true }
-    const response: any = await apiClient.post<LoginResponse>(API_ENDPOINTS.AUTH.VERIFY_EMAIL, { token }, config)
+    const response: any = await apiClient.put<CurrentUserResponse>(API_ENDPOINTS.AUTH.PROFILE, profileData)
 
-    if (response.success && response.data) {
-      SessionTokenManager.setTokens(response.data.accessToken, response.data.refreshToken, response.data.expiresIn)
-
-      console.log('✅ Email verification successful, tokens saved')
-
-      if (process.env.NODE_ENV === 'development') {
-        SessionTokenManager.debugInfo()
-      }
-    }
-
+    console.log('✅ Profile updated successfully')
     return response
   } catch (error) {
-    console.error('❌ Email verification failed:', error)
+    console.error('❌ Profile update failed:', error)
     throw error
+  }
+}
+
+/**
+ * Şifre değiştirme işlemi
+ * @param passwordData - Şifre değiştirme bilgileri
+ * @returns Promise<BasicResponse>
+ */
+export const changePassword = async (passwordData: ChangePasswordRequest): Promise<BasicResponse> => {
+  try {
+    console.log('🔄 Changing password...')
+
+    const response: any = await apiClient.put<BasicResponse>(API_ENDPOINTS.AUTH.CHANGE_PASSWORD, passwordData)
+
+    console.log('✅ Password changed successfully')
+    return response
+  } catch (error) {
+    console.error('❌ Password change failed:', error)
+    throw error
+  }
+}
+
+/**
+ * Kullanıcı çıkış işlemi
+ * @returns Promise<void>
+ */
+export const logoutUser = async (): Promise<void> => {
+  try {
+    console.log('🔄 Logout attempt...')
+
+    const refreshToken = SessionTokenManager.getRefreshToken()
+
+    if (refreshToken) {
+      await apiClient.post(API_ENDPOINTS.AUTH.LOGOUT, { refreshToken })
+    }
+
+    console.log('✅ Logout successful')
+  } catch (error) {
+    console.error('⚠️ Logout API call failed, but continuing with local cleanup:', error)
+  } finally {
+    clearTokens()
   }
 }
 
 // Default export with all functions
 const AuthApiService = {
-  loginUser,
-  logoutUser,
-  verifyEmail,
   registerUser,
-  getCurrentUser,
+  loginUser,
+  verifyEmail,
+  resendVerification,
   refreshAccessToken,
+  forgotPassword,
+  resetPassword,
+  getCurrentUser,
+  updateProfile,
+  changePassword,
+  logoutUser,
 }
 
 export default AuthApiService

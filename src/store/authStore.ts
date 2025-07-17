@@ -57,15 +57,15 @@ export const useAuthStore = create<AuthStore>()(
         set({ isLoading: true })
 
         try {
-          // Enhanced API service otomatik toast gösterecek
-          const response = await enhancedApiService.post<AuthResponse>('/auth/login', credentials, {
-            skipSuccessToast: true, // Login'de özel mesaj göstermek için
+          const response = await enhancedApiService.post<AuthResponse>('/api/auth/login', credentials, {
+            skipSuccessToast: true,
           })
 
           if (!response.data.success) {
             throw new Error('Login failed')
           }
 
+          // Doğru veri erişimi
           const { user, accessToken, refreshToken } = response.data.data
 
           TokenManager.setTokens(accessToken, refreshToken)
@@ -75,9 +75,6 @@ export const useAuthStore = create<AuthStore>()(
             isAuthenticated: true,
             isLoading: false,
           })
-
-          // Özel başarı mesajı
-          // toast.success('Hoş geldiniz!') // Bu ToastProvider'da otomatik olacak
 
           await new Promise((resolve) => setTimeout(resolve, 100))
         } catch (error: any) {
@@ -116,10 +113,9 @@ export const useAuthStore = create<AuthStore>()(
         }
 
         try {
-          // GET request olduğu için toast gösterilmeyecek
-          const response = await enhancedApiService.get<{ success: boolean; data: User }>('/auth/me')
+          const response = await enhancedApiService.get<{ success: boolean; data: User }>('/api/auth/me')
 
-          if (response.data.success) {
+          if (response.data.success && response.data.data) {
             set({
               user: response.data.data,
               isAuthenticated: true,

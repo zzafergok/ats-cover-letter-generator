@@ -18,7 +18,7 @@ import {
 import { Badge } from '@/components/core/badge'
 import { Avatar } from '@/components/core/avatar'
 import { Button } from '@/components/core/button'
-import { Logo } from '@/components/ui/brand/logo'
+// import { Logo } from '@/components/ui/brand/logo'
 
 import { useAuth } from '@/providers/AuthProvider'
 
@@ -104,7 +104,7 @@ export function AuthHeader() {
           <div className='flex justify-between items-center h-16'>
             <div className='flex items-center space-x-8'>
               <Link href='/dashboard' className='flex items-center space-x-2'>
-                <Logo size='sm' showText={false} className='hover:scale-105 transition-transform' />
+                {/* <Logo size='sm' showText={false} className='hover:scale-105 transition-transform' /> */}
                 <span className='text-xl font-bold text-foreground hidden sm:block'>{t('common.appName')}</span>
               </Link>
 

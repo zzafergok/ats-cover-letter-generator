@@ -5,7 +5,7 @@ import React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Heart, Github, HelpCircle } from 'lucide-react'
 
-import { Button } from '@/components/core/Button/Button'
+import { Button } from '@/components/core/button'
 
 export function AuthFooter() {
   const { t } = useTranslation()

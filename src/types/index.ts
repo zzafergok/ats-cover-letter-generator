@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as React from 'react'
 
 // React bileşen türleri
@@ -72,18 +73,6 @@ export interface ApiError {
   details?: Record<string, unknown>
 }
 
-// User türleri
-export interface User {
-  id: string
-  username: string
-  email: string
-  name: string
-  avatar?: string
-  role: string
-  createdAt?: string
-  updatedAt?: string
-}
-
 // Auth türleri
 export interface LoginCredentials {
   email: string
@@ -127,6 +116,28 @@ export interface Toast {
     label: string
     onClick: () => void
   }
+}
+
+export interface User {
+  id: string
+  email: string
+  firstName: string
+  lastName: string
+  emailVerified: boolean
+  role: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface APIResponse<T = any> {
+  success: boolean
+  message: string
+  data: T
+}
+
+export interface AuthTokens {
+  accessToken: string
+  refreshToken: string
 }
 
 // Utility türleri

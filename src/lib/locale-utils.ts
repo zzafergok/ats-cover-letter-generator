@@ -29,7 +29,7 @@ export function parseAcceptLanguage(acceptLanguage: string): Array<{ locale: str
 }
 
 /**
- * Dil tercihi algılama mantığı
+ * Dil tercihi algılama mantığı - Güncellenmiş versiyon
  */
 export function detectPreferredLocale(request: NextRequest): SupportedLocale {
   // URL parametresi kontrolü
@@ -38,7 +38,7 @@ export function detectPreferredLocale(request: NextRequest): SupportedLocale {
     return urlLocale
   }
 
-  // Cookie kontrolü
+  // Cookie kontrolü (en yüksek öncelik kalıcı tercih için)
   const cookieLocale = request.cookies.get('language')?.value
   if (cookieLocale && isSupportedLocale(cookieLocale)) {
     return cookieLocale
@@ -48,7 +48,6 @@ export function detectPreferredLocale(request: NextRequest): SupportedLocale {
   const acceptLanguage = request.headers.get('accept-language')
   if (acceptLanguage) {
     const parsedLanguages = parseAcceptLanguage(acceptLanguage)
-
     for (const { locale } of parsedLanguages) {
       if (isSupportedLocale(locale)) {
         return locale
@@ -60,12 +59,16 @@ export function detectPreferredLocale(request: NextRequest): SupportedLocale {
 }
 
 /**
- * Kullanıcının tercih ettiği dili localStorage'a kaydetmek için client-side fonksiyon
+ * Kullanıcının tercih ettiği dili localStorage'a kaydetmek için client-side fonksiyon - Güncellenmiş
  */
 export function setUserLocale(locale: SupportedLocale): void {
   if (typeof window !== 'undefined') {
     localStorage.setItem('language', locale)
-    document.cookie = `language=${locale}; path=/; max-age=${365 * 24 * 60 * 60}; samesite=lax`
+
+    // Cookie'yi 1 yıl boyunca kalıcı hale getir
+    const expires = new Date()
+    expires.setFullYear(expires.getFullYear() + 1)
+    document.cookie = `language=${locale}; path=/; expires=${expires.toUTCString()}; samesite=lax`
 
     // HTML lang attribute'unu güncelle
     document.documentElement.lang = locale
@@ -73,11 +76,11 @@ export function setUserLocale(locale: SupportedLocale): void {
 }
 
 /**
- * Mevcut dili client-side'da alır
+ * Mevcut dili client-side'da alır - Güncellenmiş öncelik sırası
  */
 export function getUserLocale(): SupportedLocale {
   if (typeof window !== 'undefined') {
-    // localStorage'dan kontrol et
+    // localStorage'dan kontrol et (en yüksek öncelik)
     const storedLocale = localStorage.getItem('language')
     if (storedLocale && isSupportedLocale(storedLocale)) {
       return storedLocale
@@ -97,4 +100,22 @@ export function getUserLocale(): SupportedLocale {
   }
 
   return DEFAULT_LOCALE
+}
+
+/**
+ * Sayfa yenileme durumunda dil tercihini URL'e yansıt
+ */
+export function ensureLocaleInUrl(): void {
+  if (typeof window !== 'undefined') {
+    const currentLocale = getUserLocale()
+    const urlParams = new URLSearchParams(window.location.search)
+    const urlLocale = urlParams.get('lang')
+
+    // Eğer URL'de lang yoksa ve kullanıcı tercihi varsayılan değilse URL'yi güncelle
+    if (!urlLocale && currentLocale !== DEFAULT_LOCALE) {
+      urlParams.set('lang', currentLocale)
+      const newUrl = `${window.location.pathname}?${urlParams.toString()}`
+      window.history.replaceState(null, '', newUrl)
+    }
+  }
 }

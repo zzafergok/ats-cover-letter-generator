@@ -29,14 +29,14 @@ import {
   DialogHeader,
   DialogContent,
   DialogDescription,
-} from '@/components/core/Dialog/Dialog'
+} from '@/components/core/dialog'
 import {
   DropdownMenu,
   DropdownMenuItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-} from '@/components/core/Dropdown/Dropdown'
+} from '@/components/core/dropdown'
 import {
   AlertDialog,
   AlertDialogTitle,
@@ -46,13 +46,13 @@ import {
   AlertDialogHeader,
   AlertDialogContent,
   AlertDialogDescription,
-} from '@/components/core/AlertDialog/AlertDialog'
-import { Badge } from '@/components/core/Badge/Badge'
-import { Input } from '@/components/core/Input/Input'
-import { Button } from '@/components/core/Button/Button'
-import { Card, CardContent } from '@/components/core/Card/Card'
-import { Avatar, AvatarFallback } from '@/components/core/Avatar/Avatar'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/core/Select/Select'
+} from '@/components/core/alert-dialog'
+import { Badge } from '@/components/core/badge'
+import { Input } from '@/components/core/input'
+import { Button } from '@/components/core/button'
+import { Card, CardContent } from '@/components/core/card'
+import { Avatar, AvatarFallback } from '@/components/core/avatar'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/core/select'
 
 import { cn } from '@/lib/utils'
 

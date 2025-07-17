@@ -4,11 +4,11 @@ import React, { useState } from 'react'
 
 import { Copy, Check, ExternalLink, Code, Settings, ChevronDown, ChevronRight } from 'lucide-react'
 
-import { Badge } from '@/components/core/Badge/Badge'
-import { Button } from '@/components/core/Button/Button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/core/Tabs/Tabs'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/core/Dialog/Dialog'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/core/Card/Card'
+import { Badge } from '@/components/core/badge'
+import { Button } from '@/components/core/button'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/core/tabs'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/core/dialog'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/core/card'
 
 import { cn } from '@/lib/utils'
 

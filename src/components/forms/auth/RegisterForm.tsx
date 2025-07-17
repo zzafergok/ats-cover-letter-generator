@@ -8,12 +8,12 @@ import { Eye, EyeOff, Mail, User, Lock, ArrowLeft, Sparkles } from 'lucide-react
 
 import { useForm } from '@/hooks/useForm'
 import { registerSchema, type RegisterFormValues } from '@/lib/validations/auth'
-import { Button } from '@/components/core/Button/Button'
-import { Input } from '@/components/core/Input/Input'
-import { Checkbox } from '@/components/core/Checkbox/Checkbox'
-import { Label } from '@/components/core/Label/Label'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/core/Card/Card'
-import { LoadingSpinner } from '@/components/core/Loading/LoadingSpinner'
+import { Button } from '@/components/core/button'
+import { Input } from '@/components/core/input'
+import { Checkbox } from '@/components/core/checkbox'
+import { Label } from '@/components/core/label'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/core/card'
+import { LoadingSpinner } from '@/components/core/loading-spinner'
 import { useAppDispatch } from '@/store'
 import { showToast } from '@/store/slices/toastSlice'
 

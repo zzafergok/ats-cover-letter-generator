@@ -21,7 +21,7 @@ const developmentConfig: ApiConfig = {
   maxConcurrentRequests: 10,
   enableErrorReporting: false,
   enablePerformanceMonitoring: true,
-  baseURL: 'http://localhost:3000/api',
+  baseURL: 'http://localhost:5000/api',
   defaultCacheTime: 300000, // 5 dakika
   tokenRefreshBuffer: 300000, // 5 dakika
 }
@@ -50,7 +50,7 @@ const testConfig: ApiConfig = {
   maxConcurrentRequests: 5,
   enableErrorReporting: false,
   enablePerformanceMonitoring: false,
-  baseURL: 'http://localhost:3001/api',
+  baseURL: 'http://localhost:5000/api',
   tokenRefreshBuffer: 60000, // 1 dakika
 }
 

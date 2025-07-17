@@ -2,46 +2,36 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-
-  // CSS optimizasyonlarını devre dışı bırak
   experimental: {
-    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
-    // optimizeCss seçeneğini geçici olarak kaldır
+    missingSuspenseWithCSRBailout: false,
   },
 
-  // Turbopack için basit konfigürasyon
-  turbopack: {
-    // CSS loader'larını kaldır
+  // Build konfigürasyonu
+  typescript: {
+    // Type checking sırasında build'i bloklamayı devre dışı bırak
+    ignoreBuildErrors: false,
   },
 
-  // Webpack konfigürasyonunu minimal tut
-  webpack: (config, { isServer }) => {
-    // Bundle analyzer sadece production için
-    if (process.env.ANALYZE === 'true' && !isServer) {
-      const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
-      config.plugins.push(
-        new BundleAnalyzerPlugin({
-          analyzerMode: 'static',
-          openAnalyzer: false,
-        }),
-      )
-    }
+  eslint: {
+    // Linting hatalarını warning olarak işaretle
+    ignoreDuringBuilds: false,
+  },
 
-    // Server-side için fallback ayarları
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
+  // Bundle analyzer desteği (isteğe bağlı)
+  ...(process.env.ANALYZE === 'true' && {
+    webpack: (config) => {
+      if (process.env.ANALYZE) {
+        const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
+        config.plugins.push(
+          new BundleAnalyzerPlugin({
+            analyzerMode: 'static',
+            openAnalyzer: false,
+          }),
+        )
       }
-    }
-
-    return config
-  },
-
-  // Environment variables
-  env: {
-    CUSTOM_BUILD_ID: process.env.BUILD_ID || 'development',
-  },
+      return config
+    },
+  }),
 }
 
 export default nextConfig

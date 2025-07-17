@@ -4,8 +4,8 @@ import React, { useState, useRef, useCallback, useMemo } from 'react'
 
 import { Upload, File, X, AlertCircle, FileText, Image, FileArchive, Film } from 'lucide-react'
 
-import { Input } from '../../core/Input/Input'
-import { Button } from '../../core/Button/Button'
+import { Input } from '../../core/input'
+import { Button } from '../../core/button'
 
 import { cn } from '@/lib/utils'
 

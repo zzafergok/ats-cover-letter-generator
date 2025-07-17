@@ -1,6 +1,4 @@
 // Navigation Components
-export { PublicNavbar } from './PublicNavbar'
-export { AuthNavbar } from './AuthNavbar'
 export { PublicFooter } from './PublicFooter'
 export { AuthFooter } from './AuthFooter'
 
@@ -62,13 +60,6 @@ export const createNavigationItem = (
   ...options,
 })
 
-export const isActiveRoute = (pathname: string, href: string): boolean => {
-  if (href === '/') {
-    return pathname === '/'
-  }
-  return pathname.startsWith(href)
-}
-
 // Constants
 export const NAVIGATION_HEIGHTS = {
   PUBLIC_NAVBAR: 'h-16 lg:h-20',
@@ -82,3 +73,25 @@ export const NAVIGATION_Z_INDEX = {
   MOBILE_MENU: 'z-40',
   OVERLAY: 'z-40',
 } as const
+
+export interface NavigationItem {
+  name: string
+  href: string
+  current?: boolean
+  icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>
+  badge?: number
+  description?: string
+  external?: boolean
+}
+
+export interface DropdownSection {
+  title: string
+  items: NavigationItem[]
+}
+
+export const isActiveRoute = (pathname: string, href: string): boolean => {
+  if (href === '/') {
+    return pathname === '/'
+  }
+  return pathname.startsWith(href)
+}

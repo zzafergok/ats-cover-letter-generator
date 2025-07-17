@@ -29,7 +29,7 @@ import {
   DialogHeader,
   DialogContent,
   DialogDescription,
-} from '@/components/core/Dialog/Dialog'
+} from '@/components/core/dialog'
 import {
   AlertDialog,
   AlertDialogTitle,
@@ -39,17 +39,17 @@ import {
   AlertDialogHeader,
   AlertDialogContent,
   AlertDialogDescription,
-} from '@/components/core/AlertDialog/AlertDialog'
-import { Input } from '@/components/core/Input/Input'
-import { Badge } from '@/components/core/Badge/Badge'
-import { Button } from '@/components/core/Button/Button'
-import { Switch } from '@/components/core/Switch/Switch'
-import { Textarea } from '@/components/core/Textarea/Textarea'
-import { Separator } from '@/components/core/Separator/Seperator'
-import { Avatar, AvatarFallback } from '@/components/core/Avatar/Avatar'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/core/Tabs/Tabs'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/core/Select/Select'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/core/Card/Card'
+} from '@/components/core/alert-dialog'
+import { Input } from '@/components/core/input'
+import { Badge } from '@/components/core/badge'
+import { Button } from '@/components/core/button'
+import { Switch } from '@/components/core/switch'
+import { Textarea } from '@/components/core/textarea'
+import { Separator } from '@/components/core/seperator'
+import { Avatar, AvatarFallback } from '@/components/core/avatar'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/core/tabs'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/core/select'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/core/card'
 
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'

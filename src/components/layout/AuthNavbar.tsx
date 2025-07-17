@@ -1,227 +1,298 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import React, { useState, useCallback } from 'react'
-import { useTranslation } from 'react-i18next'
-import { Menu, X, User, Settings, LogOut } from 'lucide-react'
+import { usePathname } from 'next/navigation'
 
-import { useAuth } from '@/hooks/useAuth'
-import { Button } from '@/components/core/Button/Button'
-import { ThemeToggle } from '@/components/ui/ThemeToggle/ThemeToggle'
-import { LanguageToggle } from '@/components/ui/LanguageToggle/LanguageToggle'
-import { Avatar, AvatarFallback } from '@/components/core/Avatar/Avatar'
-import { NavbarZIndexFix } from './NavbarZIndexFix'
+import { useState, useEffect } from 'react'
+
+import { useTranslation } from 'react-i18next'
+import { LogOut, Settings, FolderOpen, LayoutDashboard, UserCircle, Menu, X, ChevronDown } from 'lucide-react'
+
 import {
   DropdownMenu,
-  DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
+  DropdownMenuContent,
   DropdownMenuTrigger,
-} from '@/components/core/Dropdown/Dropdown'
+  DropdownMenuSeparator,
+} from '@/components/core/dropdown'
+import { Badge } from '@/components/core/badge'
+import { Avatar } from '@/components/core/avatar'
+import { Button } from '@/components/core/button'
+import { Logo } from '@/components/ui/brand/logo'
 
-export function AuthNavbar() {
-  const router = useRouter()
+import { useAuth } from '@/providers/AuthProvider'
+
+import { cn } from '@/lib/utils'
+
+interface NavigationItem {
+  name: string
+  href: string
+  icon: React.ComponentType<{ className?: string }>
+  description?: string
+  badge?: string
+}
+
+export function AuthHeader() {
   const { t } = useTranslation()
+  const pathname = usePathname()
   const { user, logout } = useAuth()
+
+  const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
-  const handleLogout = useCallback(async () => {
+  const navigation: NavigationItem[] = [
+    {
+      name: t('navigation.dashboard'),
+      href: '/dashboard',
+      icon: LayoutDashboard,
+      description: t('navigation.dashboardDescription'),
+    },
+    {
+      name: t('navigation.projects'),
+      href: '/projects',
+      icon: FolderOpen,
+      description: t('navigation.projectsDescription'),
+    },
+  ]
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10)
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  useEffect(() => {
+    setIsMobileMenuOpen(false)
+  }, [pathname])
+
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [isMobileMenuOpen])
+
+  const handleLogout = async () => {
     try {
       await logout()
-      router.push('/')
     } catch (error) {
-      console.error('Logout failed:', error)
+      console.error('Logout error:', error)
     }
-  }, [logout, router])
+  }
 
-  const toggleMobileMenu = useCallback(() => {
-    setIsMobileMenuOpen((prev) => !prev)
-  }, [])
-
-  const closeMobileMenu = useCallback(() => {
-    setIsMobileMenuOpen(false)
-  }, [])
-
-  const navigationItems = [
-    { href: '/dashboard', label: t('navigation.dashboard') },
-    { href: '/components', label: t('navigation.components') },
-    { href: '/users', label: t('navigation.users') },
-    { href: '/settings', label: t('navigation.settings') },
-  ]
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen)
+  }
 
   return (
     <>
-      <NavbarZIndexFix />
-      <nav className='sticky top-0 z-[9999] bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md border-b border-neutral-200 dark:border-neutral-800 supports-[backdrop-filter]:bg-white/80 dark:supports-[backdrop-filter]:bg-neutral-900/80'>
+      <header
+        className={cn(
+          'sticky top-0 z-50 w-full border-b transition-all duration-300',
+          isScrolled ? 'bg-background/95 backdrop-blur-md shadow-sm border-border/80' : 'bg-background border-border',
+        )}
+      >
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
           <div className='flex justify-between items-center h-16'>
-            {/* Logo */}
-            <div className='flex items-center'>
-              <Link
-                href='/dashboard'
-                className='text-xl font-bold text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors'
-              >
-                Starkon Template
+            <div className='flex items-center space-x-8'>
+              <Link href='/dashboard' className='flex items-center space-x-2'>
+                <Logo size='sm' showText={false} className='hover:scale-105 transition-transform' />
+                <span className='text-xl font-bold text-foreground hidden sm:block'>{t('common.appName')}</span>
               </Link>
-            </div>
 
-            {/* Desktop Navigation */}
-            <div className='hidden md:flex items-center space-x-8'>
-              {navigationItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className='text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-100 font-medium transition-colors relative group'
-                >
-                  {item.label}
-                  <span className='absolute bottom-0 left-0 w-0 h-0.5 bg-primary-500 group-hover:w-full transition-all duration-300' />
-                </Link>
-              ))}
-            </div>
+              <nav className='hidden lg:flex items-center space-x-1'>
+                {navigation.map((item) => {
+                  const isActive =
+                    pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
 
-            {/* Desktop Actions */}
-            <div className='hidden md:flex items-center space-x-4'>
-              {/* Theme Toggle - En yüksek z-index */}
-              <div className='relative z-[10000]'>
-                <ThemeToggle />
-              </div>
-
-              {/* Language Toggle - Yüksek z-index */}
-              <div className='relative z-[9999]'>
-                <LanguageToggle />
-              </div>
-
-              {/* User Menu - Yüksek z-index */}
-              <div className='relative z-[9998]'>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant='ghost'
-                      size='sm'
-                      className='h-9 w-9 rounded-full p-0 hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={cn(
+                        'flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200',
+                        isActive
+                          ? 'bg-primary/10 text-primary shadow-sm'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
+                      )}
                     >
-                      <Avatar className='h-8 w-8'>
-                        <AvatarFallback className='bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 text-xs font-medium'>
-                          {user?.username?.charAt(0)?.toUpperCase() || 'U'}
-                        </AvatarFallback>
-                      </Avatar>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align='end' className='w-56 z-[9999]' sideOffset={8}>
-                    <DropdownMenuLabel className='font-normal'>
-                      <div className='flex flex-col space-y-1'>
-                        <p className='text-sm font-medium'>{user?.username || 'Kullanıcı'}</p>
-                        <p className='text-xs text-neutral-500 dark:text-neutral-400'>{user?.email}</p>
-                      </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => router.push('/profile')} className='cursor-pointer'>
-                      <User className='mr-2 h-4 w-4' />
-                      {t('navigation.profile')}
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => router.push('/settings')} className='cursor-pointer'>
-                      <Settings className='mr-2 h-4 w-4' />
-                      {t('navigation.settings')}
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout} className='cursor-pointer text-red-600 dark:text-red-400'>
-                      <LogOut className='mr-2 h-4 w-4' />
-                      {t('auth.logout')}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+                      <item.icon className={cn('h-4 w-4', isActive ? 'text-primary' : 'text-muted-foreground')} />
+                      <span>{item.name}</span>
+                      {item.badge && (
+                        <Badge variant='secondary' className='ml-1 h-5 text-xs'>
+                          {item.badge}
+                        </Badge>
+                      )}
+                    </Link>
+                  )
+                })}
+              </nav>
             </div>
 
-            {/* Mobile Menu Button */}
-            <div className='md:hidden'>
-              <Button variant='ghost' size='sm' onClick={toggleMobileMenu} className='h-9 w-9 p-0' aria-label='Menü'>
+            <div className='flex items-center space-x-4'>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant='ghost' className='flex items-center space-x-2 h-10 px-2'>
+                    <Avatar className='h-8 w-8'>
+                      <div className='w-full h-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-primary-foreground text-sm font-semibold'>
+                        {user?.name ? user.name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase() || 'U'}
+                      </div>
+                    </Avatar>
+                    <div className='hidden sm:block text-left'>
+                      <p className='text-sm font-medium text-foreground'>{user?.name || t('user.defaultName')}</p>
+                      <p className='text-xs text-muted-foreground'>{user?.email}</p>
+                    </div>
+                    <ChevronDown className='h-4 w-4 text-muted-foreground hidden sm:block' />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='end' className='w-56'>
+                  <div className='flex items-center space-x-2 p-2'>
+                    <Avatar className='h-10 w-10'>
+                      <div className='w-full h-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-primary-foreground font-semibold'>
+                        {user?.name ? user.name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase() || 'U'}
+                      </div>
+                    </Avatar>
+                    <div className='flex-1'>
+                      <p className='text-sm font-medium text-foreground'>{user?.name || t('user.defaultName')}</p>
+                      <p className='text-xs text-muted-foreground'>{user?.email}</p>
+                    </div>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href='/profile' className='flex items-center cursor-pointer'>
+                      <UserCircle className='mr-2 h-4 w-4' />
+                      {t('user.profile')}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href='/settings' className='flex items-center cursor-pointer'>
+                      <Settings className='mr-2 h-4 w-4' />
+                      {t('user.settings')}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className='text-destructive focus:text-destructive cursor-pointer'
+                  >
+                    <LogOut className='mr-2 h-4 w-4' />
+                    {t('user.logout')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <Button
+                variant='ghost'
+                size='icon'
+                className='lg:hidden'
+                onClick={toggleMobileMenu}
+                aria-label='Toggle menu'
+              >
                 {isMobileMenuOpen ? <X className='h-5 w-5' /> : <Menu className='h-5 w-5' />}
               </Button>
             </div>
           </div>
         </div>
+      </header>
 
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <div className='md:hidden border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900'>
-            <div className='px-4 py-4 space-y-3'>
-              {/* Mobile Navigation Links */}
-              <div className='space-y-2'>
-                {navigationItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={closeMobileMenu}
-                    className='block px-3 py-2 text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-md font-medium transition-colors'
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
+      {isMobileMenuOpen && (
+        <div className='fixed inset-0 z-50 lg:hidden'>
+          <div className='fixed inset-0 bg-background/20 backdrop-blur-sm' onClick={() => setIsMobileMenuOpen(false)} />
 
-              <div className='border-t border-neutral-200 dark:border-neutral-700 pt-3 mt-3'>
-                {/* Mobile User Info */}
-                <div className='px-3 py-2 mb-3'>
-                  <div className='flex items-center space-x-3'>
-                    <Avatar className='h-8 w-8'>
-                      <AvatarFallback className='bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 text-xs font-medium'>
-                        {user?.username?.charAt(0)?.toUpperCase() || 'U'}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className='text-sm font-medium text-neutral-900 dark:text-neutral-100'>
-                        {user?.username || 'Kullanıcı'}
-                      </p>
-                      <p className='text-xs text-neutral-500 dark:text-neutral-400'>{user?.email}</p>
+          <div className='fixed top-0 right-0 bottom-0 w-full max-w-sm bg-card shadow-xl'>
+            <div className='flex items-center justify-between p-4 border-b border-border'>
+              <h2 className='text-lg font-semibold text-foreground'>{t('navigation.menu')}</h2>
+              <Button variant='ghost' size='icon' onClick={() => setIsMobileMenuOpen(false)}>
+                <X className='h-5 w-5' />
+              </Button>
+            </div>
+
+            <div className='p-4'>
+              <nav className='space-y-2'>
+                {navigation.map((item) => {
+                  const isActive =
+                    pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
+
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={cn(
+                        'flex items-center space-x-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors',
+                        isActive
+                          ? 'bg-primary/10 text-primary'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
+                      )}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <item.icon className={cn('h-5 w-5', isActive ? 'text-primary' : 'text-muted-foreground')} />
+                      <div className='flex-1'>
+                        <div className='flex items-center justify-between'>
+                          <span>{item.name}</span>
+                          {item.badge && (
+                            <Badge variant='secondary' className='ml-2'>
+                              {item.badge}
+                            </Badge>
+                          )}
+                        </div>
+                        {item.description && <p className='text-xs text-muted-foreground mt-0.5'>{item.description}</p>}
+                      </div>
+                    </Link>
+                  )
+                })}
+              </nav>
+
+              <div className='mt-8 pt-6 border-t border-border'>
+                <div className='flex items-center space-x-3 mb-4'>
+                  <Avatar className='h-10 w-10'>
+                    <div className='w-full h-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-primary-foreground font-semibold'>
+                      {user?.name ? user.name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase() || 'U'}
                     </div>
+                  </Avatar>
+                  <div>
+                    <p className='font-medium text-foreground'>{user?.name || t('user.defaultName')}</p>
+                    <p className='text-xs text-muted-foreground'>{user?.email}</p>
                   </div>
                 </div>
 
-                {/* Mobile Actions */}
                 <div className='space-y-2'>
-                  <Link
-                    href='/profile'
-                    onClick={closeMobileMenu}
-                    className='flex items-center px-3 py-2 text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-md transition-colors'
-                  >
-                    <User className='mr-3 h-4 w-4' />
-                    {t('navigation.profile')}
+                  <Link href='/profile' onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button variant='outline' className='w-full justify-start'>
+                      <UserCircle className='mr-2 h-4 w-4' />
+                      {t('user.profile')}
+                    </Button>
                   </Link>
-                  <Link
-                    href='/settings'
-                    onClick={closeMobileMenu}
-                    className='flex items-center px-3 py-2 text-neutral-600 dark:text-neutral-300 hover:text-neutral-900 dark:hover:text-neutral-100 hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-md transition-colors'
-                  >
-                    <Settings className='mr-3 h-4 w-4' />
-                    {t('navigation.settings')}
+                  <Link href='/settings' onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button variant='outline' className='w-full justify-start'>
+                      <Settings className='mr-2 h-4 w-4' />
+                      {t('user.settings')}
+                    </Button>
                   </Link>
-
-                  <div className='flex items-center justify-between px-3 py-2'>
-                    <div className='flex items-center space-x-3'>
-                      <ThemeToggle />
-                      <LanguageToggle />
-                    </div>
-                  </div>
-
-                  <button
+                  <Button
+                    variant='destructive'
+                    className='w-full justify-start'
                     onClick={() => {
-                      closeMobileMenu()
                       handleLogout()
+                      setIsMobileMenuOpen(false)
                     }}
-                    className='flex items-center w-full px-3 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors'
                   >
-                    <LogOut className='mr-3 h-4 w-4' />
-                    {t('auth.logout')}
-                  </button>
+                    <LogOut className='mr-2 h-4 w-4' />
+                    {t('user.logout')}
+                  </Button>
                 </div>
               </div>
             </div>
           </div>
-        )}
-      </nav>
+        </div>
+      )}
     </>
   )
 }

@@ -4,7 +4,7 @@ import React from 'react'
 
 import { ChevronRight, HomeIcon, InfoIcon } from 'lucide-react'
 
-import { Button } from '../../core/Button/Button'
+import { Button } from '../../core/button'
 
 import { cn } from '@/lib/utils'
 

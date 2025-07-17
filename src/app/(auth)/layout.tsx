@@ -1,22 +1,16 @@
-import React from 'react'
-import { AuthProvider } from '@/providers/AuthProvider'
-import { AuthNavbar } from '@/components/layout/AuthNavbar'
-import { AuthFooter } from '@/components/layout/AuthFooter'
+'use client'
 
-interface AuthLayoutProps {
-  children: React.ReactNode
-}
+import { AuthHeader } from '@/components/layout/AuthNavbar'
 
-export default function AuthLayout({ children }: AuthLayoutProps) {
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute'
+
+export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <AuthProvider requireAuth redirectTo='/auth/login'>
-      <div className='min-h-screen flex flex-col bg-white dark:bg-neutral-900'>
-        <AuthNavbar />
-        <main className='flex-1 max-w-7xl mx-auto w-full py-6 px-4 sm:px-6 lg:px-8 bg-white dark:bg-neutral-900'>
-          {children}
-        </main>
-        <AuthFooter />
+    <ProtectedRoute requireAuth={true}>
+      <div className='min-h-screen bg-gray-50'>
+        <AuthHeader />
+        <main className='flex-1'>{children}</main>
       </div>
-    </AuthProvider>
+    </ProtectedRoute>
   )
 }

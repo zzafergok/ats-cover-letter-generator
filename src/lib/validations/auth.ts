@@ -123,7 +123,7 @@ export const forgotPasswordSchema = z.object({
     .transform((email) => email.toLowerCase().trim()),
 })
 
-// Reset password şeması
+// Reset password şeması - tamamlanmış versiyonu
 export const resetPasswordSchema = z
   .object({
     token: z
@@ -132,17 +132,15 @@ export const resetPasswordSchema = z
       })
       .min(1, { message: 'Reset token gereklidir' }),
 
-    password: z
+    newPassword: z
       .string({
         required_error: 'Şifre gereklidir',
       })
       .min(1, { message: 'Şifre gereklidir' })
       .min(8, { message: 'Şifre en az 8 karakter olmalıdır' })
       .max(128, { message: 'Şifre çok uzun' })
-      .regex(/[A-Z]/, { message: 'Şifre en az bir büyük harf içermelidir' })
-      .regex(/[a-z]/, { message: 'Şifre en az bir küçük harf içermelidir' })
-      .regex(/[0-9]/, { message: 'Şifre en az bir rakam içermelidir' })
-      .regex(/[@$!%*?&]/, { message: 'Şifre en az bir özel karakter içermelidir' }),
+      .regex(/[A-Za-z]/, { message: 'Şifre en az bir harf içermelidir' })
+      .regex(/[0-9]/, { message: 'Şifre en az bir rakam içermelidir' }),
 
     confirmPassword: z
       .string({
@@ -151,7 +149,8 @@ export const resetPasswordSchema = z
       .min(1, { message: 'Şifre tekrarı gereklidir' }),
   })
   .superRefine((data, ctx) => {
-    if (data.password !== data.confirmPassword) {
+    // Şifre eşleşme kontrolü
+    if (data.newPassword !== data.confirmPassword) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Şifreler eşleşmiyor',
@@ -163,8 +162,10 @@ export const resetPasswordSchema = z
 // Type exports
 export type LoginFormValues = z.infer<typeof loginSchema>
 export type RegisterFormValues = z.infer<typeof registerSchema>
-export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>
+export type ResetPasswordRequest = z.infer<typeof resetPasswordSchema>
+export type ForgotPasswordRequest = z.infer<typeof forgotPasswordSchema>
 export type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>
+export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>
 
 // Password strength checker utility
 export const checkPasswordStrength = (password: string): PasswordStrength => {

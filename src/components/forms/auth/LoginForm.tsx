@@ -10,10 +10,10 @@ import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
 
 import { useForm } from '@/hooks/useForm'
 
-import { Button } from '@/components/core/Button/Button'
-import { Input } from '@/components/core/Input/Input'
-import { Checkbox } from '@/components/core/Checkbox/Checkbox'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/core/Card/Card'
+import { Button } from '@/components/core/button'
+import { Input } from '@/components/core/input'
+import { Checkbox } from '@/components/core/checkbox'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/core/card'
 
 import { loginSchema, LoginFormValues } from '@/lib/validations/auth'
 import { cn } from '@/lib/utils'

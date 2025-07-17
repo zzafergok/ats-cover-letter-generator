@@ -1,152 +1,300 @@
+// src/app/dashboard/page.tsx
 'use client'
 
-import React from 'react'
-import { useTranslation } from 'react-i18next'
-
-import { Button } from '@/components/core/Button/Button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/core/Card/Card'
-import { Badge } from '@/components/core/Badge/Badge'
-
-import { useAuth } from '@/hooks/useAuth'
-import { logAuthDebug } from '@/utils/authDebug'
+import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { FileText, Upload, Wand2, Download, Trash2 } from 'lucide-react'
+import { useAuthStore } from '@/store/authStore'
+import { useCVStore } from '@/store/cvStore'
+import { useCoverLetterStore } from '@/store/coverLetterStore'
+import { Button } from '@/components/core/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/core/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/core/tabs'
+import { Badge } from '@/components/core/badge'
+import { CVUpload } from '@/components/ui/cv/CVUpload'
+import { CVGeneratorForm } from '@/components/ui/cv/CVGeneratorForm'
+import { CoverLetterGenerator } from '@/components/ui/cover-letter/CoverLetterGenerator'
+import { ContentViewer } from '@/components/ui/common/ContentViewer'
 
 export default function DashboardPage() {
-  const { t } = useTranslation()
-  const { user, logout, isLoading } = useAuth()
+  const router = useRouter()
+  const { user, isAuthenticated, getProfile } = useAuthStore()
+  const { uploadedCVs, savedCVs, getUploadedCVs, getSavedCVs, saveCV, deleteSavedCV, downloadCV } = useCVStore()
+  const { savedCoverLetters, getSavedCoverLetters, saveCoverLetter, deleteSavedCoverLetter, downloadCoverLetter } =
+    useCoverLetterStore()
 
-  const handleLogout = async () => {
-    try {
-      await logout()
-    } catch {
-      // console.error('Logout failed:', error)
+  const [generatedCV, setGeneratedCV] = useState<string>('')
+  const [generatedCoverLetter, setGeneratedCoverLetter] = useState<string>('')
+  const [activeTab, setActiveTab] = useState<string>('cv-upload')
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push('/auth/login')
+      return
     }
+
+    // Load user data and saved content
+    getProfile()
+    getUploadedCVs()
+    getSavedCVs()
+    getSavedCoverLetters()
+  }, [isAuthenticated, router, getProfile, getUploadedCVs, getSavedCVs, getSavedCoverLetters])
+
+  const handleCVUploadSuccess = () => {
+    setActiveTab('cv-generate')
   }
 
-  const handleDebugAuth = () => {
-    if (process.env.NODE_ENV === 'development') {
-      logAuthDebug('Manual Debug - Dashboard')
-    }
+  const handleCVGenerate = (content: string) => {
+    setGeneratedCV(content)
+    setActiveTab('cv-preview')
   }
 
-  if (!user) {
-    return (
-      <div className='min-h-screen flex items-center justify-center'>
-        <Card className='w-full max-w-md'>
-          <CardHeader>
-            <CardTitle className='text-center'>{t('pages.dashboard.userInfoNotLoaded')}</CardTitle>
-          </CardHeader>
-          <CardContent className='space-y-4'>
-            <Button onClick={handleLogout} variant='outline' className='w-full'>
-              {t('auth.logout')}
-            </Button>
-            {process.env.NODE_ENV === 'development' && (
-              <Button onClick={handleDebugAuth} variant='ghost' size='sm' className='w-full'>
-                Debug Auth State
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    )
+  const handleCoverLetterGenerate = (content: string) => {
+    setGeneratedCoverLetter(content)
+    setActiveTab('cover-letter-preview')
+  }
+
+  const handleSaveCV = async (data: { title: string; content: string }) => {
+    await saveCV(data)
+  }
+
+  const handleSaveCoverLetter = async (data: { title: string; content: string }) => {
+    await saveCoverLetter(data)
+  }
+
+  const handleDownloadCV = async (id: string, format: 'pdf' | 'docx') => {
+    await downloadCV(id, format)
+  }
+
+  const handleDownloadCoverLetter = async (id: string, format: 'pdf' | 'docx') => {
+    await downloadCoverLetter(id, format)
+  }
+
+  if (!isAuthenticated) {
+    return null
   }
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-neutral-50 via-white to-neutral-100/50 dark:from-neutral-950 dark:via-neutral-900 dark:to-neutral-950/80'>
-      <div className='container mx-auto px-4 py-8'>
-        <div className='max-w-4xl mx-auto space-y-8'>
-          {/* Welcome Header */}
-          <div className='text-center space-y-4'>
-            <h1 className='text-4xl font-bold text-neutral-900 dark:text-neutral-50'>
-              {t('pages.dashboard.welcome', { name: user.username })}
-            </h1>
-            <p className='text-neutral-600 dark:text-neutral-400 text-lg'>{t('pages.dashboard.description')}</p>
-          </div>
-
-          {/* User Info Card */}
-          <Card className='bg-white/70 dark:bg-neutral-800/70 backdrop-blur-sm border-neutral-200/80 dark:border-neutral-700/50'>
-            <CardHeader>
-              <CardTitle className='flex items-center justify-between'>
-                <span>Kullanıcı Bilgileri</span>
-                <Badge className='bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800/50'>
-                  {user.role}
-                </Badge>
-              </CardTitle>
-              <CardDescription>Hesap detayları ve bilgileri</CardDescription>
-            </CardHeader>
-            <CardContent className='space-y-4'>
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                <div className='space-y-1'>
-                  <label className='text-sm font-medium text-neutral-700 dark:text-neutral-300'>Ad Soyad</label>
-                  <p className='text-neutral-900 dark:text-neutral-100'>{user.username}</p>
-                </div>
-                <div className='space-y-1'>
-                  <label className='text-sm font-medium text-neutral-700 dark:text-neutral-300'>Kullanıcı Adı</label>
-                  <p className='text-neutral-900 dark:text-neutral-100'>{user.username}</p>
-                </div>
-                <div className='space-y-1'>
-                  <label className='text-sm font-medium text-neutral-700 dark:text-neutral-300'>E-posta</label>
-                  <p className='text-neutral-900 dark:text-neutral-100'>{user.email}</p>
-                </div>
-                <div className='space-y-1'>
-                  <label className='text-sm font-medium text-neutral-700 dark:text-neutral-300'>Kayıt Tarihi</label>
-                  <p className='text-neutral-900 dark:text-neutral-100'>
-                    {(user as any).createdAt
-                      ? new Date((user as any).createdAt).toLocaleDateString('tr-TR')
-                      : 'Bilgi yok'}
-                  </p>
-                </div>
-                {(user as any).lastLoginAt && (
-                  <div className='space-y-1 md:col-span-2'>
-                    <label className='text-sm font-medium text-neutral-700 dark:text-neutral-300'>Son Giriş</label>
-                    <p className='text-neutral-900 dark:text-neutral-100'>
-                      {new Date((user as any).lastLoginAt).toLocaleString('tr-TR')}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Actions */}
-          <div className='flex flex-col sm:flex-row gap-4 justify-center'>
-            <Button
-              onClick={() => (window.location.href = '/profile')}
-              variant='outline'
-              className='bg-white/70 dark:bg-neutral-800/70 border-neutral-200/80 dark:border-neutral-600/80'
-            >
-              {t('pages.dashboard.viewProfile')}
-            </Button>
-            <Button
-              onClick={handleLogout}
-              disabled={isLoading}
-              variant='default'
-              className='bg-red-600 hover:bg-red-700 text-white'
-            >
-              {isLoading ? 'Çıkış yapılıyor...' : t('pages.dashboard.logout')}
-            </Button>
-          </div>
-
-          {/* Debug Panel - Development Only */}
-          {process.env.NODE_ENV === 'development' && (
-            <Card className='bg-yellow-50/50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800/50'>
-              <CardHeader>
-                <CardTitle className='text-yellow-800 dark:text-yellow-200 text-sm'>
-                  🔧 Development Debug Panel
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className='flex gap-2'>
-                  <Button onClick={handleDebugAuth} variant='ghost' size='sm'>
-                    Debug Auth State
-                  </Button>
-                  <Button onClick={() => console.log('User Object:', user)} variant='ghost' size='sm'>
-                    Log User Object
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+    <div className='min-h-screen bg-background'>
+      <div className='container mx-auto py-6 px-4'>
+        {/* Header */}
+        <div className='mb-8'>
+          <h1 className='text-3xl font-bold'>ATS CV & Ön Yazı Oluşturucu</h1>
+          <p className='text-muted-foreground mt-2'>
+            Hoş geldiniz, {user?.firstName}! Profesyonel CV ve ön yazılarınızı oluşturun.
+          </p>
         </div>
+
+        {/* Main Content */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className='space-y-6'>
+          <TabsList className='grid w-full grid-cols-6'>
+            <TabsTrigger value='cv-upload' className='flex items-center gap-2'>
+              <Upload className='h-4 w-4' />
+              CV Yükle
+            </TabsTrigger>
+            <TabsTrigger value='cv-generate' className='flex items-center gap-2'>
+              <Wand2 className='h-4 w-4' />
+              CV Oluştur
+            </TabsTrigger>
+            <TabsTrigger value='cv-preview' className='flex items-center gap-2'>
+              <FileText className='h-4 w-4' />
+              CV Önizleme
+            </TabsTrigger>
+            <TabsTrigger value='cover-letter-generate' className='flex items-center gap-2'>
+              <Wand2 className='h-4 w-4' />
+              Ön Yazı
+            </TabsTrigger>
+            <TabsTrigger value='cover-letter-preview' className='flex items-center gap-2'>
+              <FileText className='h-4 w-4' />
+              Ön Yazı Önizleme
+            </TabsTrigger>
+            <TabsTrigger value='saved' className='flex items-center gap-2'>
+              <Download className='h-4 w-4' />
+              Kayıtlı
+            </TabsTrigger>
+          </TabsList>
+
+          {/* CV Upload Tab */}
+          <TabsContent value='cv-upload' className='space-y-6'>
+            <div className='grid gap-6 md:grid-cols-2'>
+              <CVUpload onUploadSuccess={handleCVUploadSuccess} />
+
+              {/* Uploaded CVs */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Yüklenmiş CV&apos;ler</CardTitle>
+                  <CardDescription>Daha önce yüklediğiniz CV dosyaları</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {uploadedCVs.length === 0 ? (
+                    <p className='text-sm text-muted-foreground text-center py-4'>Henüz CV yüklememişsiniz</p>
+                  ) : (
+                    <div className='space-y-3'>
+                      {uploadedCVs.map((cv) => (
+                        <div key={cv.id} className='flex items-center justify-between p-3 border rounded-lg'>
+                          <div className='flex items-center gap-3'>
+                            <FileText className='h-5 w-5 text-muted-foreground' />
+                            <div>
+                              <p className='font-medium'>{cv.fileName}</p>
+                              <p className='text-xs text-muted-foreground'>
+                                {new Date(cv.uploadedAt).toLocaleDateString('tr-TR')}
+                              </p>
+                            </div>
+                          </div>
+                          <Badge variant='secondary'>{cv.keywords.length} anahtar kelime</Badge>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* CV Generate Tab */}
+          <TabsContent value='cv-generate'>
+            <CVGeneratorForm onGenerate={handleCVGenerate} />
+          </TabsContent>
+
+          {/* CV Preview Tab */}
+          <TabsContent value='cv-preview'>
+            {generatedCV ? (
+              <ContentViewer content={generatedCV} title='Oluşturulan CV' type='cv' onSave={handleSaveCV} />
+            ) : (
+              <Card>
+                <CardContent className='text-center py-8'>
+                  <FileText className='h-12 w-12 text-muted-foreground mx-auto mb-4' />
+                  <p className='text-lg font-medium'>Henüz CV oluşturulmadı</p>
+                  <p className='text-muted-foreground'>CV oluşturmak için &quot;CV Oluştur&quot; sekmesini kullanın</p>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          {/* Cover Letter Generate Tab */}
+          <TabsContent value='cover-letter-generate'>
+            <CoverLetterGenerator onGenerate={handleCoverLetterGenerate} />
+          </TabsContent>
+
+          {/* Cover Letter Preview Tab */}
+          <TabsContent value='cover-letter-preview'>
+            {generatedCoverLetter ? (
+              <ContentViewer
+                content={generatedCoverLetter}
+                title='Oluşturulan Ön Yazı'
+                type='cover-letter'
+                onSave={handleSaveCoverLetter}
+              />
+            ) : (
+              <Card>
+                <CardContent className='text-center py-8'>
+                  <FileText className='h-12 w-12 text-muted-foreground mx-auto mb-4' />
+                  <p className='text-lg font-medium'>Henüz ön yazı oluşturulmadı</p>
+                  <p className='text-muted-foreground'>
+                    Ön yazı oluşturmak için &quot;Ön Yazı&quot; sekmesini kullanın
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          {/* Saved Content Tab */}
+          <TabsContent value='saved' className='space-y-6'>
+            <div className='grid gap-6 md:grid-cols-2'>
+              {/* Saved CVs */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Kayıtlı CV&apos;ler</CardTitle>
+                  <CardDescription>Maksimum 5 CV kaydedebilirsiniz ({savedCVs.length}/5)</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {savedCVs.length === 0 ? (
+                    <p className='text-sm text-muted-foreground text-center py-4'>Henüz kayıtlı CV&apost;iniz yok</p>
+                  ) : (
+                    <div className='space-y-3'>
+                      {savedCVs.map((cv) => (
+                        <div key={cv.id} className='border rounded-lg p-4'>
+                          <div className='flex items-start justify-between mb-2'>
+                            <h4 className='font-medium'>{cv.title}</h4>
+                            <Button
+                              variant='ghost'
+                              size='sm'
+                              onClick={() => deleteSavedCV(cv.id)}
+                              className='text-destructive hover:text-destructive'
+                            >
+                              <Trash2 className='h-4 w-4' />
+                            </Button>
+                          </div>
+                          <p className='text-xs text-muted-foreground mb-3'>
+                            {new Date(cv.createdAt).toLocaleDateString('tr-TR')}
+                          </p>
+                          <div className='flex gap-2'>
+                            <Button variant='outline' size='sm' onClick={() => handleDownloadCV(cv.id, 'pdf')}>
+                              PDF İndir
+                            </Button>
+                            <Button variant='outline' size='sm' onClick={() => handleDownloadCV(cv.id, 'docx')}>
+                              DOCX İndir
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Saved Cover Letters */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Kayıtlı Ön Yazılar</CardTitle>
+                  <CardDescription>Maksimum 5 ön yazı kaydedebilirsiniz ({savedCoverLetters.length}/5)</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {savedCoverLetters.length === 0 ? (
+                    <p className='text-sm text-muted-foreground text-center py-4'>Henüz kayıtlı ön yazınız yok</p>
+                  ) : (
+                    <div className='space-y-3'>
+                      {savedCoverLetters.map((letter) => (
+                        <div key={letter.id} className='border rounded-lg p-4'>
+                          <div className='flex items-start justify-between mb-2'>
+                            <h4 className='font-medium'>{letter.title}</h4>
+                            <Button
+                              variant='ghost'
+                              size='sm'
+                              onClick={() => deleteSavedCoverLetter(letter.id)}
+                              className='text-destructive hover:text-destructive'
+                            >
+                              <Trash2 className='h-4 w-4' />
+                            </Button>
+                          </div>
+                          <p className='text-xs text-muted-foreground mb-3'>
+                            {new Date(letter.createdAt).toLocaleDateString('tr-TR')}
+                          </p>
+                          <div className='flex gap-2'>
+                            <Button
+                              variant='outline'
+                              size='sm'
+                              onClick={() => handleDownloadCoverLetter(letter.id, 'pdf')}
+                            >
+                              PDF İndir
+                            </Button>
+                            <Button
+                              variant='outline'
+                              size='sm'
+                              onClick={() => handleDownloadCoverLetter(letter.id, 'docx')}
+                            >
+                              DOCX İndir
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   )

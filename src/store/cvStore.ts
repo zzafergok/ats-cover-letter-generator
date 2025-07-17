@@ -2,7 +2,7 @@
 // src/store/cvStore.ts
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { apiClient } from '@/lib/api'
+import { cvApi } from '@/lib/api/api'
 
 interface UploadedCV {
   id: string
@@ -75,7 +75,7 @@ export const useCVStore = create<CVStore>()(
       uploadCV: async (file: File) => {
         set({ isUploading: true, error: null })
         try {
-          const uploadedCV = await apiClient.uploadCV(file)
+          const uploadedCV = await cvApi.upload(file)
           set((state) => ({
             uploadedCVs: [...state.uploadedCVs, uploadedCV],
             isUploading: false,
@@ -91,7 +91,7 @@ export const useCVStore = create<CVStore>()(
       getUploadedCVs: async () => {
         set({ isLoading: true, error: null })
         try {
-          const cvs = await apiClient.getUploadedCVs()
+          const cvs = await cvApi.getUploaded()
           set({ uploadedCVs: cvs, isLoading: false })
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || "CV'ler yüklenirken hata oluştu"
@@ -106,7 +106,7 @@ export const useCVStore = create<CVStore>()(
       generateCV: async (data) => {
         set({ isGenerating: true, error: null })
         try {
-          const result = await apiClient.generateCV(data)
+          const result = await cvApi.generate(data)
           set({ isGenerating: false })
           return result.content
         } catch (error: any) {
@@ -119,7 +119,7 @@ export const useCVStore = create<CVStore>()(
       saveCV: async (data) => {
         set({ isLoading: true, error: null })
         try {
-          await apiClient.saveCV(data)
+          await cvApi.save(data)
           await get().getSavedCVs()
           set({ isLoading: false })
         } catch (error: any) {
@@ -132,7 +132,7 @@ export const useCVStore = create<CVStore>()(
       getSavedCVs: async () => {
         set({ isLoading: true, error: null })
         try {
-          const cvs = await apiClient.getSavedCVs()
+          const cvs = await cvApi.getSaved()
           set({ savedCVs: cvs, isLoading: false })
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || "Kayıtlı CV'ler yüklenirken hata oluştu"
@@ -143,7 +143,7 @@ export const useCVStore = create<CVStore>()(
       deleteSavedCV: async (id) => {
         set({ isLoading: true, error: null })
         try {
-          await apiClient.deleteSavedCV(id)
+          await cvApi.delete(id)
           set((state) => ({
             savedCVs: state.savedCVs.filter((cv) => cv.id !== id),
             isLoading: false,
@@ -157,7 +157,7 @@ export const useCVStore = create<CVStore>()(
       downloadCV: async (content, fileName, format) => {
         set({ isLoading: true, error: null })
         try {
-          const blob = await apiClient.downloadCV(format, content, fileName)
+          const blob = await cvApi.download(format, content, fileName)
           const url = window.URL.createObjectURL(blob)
           const a = document.createElement('a')
           a.href = url

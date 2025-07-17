@@ -1,3 +1,4 @@
+// lib/api/api.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { User } from '@/types'
 import { apiRequest } from './axios'
@@ -88,6 +89,77 @@ export interface ContactResponse {
   data?: any
 }
 
+// CV type tanımları
+export interface UploadedCV {
+  id: string
+  originalName: string
+  uploadDate: string
+  markdownContent: string
+}
+
+export interface SavedCV {
+  id: string
+  title: string
+  content: string
+  cvType: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CVGenerateData {
+  cvUploadId: string
+  positionTitle: string
+  companyName: string
+  cvType: 'ATS_OPTIMIZED' | 'CREATIVE' | 'TECHNICAL'
+  jobDescription: string
+  additionalRequirements?: string
+  targetKeywords?: string[]
+}
+
+export interface CVSaveData {
+  title: string
+  content: string
+  cvType: 'ATS_OPTIMIZED' | 'CREATIVE' | 'TECHNICAL'
+}
+
+// Cover Letter type tanımları
+export interface CoverLetterCategory {
+  key: string
+  label: string
+}
+
+export interface SavedCoverLetter {
+  id: string
+  title: string
+  content: string
+  category: string
+  positionTitle: string
+  companyName: string
+  contactPerson?: string
+  applicationDate: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CoverLetterGenerateData {
+  cvUploadId: string
+  category: string
+  positionTitle: string
+  companyName: string
+  contactPerson?: string
+  jobDescription: string
+  additionalRequirements?: string
+}
+
+export interface CoverLetterSaveData {
+  title: string
+  content: string
+  category: string
+  positionTitle: string
+  companyName: string
+  contactPerson?: string
+}
+
 export const authApi = {
   login: (credentials: { email: string; password: string }): Promise<any> =>
     apiRequest.post('/auth/login', credentials, { skipAuth: true }),
@@ -116,4 +188,42 @@ export const userApi = {
 
 export const contactApi = {
   send: (data: ContactFormData): Promise<ContactResponse> => apiRequest.post('/contact/send', data, { skipAuth: true }),
+}
+
+export const cvApi = {
+  upload: (file: File): Promise<UploadedCV> => {
+    const formData = new FormData()
+    formData.append('cvFile', file)
+    return apiRequest.post('/cv/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+  },
+  getUploaded: (): Promise<UploadedCV[]> => apiRequest.get('/cv/uploads'),
+  generate: (
+    data: CVGenerateData,
+  ): Promise<{ content: string; positionTitle: string; companyName: string; cvType: string }> =>
+    apiRequest.post('/cv/generate', data),
+  save: (data: CVSaveData): Promise<SavedCV> => apiRequest.post('/cv/save', data),
+  getSaved: (): Promise<SavedCV[]> => apiRequest.get('/cv/saved'),
+  delete: (id: string): Promise<void> => apiRequest.delete(`/cv/saved/${id}`),
+  download: (format: 'pdf' | 'docx', content: string, fileName: string): Promise<Blob> =>
+    apiRequest.post(`/cv/download/${format}`, { content, fileName }, { responseType: 'blob' }),
+}
+
+export const coverLetterApi = {
+  getCategories: (): Promise<CoverLetterCategory[]> => apiRequest.get('/cover-letter/categories'),
+  generate: (
+    data: CoverLetterGenerateData,
+  ): Promise<{
+    content: string
+    category: string
+    positionTitle: string
+    companyName: string
+    contactPerson?: string
+  }> => apiRequest.post('/cover-letter/generate', data),
+  save: (data: CoverLetterSaveData): Promise<SavedCoverLetter> => apiRequest.post('/cover-letter/save', data),
+  getSaved: (): Promise<SavedCoverLetter[]> => apiRequest.get('/cover-letter/saved'),
+  delete: (id: string): Promise<void> => apiRequest.delete(`/cover-letter/saved/${id}`),
+  download: (format: 'pdf' | 'docx', content: string, fileName: string): Promise<Blob> =>
+    apiRequest.post(`/cover-letter/download/${format}`, { content, fileName }, { responseType: 'blob' }),
 }

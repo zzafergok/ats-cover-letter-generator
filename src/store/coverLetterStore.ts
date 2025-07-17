@@ -2,7 +2,7 @@
 // src/store/coverLetterStore.ts
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { apiClient } from '@/lib/api'
+import { coverLetterApi } from '@/lib/api/api'
 
 interface CoverLetterCategory {
   key: string
@@ -77,7 +77,7 @@ export const useCoverLetterStore = create<CoverLetterStore>()(
       getCategories: async () => {
         set({ isLoading: true, error: null })
         try {
-          const categories = await apiClient.getCoverLetterCategories()
+          const categories = await coverLetterApi.getCategories()
           set({ categories, isLoading: false })
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || 'Kategoriler yüklenirken hata oluştu'
@@ -92,7 +92,7 @@ export const useCoverLetterStore = create<CoverLetterStore>()(
       generateCoverLetter: async (data) => {
         set({ isGenerating: true, error: null })
         try {
-          const result = await apiClient.generateCoverLetter(data)
+          const result = await coverLetterApi.generate(data)
           set({ isGenerating: false })
           return result.content
         } catch (error: any) {
@@ -105,7 +105,7 @@ export const useCoverLetterStore = create<CoverLetterStore>()(
       saveCoverLetter: async (data) => {
         set({ isLoading: true, error: null })
         try {
-          await apiClient.saveCoverLetter(data)
+          await coverLetterApi.save(data)
           await get().getSavedCoverLetters()
           set({ isLoading: false })
         } catch (error: any) {
@@ -118,7 +118,7 @@ export const useCoverLetterStore = create<CoverLetterStore>()(
       getSavedCoverLetters: async () => {
         set({ isLoading: true, error: null })
         try {
-          const coverLetters = await apiClient.getSavedCoverLetters()
+          const coverLetters = await coverLetterApi.getSaved()
           set({ savedCoverLetters: coverLetters, isLoading: false })
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || 'Kayıtlı ön yazılar yüklenirken hata oluştu'
@@ -129,7 +129,7 @@ export const useCoverLetterStore = create<CoverLetterStore>()(
       deleteSavedCoverLetter: async (id) => {
         set({ isLoading: true, error: null })
         try {
-          await apiClient.deleteSavedCoverLetter(id)
+          await coverLetterApi.delete(id)
           set((state) => ({
             savedCoverLetters: state.savedCoverLetters.filter((letter) => letter.id !== id),
             isLoading: false,
@@ -143,7 +143,7 @@ export const useCoverLetterStore = create<CoverLetterStore>()(
       downloadCoverLetter: async (content, fileName, format) => {
         set({ isLoading: true, error: null })
         try {
-          const blob = await apiClient.downloadCoverLetter(format, content, fileName)
+          const blob = await coverLetterApi.download(format, content, fileName)
           const url = window.URL.createObjectURL(blob)
           const a = document.createElement('a')
           a.href = url

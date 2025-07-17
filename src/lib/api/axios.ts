@@ -17,11 +17,11 @@ export interface ApiError {
 }
 
 // Extended config interface for toast control
-export interface ExtendedRequestConfig {
+import type { AxiosRequestConfig } from 'axios'
+export interface ExtendedRequestConfig extends AxiosRequestConfig {
   skipAuth?: boolean
   skipSuccessToast?: boolean
   skipErrorToast?: boolean
-  headers?: Record<string, string>
 }
 
 interface QueueItem {

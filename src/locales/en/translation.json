@@ -1,10 +1,614 @@
 {
+  "pages": {
+    "contact": {
+      "title": "Contact",
+      "subtitle": "Get in touch with us",
+      "name": "Full Name",
+      "namePlaceholder": "Your full name",
+      "email": "Email",
+      "emailPlaceholder": "email@example.com",
+      "subject": "Subject",
+      "subjectPlaceholder": "Subject of your message",
+      "message": "Message",
+      "messagePlaceholder": "Write your message here...",
+      "sendButton": "Send Message",
+      "contactInfo": "Contact Information",
+      "successMessage": "Your message has been sent! We will get back to you soon.",
+      "privacy": "All messages are kept confidential and shared only with necessary personnel.",
+      "directContact": "Direct contact:",
+      "loading": "Sending...",
+      "error": "Message could not be sent. Please try again."
+    },
+    "support": {
+      "title": "Support",
+      "subtitle": "How can we help you?",
+      "name": "Full Name",
+      "namePlaceholder": "Your full name",
+      "email": "Email",
+      "emailPlaceholder": "email@example.com",
+      "subject": "Subject",
+      "subjectPlaceholder": "Brief description of the issue",
+      "message": "Message",
+      "messagePlaceholder": "Describe your issue in detail...",
+      "sendButton": "Send Support Request",
+      "contactInfo": "Alternative Contact",
+      "successMessage": "Your support request has been received! We will get back to you soon.",
+      "privacy": "Your support request is kept confidential and shared only with our technical team.",
+      "directContact": "For urgent matters, contact directly:",
+      "tip": "If you provide detailed information about your issue in the support request, we can help you faster.",
+      "responseTime": "We usually respond via email within 24 hours.",
+      "loading": "Sending...",
+      "error": "Support request could not be sent. Please try again."
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "welcome": "Welcome, {{userName}}",
+      "subtitle": "View all statistics in your project management dashboard",
+      "totalProjects": "Total Projects",
+      "backlogTasks": "Backlog Tasks",
+      "totalTasks": "Total Tasks",
+      "completedTasks": "Completed Tasks",
+      "inProgressTasks": "In Progress Tasks",
+      "overdueTasks": "Overdue Tasks",
+      "activeProjects": "active projects",
+      "pendingTasksDesc": "Number of pending tasks",
+      "allTasksDesc": "All tasks in the system",
+      "completedTasksDesc": "Successfully completed",
+      "inProgressTasksDesc": "Currently being worked on",
+      "overdueTasksDesc": "Tasks past their due date",
+      "generalStats": "General Statistics",
+      "detailStats": "Detail Statistics",
+      "projectActivities": "Project Activities",
+      "viewAll": "View All",
+      "tasksCount": "{{count}} tasks • {{columns}} columns",
+      "noProjects": "No projects yet",
+      "noProjectsDesc": "Start by creating your first project",
+      "newProject": "New Project",
+      "dataLoadError": "Data Could Not Be Loaded",
+      "dataLoadErrorDesc": "An error occurred while loading dashboard data. Please refresh the page and try again.",
+      "tryAgain": "Try Again",
+      "periodData": "{{period}} data",
+      "comparative": "Comparative",
+      "periods": {
+        "thisWeek": "This Week",
+        "thisMonth": "This Month",
+        "thisQuarter": "This Quarter",
+        "week": "This week",
+        "month": "This month",
+        "quarter": "This quarter"
+      }
+    },
+    "notFound": {
+      "title": "404",
+      "heading": "Page Not Found",
+      "description": "The page you're looking for doesn't exist or may have been moved.",
+      "goHome": "Go Home",
+      "goBack": "Go Back",
+      "searchHelp": "Can't find what you're looking for?",
+      "about": "About",
+      "contact": "Contact",
+      "components": "Components"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome, {{userName}}",
+    "subtitle": "View all statistics in your project management dashboard",
+    "totalProjects": "Total Projects",
+    "backlogTasks": "Backlog Tasks",
+    "totalTasks": "Total Tasks",
+    "completedTasks": "Completed Tasks",
+    "inProgressTasks": "In Progress Tasks",
+    "overdueTasks": "Overdue Tasks",
+    "activeProjects": "active projects",
+    "pendingTasksDesc": "Number of pending tasks",
+    "allTasksDesc": "All tasks in the system",
+    "completedTasksDesc": "Successfully completed",
+    "inProgressTasksDesc": "Currently being worked on",
+    "overdueTasksDesc": "Tasks past their due date",
+    "generalStats": "General Statistics",
+    "detailStats": "Detail Statistics",
+    "projectActivities": "Project Activities",
+    "viewAll": "View All",
+    "tasksCount": "{{count}} tasks • {{columns}} columns",
+    "noProjects": "No projects yet",
+    "noProjectsDesc": "Start by creating your first project",
+    "newProject": "New Project",
+    "dataLoadError": "Data Could Not Be Loaded",
+    "dataLoadErrorDesc": "An error occurred while loading dashboard data. Please refresh the page and try again.",
+    "tryAgain": "Try Again",
+    "periodData": "{{period}} data",
+    "comparative": "Comparative",
+    "periods": {
+      "thisWeek": "This Week",
+      "thisMonth": "This Month",
+      "thisQuarter": "This Quarter",
+      "week": "This week",
+      "month": "This month",
+      "quarter": "This quarter"
+    }
+  },
+  "profile": {
+    "title": "Profile Settings",
+    "subtitle": "Manage your account information",
+    "loading": "Loading profile...",
+    "backToDashboard": "Back to Dashboard",
+    "userInfo": {
+      "title": "User Information",
+      "description": "You can update your profile information",
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "Enter your full name",
+      "email": "Email Address",
+      "emailPlaceholder": "Enter your email address",
+      "role": "Role",
+      "defaultRole": "User"
+    },
+    "buttons": {
+      "edit": "Edit",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "sessionInfo": {
+      "title": "Session Information",
+      "description": "View your current session details",
+      "loggedInUser": "Logged In User",
+      "authStatus": "Authentication Status",
+      "authStatusActive": "Active",
+      "tokenType": "Token Type",
+      "tokenTypeValue": "Bearer",
+      "security": "Security",
+      "securityValue": "Encrypted with HTTPS"
+    }
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "loading": "Starkon Kanban...",
+    "unauthorized": {
+      "title": "Unauthorized Access",
+      "message": "You do not have permission to access this page.",
+      "backToDashboard": "Back to Dashboard"
+    },
+    "forgotPassword": {
+      "title": "Password Reset",
+      "description": "Enter your email address and we'll send you a password reset link",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "example@email.com",
+      "emailRequired": "Email address is required",
+      "emailInvalid": "Please enter a valid email address",
+      "sendResetLink": "Send Reset Link",
+      "sending": "Sending...",
+      "backToLogin": "Back to login",
+      "success": {
+        "title": "Email Sent",
+        "description": "A password reset link has been sent to {{email}}.",
+        "checkEmail": "Check your email",
+        "emailInstructions": "Check your inbox and click on the password reset link.",
+        "linkExpiry": "The link will expire in 1 hour.",
+        "rateLimitInfo": "You can only request a password reset once every 24 hours.",
+        "backToLoginButton": "Back to Login",
+        "didntReceive": "Didn't receive the email?",
+        "contactSupport": "Contact support"
+      },
+      "error": {
+        "rateLimitTitle": "Too Many Requests",
+        "rateLimitExceeded": "Daily limit exceeded. You can try again in {{hours}} hours.",
+        "emailNotFoundTitle": "Email Not Found",
+        "emailNotFound": "This email address is not registered in our system.",
+        "emailNotVerifiedTitle": "Email Not Verified",
+        "emailNotVerified": "You need to verify your email address first.",
+        "emailServiceUnavailable": "Email service is temporarily unavailable. Please try again later.",
+        "defaultTitle": "Error Occurred",
+        "default": "An error occurred. Please try again.",
+        "resendVerification": "Resend Verification Email"
+      },
+      "help": {
+        "title": "Need help?",
+        "description": "If you don't receive the email or have other questions, please contact us.",
+        "contact": "Contact",
+        "support": "Support"
+      }
+    },
+    "login": {
+      "title": "Sign In",
+      "subtitle": "Sign in to your account",
+      "email": {
+        "label": "Email Address",
+        "placeholder": "Enter your email address"
+      },
+      "password": {
+        "label": "Password",
+        "placeholder": "Enter your password"
+      },
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot your password?",
+      "loginButton": "Sign In",
+      "loggingIn": "Signing in...",
+      "validation": {
+        "emailRequired": "Email address and password are required",
+        "loginError": "An error occurred while signing in"
+      },
+      "demoAccounts": {
+        "title": "Demo Accounts",
+        "ortak": "Ortak",
+        "zafer": "Zafer",
+        "akin": "Akin"
+      }
+    },
+    "register": {
+      "haveAccount": "Already have an account?",
+      "title": "Create Account",
+      "subtitle": "Create your new account and get started",
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "Your full name",
+      "email": "Email Address",
+      "emailPlaceholder": "email@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "Create a strong password",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "Re-enter your password",
+      "alreadyHaveAccount": "Already have an account?",
+      "loginLink": "Sign in",
+      "loading": "Creating account...",
+      "successs": "Your account has been created successfully!",
+      "error": "An error occurred while creating your account.",
+      "agreements": {
+        "terms": {
+          "prefix": "By registering, you agree to our",
+          "linkText": "Terms of Service",
+          "suffix": ""
+        },
+        "privacy": {
+          "prefix": "You also agree to our",
+          "linkText": "Privacy Policy",
+          "suffix": ""
+        },
+        "note": "You must accept both agreements. These documents contain important information about your account security and legal rights."
+      },
+      "submitButton": "Create Account",
+      "form": {
+        "name": "Full Name",
+        "namePlaceholder": "Enter your full name",
+        "email": "Email Address",
+        "emailPlaceholder": "Enter your email address",
+        "role": "Role",
+        "rolePlaceholder": "Select your role",
+        "password": "Password",
+        "passwordPlaceholder": "Enter your password",
+        "confirmPassword": "Confirm Password",
+        "confirmPasswordPlaceholder": "Confirm your password",
+        "passwordStrength": "Password Strength",
+        "passwordStrengthLevels": {
+          "weak": "Weak",
+          "medium": "Medium",
+          "strong": "Strong"
+        },
+        "passwordRules": {
+          "title": "Password Requirements",
+          "minLength": "At least 8 characters",
+          "hasLetter": "At least one letter",
+          "hasNumber": "At least one number",
+          "hasSpecialChar": "At least one special character (@$!%*#?&)",
+          "validChars": "Only valid characters"
+        },
+        "termsPrefix": "I agree to the",
+        "termsLink": "Terms of Service",
+        "termsAnd": "and",
+        "privacyLink": "Privacy Policy",
+        "register": "Create Account",
+        "registering": "Creating account...",
+        "alreadyHaveAccount": "Already have an account?",
+        "loginHere": "Sign in here"
+      },
+      "roles": {
+        "admin": "Admin",
+        "developer": "Developer",
+        "project_analyst": "Project Analyst",
+        "product_owner": "Product Owner"
+      },
+      "validation": {
+        "nameRequired": "Full name is required",
+        "nameMinLength": "Full name must be at least 2 characters",
+        "emailRequired": "Email address is required",
+        "emailInvalid": "Please enter a valid email address",
+        "roleRequired": "Role selection is required",
+        "passwordMinLength": "Password must be at least 8 characters",
+        "passwordMaxLength": "Password cannot exceed 100 characters",
+        "passwordComplexity": "Password must contain at least 8 characters, one letter, one number, and one special character",
+        "confirmPasswordRequired": "Password confirmation is required",
+        "passwordsNotMatch": "Passwords do not match",
+        "termsRequired": "You must accept the terms of service"
+      },
+      "success": {
+        "title": "Registration Successful!",
+        "message": "Your account has been successfully created.",
+        "emailSent": "A verification email has been sent to {{email}}.",
+        "redirecting": "You will be redirected to the login page in {{seconds}} seconds",
+        "goToLogin": "Go to Login Page"
+      },
+      "errors": {
+        "registrationFailed": "Registration failed"
+      }
+    },
+    "emailVerification": {
+      "verifying": {
+        "title": "Verifying Email...",
+        "description": "Please wait while we verify your email address."
+      },
+      "success": {
+        "title": "Email Verified!",
+        "description": "Your account has been successfully activated. Redirecting to dashboard..."
+      },
+      "error": {
+        "invalidLink": {
+          "title": "Invalid Link",
+          "description": "Email verification link is invalid or missing."
+        },
+        "verificationFailed": {
+          "title": "Verification Failed",
+          "description": "An error occurred, please try again."
+        },
+        "defaultError": "Email verification failed"
+      },
+      "returnToLogin": "Return to Login"
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "description": "Enter your new password",
+      "newPasswordLabel": "New Password",
+      "newPasswordPlaceholder": "Enter your new password",
+      "confirmPasswordLabel": "Confirm Password",
+      "confirmPasswordPlaceholder": "Re-enter your new password",
+      "resetButton": "Reset Password",
+      "resetting": "Resetting...",
+      "backToLogin": "Back to login",
+      "success": {
+        "title": "Password Reset!",
+        "description": "Your password has been successfully reset. You can now sign in with your new password.",
+        "loginButton": "Sign In"
+      },
+      "error": {
+        "invalidToken": "Invalid or expired reset link",
+        "tokenRequired": "Reset token not found",
+        "rateLimitExceeded": "Daily reset limit reached",
+        "default": "An error occurred while resetting password"
+      },
+      "validation": {
+        "newPasswordRequired": "New password is required",
+        "confirmPasswordRequired": "Password confirmation is required",
+        "passwordsDoNotMatch": "Passwords do not match",
+        "passwordTooShort": "Password must be at least 8 characters",
+        "passwordRequirements": "Password must contain at least one letter and one number"
+      },
+      "requirements": {
+        "title": "Password Requirements",
+        "minLength": "At least 8 characters",
+        "hasLetter": "At least one letter",
+        "hasNumber": "At least one number"
+      }
+    }
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "description": "The page you are looking for does not exist or may have been moved.",
+    "homeButton": "Return to Home Page",
+    "loginButton": "Return to Login Page"
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Manage your account settings and preferences",
+    "accountInfo": "Account Information",
+    "personalInformation": "View your personal information",
+    "fullName": "Full Name",
+    "email": "Email",
+    "userId": "User ID",
+    "role": "Role",
+    "userRole": "User",
+    "editProfile": "Edit Profile",
+    "themeAndAppearance": "Theme and Appearance",
+    "customizeInterface": "Customize your interface preferences",
+    "darkMode": "Dark Mode",
+    "useDarkTheme": "Use dark theme",
+    "loading": "Loading settings...",
+    "returnToDashboard": "Return to Dashboard",
+    "notSpecified": "Not specified",
+    "languageAndRegion": "Language and Region",
+    "languagePreferences": "Set your language preferences",
+    "languageSelection": "Language Selection",
+    "turkish": "Turkish",
+    "english": "English",
+    "saveSettings": "Save Settings",
+    "password": {
+      "title": "Password Security",
+      "description": "Change your account password",
+      "currentPassword": "Current Password",
+      "currentPasswordPlaceholder": "Enter your current password",
+      "newPassword": "New Password",
+      "newPasswordPlaceholder": "Enter your new password",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "Re-enter your new password",
+      "changePassword": "Change Password",
+      "updateSuccess": "Password updated successfully",
+      "updateError": "An error occurred while updating password"
+    }
+  },
+  "language": {
+    "title": "Language",
+    "preference": "Language Preference",
+    "description": "Select the application language",
+    "turkish": {
+      "title": "Turkish",
+      "description": "Turkish interface",
+      "native": "Türkçe"
+    },
+    "english": {
+      "title": "English",
+      "description": "English interface",
+      "native": "English"
+    },
+    "active": "Active",
+    "switchTo": "Switch to {{language}}",
+    "current": "Current language: {{language}}",
+    "loading": "Loading language...",
+    "applying": "Applying language...",
+    "note": "Language changes are applied instantly and saved in your browser"
+  },
+  "theme": {
+    "title": "Theme",
+    "preference": "Theme Preference",
+    "description": "Select the application appearance",
+    "light": {
+      "title": "Light Theme",
+      "description": "Light colored interface"
+    },
+    "dark": {
+      "title": "Dark Theme",
+      "description": "Dark colored interface"
+    },
+    "active": "Active",
+    "switchTo": "Switch to {{theme}} theme",
+    "current": "Current theme: {{theme}}",
+    "loading": "Loading theme...",
+    "applying": "Applying theme...",
+    "note": "Theme changes are applied instantly and saved in your browser"
+  },
+  "errorPages": {
+    "notFound": {
+      "title": "Page Not Found",
+      "description": "The page you're looking for doesn't exist or may have been moved.",
+      "searchHelp": "Can't find what you're looking for?",
+      "about": "About",
+      "contact": "Contact",
+      "components": "Components"
+    }
+  },
+  "loading": {
+    "title": "Loading",
+    "redirecting": "Redirecting...",
+    "dataLoading": "Loading data...",
+    "authChecking": "Checking authorization...",
+    "pleaseWait": "Please wait..."
+  },
+  "kanbanPage": {
+    "deleteTask": {
+      "title": "Delete Task",
+      "description": "Are you sure you want to delete this task? This action cannot be undone.",
+      "confirm": "Yes, delete"
+    },
+    "deleteColumn": {
+      "title": "Delete Column",
+      "description": "Are you sure you want to delete this column? All tasks in this column will also be deleted.",
+      "confirm": "Yes, delete"
+    }
+  },
+  "confirm": {
+    "title": "Are you sure?",
+    "description": "This action cannot be undone.",
+    "confirm": "Yes",
+    "cancel": "Cancel"
+  },
+  "skeleton": {
+    "basicTypes": "Basic Skeleton Types",
+    "text": "Text",
+    "avatar": "Avatar",
+    "button": "Button"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "dashboardDescription": "Main control panel",
+    "projects": "Projects",
+    "projectsDescription": "Manage all your projects",
+    "menu": "Menu",
+    "home": "Home",
+    "homeDescription": "Main page of the application",
+    "login": "Login"
+  },
+  "user": {
+    "defaultName": "User",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Sign Out"
+  },
+  "performance": {
+    "title": "Performance Summary",
+    "period": {
+      "week": "This week",
+      "month": "This month",
+      "quarter": "This quarter"
+    },
+    "noData": {
+      "title": "No performance data yet",
+      "description": "Create your first project and add tasks to start seeing your performance metrics",
+      "action": "Create project and add tasks"
+    },
+    "metrics": {
+      "completionRate": "Completion Rate",
+      "completionSub": "{{completed}} / {{total}} tasks",
+      "activeProjects": "Active Projects",
+      "activeProjectsSub": "{{active}} / {{total}} projects",
+      "efficiencyScore": "Efficiency Score",
+      "overdueCount": "{{count}} overdue",
+      "noOverdue": "No overdue tasks"
+    },
+    "summary": {
+      "totalTasks": "Total Tasks",
+      "completed": "Completed",
+      "inProgress": "In Progress",
+      "pending": "Pending"
+    },
+    "evaluation": {
+      "title": "Performance Evaluation",
+      "excellent": "Excellent completion rate - above target performance",
+      "good": "Good completion rate - room for improvement",
+      "poor": "Low completion rate - action required",
+      "timeManagement": "Excellent time management - no overdue tasks"
+    }
+  },
+  "activities": {
+    "title": "Recent Activities",
+    "error": "An error occurred while loading activities.",
+    "empty": "No activities found yet.",
+    "unknownUser": "Unknown User"
+  },
+  "colorPicker": {
+    "custom": "Custom",
+    "presetColors": "Preset Colors",
+    "recentColors": "Recently Used",
+    "customColor": "Custom Color",
+    "openColorPicker": "Open Color Picker"
+  },
+  "colors": {
+    "slate": "Slate",
+    "red": "Red",
+    "orange": "Orange",
+    "amber": "Amber",
+    "yellow": "Yellow",
+    "lime": "Lime",
+    "green": "Green",
+    "emerald": "Emerald",
+    "teal": "Teal",
+    "cyan": "Cyan",
+    "sky": "Sky",
+    "blue": "Blue",
+    "indigo": "Indigo",
+    "violet": "Violet",
+    "purple": "Purple",
+    "fuchsia": "Fuchsia",
+    "pink": "Pink",
+    "rose": "Rose"
+  },
   "common": {
+    "deleteWarning": "This action cannot be undone.",
+    "confirmDelete": "Yes, delete",
+    "appName": "Starkon Kanban",
+    "appTitle": "Starkon Kanban",
     "loading": "Loading...",
     "error": "An error occurred",
     "success": "Success",
     "cancel": "Cancel",
     "save": "Save",
+    "create": "Create",
+    "update": "Update",
     "edit": "Edit",
     "delete": "Delete",
     "search": "Search",
@@ -19,436 +623,167 @@
     "refresh": "Refresh",
     "pleaseWait": "Please wait...",
     "authenticating": "Authenticating...",
-    "pageLoading": "Page loading...",
-    "appLoading": "Application loading...",
+    "pageLoading": "Loading page...",
+    "appLoading": "Loading application...",
     "backToHome": "Back to Home",
     "clearFilters": "Clear Filters",
     "allCategories": "All Categories",
     "viewMode": "View Mode",
     "components": "Components",
     "noComponentsFound": "No components found",
-    "changeSearchCriteria": "Try changing your search criteria"
+    "changeSearchCriteria": "Change your search criteria and try again",
+    "sort": "Sort",
+    "open": "Open",
+    "submit": "Submit",
+    "reset": "Reset",
+    "confirm": "Confirm",
+    "actions": "Actions",
+    "options": "Options",
+    "view": "View",
+    "add": "Add",
+    "new": "New",
+    "preview": "Preview",
+    "tryAgain": "Try Again",
+    "ok": "OK",
+    "warning": "Warning",
+    "info": "Info"
   },
-  "demo": {
-    "button": {
-      "description": "Interactive button component with various variants and sizes",
-      "variantDescription": "Button appearance variant",
-      "sizeDescription": "Button size",
-      "fullWidthDescription": "Makes button full width",
-      "disabledDescription": "Disables the button"
-    },
-    "checkbox": {
-      "description": "Checkbox component used for selection operations",
-      "selectedLabel": "Selected Checkbox",
-      "unselectedLabel": "Not Selected",
-      "disabledLabel": "Disabled",
-      "checkedDescription": "Is checkbox checked (controlled)",
-      "defaultCheckedDescription": "Default checked state (uncontrolled)",
-      "disabledDescription": "Is checkbox disabled",
-      "onCheckedChangeDescription": "Function called when selection state changes"
-    },
-    "switch": {
-      "description": "Toggle switch component used for on/off operations",
-      "notificationsLabel": "Notifications",
-      "emailUpdatesLabel": "Email Updates",
-      "disabledLabel": "Disabled",
-      "checkedDescription": "Is switch on (controlled)",
-      "defaultCheckedDescription": "Default on state (uncontrolled)",
-      "disabledDescription": "Is switch disabled",
-      "onCheckedChangeDescription": "Function called when state changes"
-    },
-    "select": {
-      "description": "Dropdown component used for selecting from options",
-      "countryPlaceholder": "Select country",
-      "turkey": "Turkey",
-      "usa": "United States",
-      "germany": "Germany",
-      "france": "France",
-      "valueDescription": "Selected value (controlled)",
-      "defaultValueDescription": "Default selected value (uncontrolled)",
-      "onValueChangeDescription": "Function called when value changes"
-    },
-    "loading": {
-      "description": "Loading animations in various styles",
-      "spinnerLabel": "Spinner",
-      "dotsLabel": "Dots",
-      "pulseLabel": "Pulse",
-      "sizeDescription": "Spinner size",
-      "variantDescription": "Spinner color variant",
-      "textDescription": "Text to show with spinner"
-    },
-    "skeleton": {
-      "description": "Placeholder components for content loading state",
-      "widthDescription": "Skeleton width",
-      "heightDescription": "Skeleton height",
-      "variantDescription": "Skeleton shape",
-      "linesDescription": "Number of lines for text skeleton"
-    },
-    "textarea": {
-      "description": "Multi-line text input component",
-      "basicPlaceholder": "Basic textarea...",
-      "counterPlaceholder": "With character counter...",
-      "maxLengthDescription": "Maximum character count",
-      "showCountDescription": "Show character counter",
-      "autoResizeDescription": "Auto-resize based on content size",
-      "errorDescription": "Error state"
-    },
-    "accordion": {
-      "description": "Component used for expandable and collapsible content sections",
-      "featuresTitle": "Features",
-      "featuresContent": "This component is easily customizable and developed according to accessible design principles.",
-      "usageTitle": "Usage",
-      "usageContent": "Can be used in various scenarios such as form fields, settings menu, and FAQ sections.",
-      "typeDescription": "Allows one or multiple items to be open at once",
-      "defaultValueDescription": "Values of items that are open by default",
-      "collapsibleDescription": "Allows closing of open item (for type=\"single\")"
-    },
-    "alertDialog": {
-      "description": "Alert dialog component used to get user confirmation or convey important information",
-      "deleteAccountButton": "Delete Account",
-      "confirmationMessage": "Are you sure you want to perform this operation?",
-      "operationConfirmed": "Operation confirmed!",
-      "clickToSeeExample": "Click to see example dialog",
-      "openDescription": "Is dialog open (controlled)",
-      "onOpenChangeDescription": "Function called when dialog state changes"
-    },
-    "avatar": {
-      "description": "Component used for displaying user profile pictures with fallback support",
-      "defaultLabel": "Default",
-      "colorfulLabel": "Colorful",
-      "iconLabel": "Icon",
-      "srcDescription": "Avatar image URL",
-      "altDescription": "Image alt text",
-      "fallbackDescription": "Content to show when image fails to load"
-    },
-    "card": {
-      "description": "Card component used for grouping and organizing content",
-      "cardTitle": "Card Title",
-      "cardDescription": "This is an example card description.",
-      "cardContent": "Card content goes here. Text, images, buttons and other components can be added.",
-      "cancelButton": "Cancel",
-      "saveButton": "Save",
-      "variantDescription": "Card appearance variant",
-      "sizeDescription": "Card padding size",
-      "hoverDescription": "Hover effect type"
-    },
-    "commandMenu": {
-      "description": "Command menu with keyboard shortcuts for quick search and command execution",
-      "searchPlaceholder": "Search commands...",
-      "createNewFile": "Create New File",
-      "openSettings": "Open Settings",
-      "openDescription": "Is command menu open (for dialog mode)",
-      "onOpenChangeDescription": "Function called when open state changes",
-      "valueDescription": "Value of selected item"
-    },
-    "dataTable": {
-      "description": "Advanced data table with sorting, filtering and pagination features",
-      "searchPlaceholder": "Search...",
-      "nameColumn": "Name",
-      "emailColumn": "Email",
-      "roleColumn": "Role",
-      "adminUser": "John Doe",
-      "adminEmail": "john@example.com",
-      "adminRole": "Admin",
-      "regularUser": "Jane Smith",
-      "regularEmail": "jane@example.com",
-      "regularRole": "User",
-      "columnsDescription": "Table column definitions",
-      "dataDescription": "Table data",
-      "searchKeyDescription": "Column key to search in",
-      "searchPlaceholderDescription": "Search input placeholder text"
-    },
-    "dialog": {
-      "description": "Dialog component used for opening modal windows",
-      "openButton": "Open Dialog",
-      "editProfileTitle": "Edit Profile",
-      "editProfileDescription": "You can update your profile information here. Click save button to save changes.",
-      "nameLabel": "Name",
-      "clickToSeeModal": "Click to see modal dialog",
-      "openDescription": "Is dialog open (controlled)",
-      "onOpenChangeDescription": "Function called when dialog state changes",
-      "modalDescription": "Modal behavior (closes when backdrop is clicked)"
-    },
-    "dragDropList": {
-      "description": "List component where you can reorder items with drag and drop functionality",
-      "item1": "Item 1",
-      "item2": "Item 2",
-      "item3": "Item 3",
-      "customizedItem": "Customized Item",
-      "customizedLabel": "Customized"
-    },
-    "dropdown": {
-      "description": "Radix UI based accessible dropdown menu component",
-      "optionsButton": "Options",
-      "accountOperations": "Account Operations",
-      "profile": "Profile",
-      "settings": "Settings",
-      "billing": "Billing",
-      "logout": "Logout",
-      "openDescription": "Dropdown open state (controlled)",
-      "onOpenChangeDescription": "Function called when open state changes",
-      "modalDescription": "Enable modal behavior"
-    },
-    "fileUpload": {
-      "description": "Advanced file upload component with drag and drop support",
-      "dropzoneText": "Drag files here or",
-      "browseText": "Browse Files",
-      "filesSelected": "{{count}} files selected",
-      "onChangeDescription": "Function called when file selection changes",
-      "valueDescription": "Selected files",
-      "multipleDescription": "Allow multiple file selection",
-      "acceptDescription": "Accepted file types",
-      "maxSizeDescription": "Maximum file size (MB)",
-      "maxFilesDescription": "Maximum number of files"
-    },
-    "input": {
-      "description": "Advanced input component with various variants and icon support",
-      "basicPlaceholder": "Basic input",
-      "searchPlaceholder": "Search...",
-      "emailPlaceholder": "Your email address",
-      "errorPlaceholder": "Invalid input",
-      "errorMessage": "This field is required",
-      "variantDescription": "Input appearance variant",
-      "inputSizeDescription": "Input size",
-      "startIconDescription": "Icon to show at the beginning of input",
-      "endIconDescription": "Icon to show at the end of input",
-      "errorDescription": "Error message"
-    },
-    "label": {
-      "description": "Accessible label component for form fields",
-      "basicLabel": "Basic Label",
-      "relatedInput": "Related input",
-      "requiredField": "Required Field",
-      "requiredPlaceholder": "This field is required",
-      "disabledLabel": "Disabled",
-      "disabledPlaceholder": "Disabled input",
-      "htmlForDescription": "ID value of the related input element",
-      "requiredDescription": "Shows required field mark (*)",
-      "classNameDescription": "Additional CSS classes"
-    },
-    "pageHeader": {
-      "description": "Comprehensive page header component including page title, breadcrumb, actions and tab navigation",
-      "projectManagement": "Project Management",
-      "projectDescription": "Manage and track all your projects",
-      "homepage": "Home",
-      "projects": "Projects",
-      "projectDetail": "Project Detail",
-      "help": "Help",
-      "newProject": "New Project",
-      "overview": "Overview",
-      "tasks": "Tasks",
-      "documents": "Documents",
-      "titleDescription": "Page title",
-      "subtitleDescription": "Page description",
-      "breadcrumbsDescription": "Breadcrumb navigation items",
-      "actionsDescription": "Page action buttons",
-      "tabsDescription": "Tab navigation items",
-      "activeTabDescription": "Active tab value",
-      "onTabChangeDescription": "Tab change function",
-      "stickyDescription": "Stay fixed at top when scrolling the page",
-      "backButtonDescription": "Show back button"
-    },
-    "form": {
-      "description": "Comprehensive form management system with React Hook Form integration",
-      "emailPlaceholder": "example@email.com",
-      "nameLabel": "Full Name",
-      "namePlaceholder": "Enter your first and last name",
-      "messageLabel": "Message",
-      "messagePlaceholder": "Write your message...",
-      "submitButton": "Submit",
-      "formDescription": "React Hook Form instance",
-      "onSubmitDescription": "Form submission function",
-      "classNameDescription": "CSS classes for form container"
-    },
-    "clickToSeeExample": "Click to see example dialog",
-    "clickToSeeModal": "Click to see modal dialog",
-    "dialogWillOpen": "Dialog will open!",
-    "formSubmittedSuccessfully": "Form Submitted Successfully",
-    "dataProcessedSuccessfully": "Your data has been processed successfully."
-  },
-  "auth": {
-    "login": "Login",
-    "logout": "Logout",
-    "register": "Register",
-    "forgotPassword": "Forgot Password",
-    "email": "Email",
-    "password": "Password",
-    "confirmPassword": "Confirm Password",
-    "username": "Username",
-    "rememberMe": "Remember Me",
-    "welcomeBack": "Welcome back!",
-    "loginSuccess": "Successfully logged in",
-    "logoutSuccess": "Successfully logged out",
-    "loginFailed": "Login failed",
-    "alreadyLoggedIn": "You are already logged in as {{name}}",
-    "pleaseLogin": "Please log in to continue",
-    "dontHaveAccount": "Don't have an account?",
-    "signUpHere": "Sign up here",
-    "invalidCredentials": "Invalid email or password",
-    "sessionExpired": "Your session has expired",
-    "tokenRefreshFailed": "Token refresh failed",
-    "accountLocked": "Your account is locked",
-    "tooManyAttempts": "Too many failed attempts",
-    "loginFormSubmitted": "Login form submitted",
-    "alreadyAuthenticated": "Already authenticated, redirecting",
-    "safelyLoggedOut": "You have been safely logged out"
-  },
-  "navigation": {
-    "home": "Home",
-    "profile": "Profile",
-    "settings": "Settings",
-    "dashboard": "Dashboard",
-    "users": "Users",
-    "components": "Components",
-    "about": "About",
-    "contact": "Contact",
-    "pricing": "Pricing",
-    "notifications": "Notifications",
-    "help": "Help",
-    "support": "Support",
-    "privacy": "Privacy",
-    "terms": "Terms of Service",
-    "cookies": "Cookie Policy",
-    "quickLinks": "Quick Links",
-    "legal": "Legal",
-    "madeWith": "Made with ❤️ in Turkey",
-    "language": "Language Selection"
-  },
-  "pages": {
-    "home": {
-      "title": "Welcome to Starkon Template",
-      "subtitle": "Comprehensive component library designed for modern React applications. Radix UI based, accessible and customizable components.",
-      "getStarted": "Get Started",
-      "learnMore": "Learn More",
-      "goToDashboard": "Go to Dashboard",
-      "features": {
-        "title": "Features",
-        "subtitle": "Build modern applications with Starkon Template",
-        "modern": {
-          "title": "Modern Design",
-          "description": "Create modern and elegant interfaces with sea blue theme"
-        },
-        "performance": {
-          "title": "Performance",
-          "description": "Build fast applications with optimized components"
-        },
-        "customizable": {
-          "title": "Customizable",
-          "description": "All components can be customized according to your needs"
-        }
-      },
+  "legal": {
+    "terms": {
+      "title": "Terms of Service",
+      "lastUpdated": "Last Updated",
+      "lastUpdatedDate": "January 1, 2024",
       "footer": {
-        "copyright": "© 2024 Starkon Template. All rights reserved."
+        "effectiveDate": "Effective Date"
+      },
+      "sections": {
+        "introduction": {
+          "title": "Introduction",
+          "content": "These terms of service set out the rules and conditions you must follow when using our website and services. By using our service, you agree to these terms."
+        },
+        "serviceDescription": {
+          "title": "Service Description",
+          "content": "The platform provides a digital workspace environment where users can manage projects, organize tasks, and enable team collaboration.",
+          "note": "Our service is continuously being developed, and new features may be added or existing features may be modified."
+        },
+        "userResponsibilities": {
+          "title": "User Responsibilities",
+          "intro": "When using our service, you undertake the following responsibilities:",
+          "item1": "Providing accurate and up-to-date information",
+          "item2": "Protecting your account security and keeping your passwords confidential",
+          "item3": "Using our service only for legal purposes",
+          "item4": "Respecting the rights of other users"
+        },
+        "prohibitedActivities": {
+          "title": "Prohibited Activities",
+          "intro": "The following activities are strictly prohibited:",
+          "item1": "Sharing content that violates copyright",
+          "item2": "Spreading malware or viruses",
+          "item3": "Harassing or disturbing other users",
+          "item4": "Attempting to compromise system security"
+        },
+        "intellectualProperty": {
+          "title": "Intellectual Property",
+          "content": "All content, designs, logos and other materials on the platform are protected by copyright. You may not copy, modify or distribute these materials without permission."
+        },
+        "limitationOfLiability": {
+          "title": "Limitation of Liability",
+          "content": "While we strive to provide our service in the best possible way, our liability for any interruptions, data loss or service quality issues is limited. You accept the service as is."
+        },
+        "serviceModifications": {
+          "title": "Service Modifications",
+          "content": "We reserve the right to make changes to our service, add or remove features at any time. We try to inform our users in advance of significant changes."
+        },
+        "termination": {
+          "title": "Account Termination",
+          "content": "We reserve the right to terminate your account without warning if you violate these terms. You may also terminate your account yourself at any time."
+        },
+        "governingLaw": {
+          "title": "Governing Law",
+          "content": "These terms are governed by the laws of the Republic of Turkey. Turkish courts have jurisdiction in case of any disputes."
+        },
+        "contact": {
+          "title": "Contact",
+          "content": "If you have any questions about these terms of service, you can contact us:"
+        }
       }
     },
-    "dashboard": {
-      "welcome": "Welcome, {{name}}!",
-      "description": "This page can only be viewed by logged-in users.",
-      "viewProfile": "View Profile",
-      "logout": "Logout",
-      "userInfoNotLoaded": "User information could not be loaded"
-    },
-    "components": {
-      "title": "Components",
-      "searchPlaceholder": "Search components... (Button, Input, Card...)",
-      "showcase": "Component Showcase",
-      "count": "Components ({{count}})"
-    },
-    "notFound": {
-      "title": "404",
-      "heading": "Page Not Found",
-      "description": "The page you're looking for doesn't exist or has been removed.",
-      "goHome": "Go to Homepage",
-      "goBack": "Go Back"
-    },
-    "about": {
-      "title": "About Us",
-      "content": "Learn more about Starkon Template and our mission."
-    },
-    "contact": {
-      "title": "Contact",
-      "content": "Get in touch with our team."
-    },
-    "pricing": {
-      "title": "Pricing",
-      "content": "Choose the plan that's right for you."
-    },
-    "profile": {
-      "title": "Profile",
-      "content": "Manage your profile information."
-    },
-    "settings": {
-      "title": "Settings",
-      "content": "Configure your application preferences."
-    },
-    "users": {
-      "title": "Users",
-      "content": "Manage system users."
-    },
-    "register": {
-      "title": "Register",
-      "content": "Create a new account."
-    },
-    "forgotPassword": {
-      "title": "Forgot Password",
-      "content": "Reset your password."
+    "privacy": {
+      "title": "Privacy Policy",
+      "lastUpdated": "Last Updated",
+      "lastUpdatedDate": "January 1, 2024",
+      "footer": {
+        "effectiveDate": "Effective Date"
+      },
+      "sections": {
+        "introduction": {
+          "title": "Introduction",
+          "content": "This privacy policy explains how we collect, use and protect your personal data. Your privacy is important to us and we manage your data responsibly."
+        },
+        "informationCollection": {
+          "title": "Information We Collect",
+          "intro": "We collect the following types of information to better serve you:",
+          "personalInfo": {
+            "title": "Personal Information",
+            "item1": "Name, surname and email address",
+            "item2": "Profile information and preferences",
+            "item3": "Contact information"
+          },
+          "technicalInfo": {
+            "title": "Technical Information",
+            "item1": "IP address and browser information",
+            "item2": "Device type and operating system",
+            "item3": "Usage statistics and site interactions"
+          }
+        },
+        "informationUse": {
+          "title": "How We Use Information",
+          "intro": "We use the information we collect for the following purposes:",
+          "item1": "To provide and improve our services",
+          "item2": "To personalize user experience",
+          "item3": "Security and fraud prevention",
+          "item4": "To fulfill our legal obligations",
+          "item5": "To inform you about important updates"
+        },
+        "informationSharing": {
+          "title": "Information Sharing",
+          "intro": "We are very careful about sharing your personal information with third parties.",
+          "commitment": "We do not sell, rent or share your data with unauthorized third parties."
+        },
+        "dataSecurity": {
+          "title": "Data Security",
+          "content": "We take industry-standard security measures to protect your data:",
+          "measure1": "Data transmission with SSL encryption",
+          "measure2": "Secure server infrastructure",
+          "measure3": "Regular security audits",
+          "measure4": "Limited access controls"
+        },
+        "dataRetention": {
+          "title": "Data Retention",
+          "content": "We retain your personal data only for as long as necessary. When you delete your account, your data is securely removed from the system."
+        },
+        "userRights": {
+          "title": "User Rights",
+          "intro": "You have the following rights regarding your personal data:",
+          "right1": "Access to your data and obtaining a copy",
+          "right2": "Requesting correction of incorrect information",
+          "right3": "Requesting deletion of your data",
+          "right4": "Objecting to data processing activities"
+        },
+        "cookies": {
+          "title": "Cookies and Tracking",
+          "content": "We use cookies on our website to improve your experience. These cookies are used to analyze site performance and remember your preferences.",
+          "note": "You can disable cookies from your browser settings, but some features may not work in this case."
+        },
+        "policyChanges": {
+          "title": "Policy Changes",
+          "content": "We may update this privacy policy from time to time. We will notify you of significant changes by email or through the site."
+        },
+        "contact": {
+          "title": "Contact",
+          "content": "If you have questions about our privacy policy or data processing practices, you can contact us:"
+        }
+      }
     }
-  },
-  "validation": {
-    "required": "This field is required",
-    "email": "Please enter a valid email address",
-    "minLength": "Must be at least {{min}} characters",
-    "maxLength": "Must be at most {{max}} characters",
-    "passwordMatch": "Passwords must match",
-    "invalidFormat": "Invalid format",
-    "passwordComplexity": "Password must contain at least one uppercase, lowercase, number and special character",
-    "emailDomainNotAllowed": "This email domain is not supported",
-    "phoneFormat": "Enter a valid phone number",
-    "passwordWeak": "Password is too weak",
-    "passwordMedium": "Password strength is medium",
-    "passwordStrong": "Password is strong",
-    "invalidType": "Expected {{expected}} type, received {{received}}",
-    "minValue": "Must be at least {{min}}",
-    "maxValue": "Must be at most {{max}}",
-    "minItems": "Must contain at least {{min}} items",
-    "maxItems": "Can contain at most {{max}} items",
-    "url": "Enter a valid URL",
-    "uuid": "Enter a valid UUID",
-    "pattern": "Invalid format",
-    "mustBe": "Must be {{value}}",
-    "unknownKeys": "Unknown fields: {{keys}}",
-    "invalidOption": "Invalid option",
-    "invalidDate": "Invalid date",
-    "custom": "Invalid value",
-    "invalid": "Invalid value"
-  },
-  "theme": {
-    "light": "Light",
-    "dark": "Dark",
-    "system": "System",
-    "toggle": "Toggle Theme"
-  },
-  "components": {
-    "button": {
-      "loadingText": "Please wait..."
-    },
-    "dialog": {
-      "close": "Close"
-    },
-    "datePicker": {
-      "placeholder": "Select date...",
-      "today": "Today"
-    },
-    "navbar": {
-      "searchPlaceholder": "Search...",
-      "notifications": "Notifications",
-      "noNotifications": "No new notifications",
-      "viewAllNotifications": "View all notifications"
-    }
-  },
-  "errors": {
-    "unauthorized": "You must log in to access this page",
-    "sessionExpired": "Your session has expired, please log in again",
-    "invalidToken": "Invalid token, please log in again"
   }
 }

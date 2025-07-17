@@ -1,0 +1,18 @@
+# Development files
+
+\*.log
+.env.local
+.env.development
+node_modules/.cache
+.next/cache
+
+# Test files
+
+**/_.test._
+**/_.spec._
+coverage/
+
+# Documentation
+
+docs/
+README.md

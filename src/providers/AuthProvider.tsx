@@ -6,6 +6,7 @@ import React, { createContext, useContext, useEffect, useState, ReactNode, useCa
 
 import AuthApiService from '@/lib/services/authApiService'
 import { SessionTokenManager } from '@/lib/services/sessionTokenManager'
+import { useAuthStore } from '@/store/authStore'
 
 interface User {
   id: string
@@ -41,11 +42,27 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const accessToken = SessionTokenManager.getAccessToken()
+  const authStore = useAuthStore()
 
   const [user, setUser] = useState<User | null>(null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
   const [isInitialized, setIsInitialized] = useState(false)
+
+  // AuthStore ile senkronizasyon
+  const syncWithStore = useCallback(
+    (userData: User | null, authStatus: boolean) => {
+      setUser(userData)
+      setIsAuthenticated(authStatus)
+
+      // AuthStore'u güncelle
+      authStore.setUser(userData)
+      if (userData && authStatus) {
+        authStore.setLoading(false)
+      }
+    },
+    [authStore],
+  )
 
   // Kullanıcı bilgilerini API'den al - response format handling ile
   const fetchCurrentUser = useCallback(async (): Promise<User | null> => {
@@ -128,9 +145,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return false
       }
 
-      // State'i güncelle
-      setUser(userData)
-      setIsAuthenticated(true)
+      // AuthProvider ve AuthStore'u senkronize et
+      syncWithStore(userData, true)
       console.log('✅ Authentication verified for user:', userData.email)
 
       return true
@@ -139,74 +155,80 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await handleLogout(false)
       return false
     }
-  }, [isAuthenticated])
+  }, [isAuthenticated, syncWithStore])
 
   // Login işlemi
-  const login = useCallback(async (email: string, password: string, rememberMe: boolean = false): Promise<void> => {
-    try {
-      console.log('🔄 Login attempt for:', email)
-      setLoading(true)
+  const login = useCallback(
+    async (email: string, password: string, rememberMe: boolean = false): Promise<void> => {
+      try {
+        console.log('🔄 Login attempt for:', email)
+        setLoading(true)
 
-      const response = await AuthApiService.loginUser({ email, password })
+        const response = await AuthApiService.loginUser({ email, password })
 
-      if (response.success && response.data) {
-        // User bilgisini hemen set et
-        const userData = response.data.user as User
-        setUser(userData)
-        setIsAuthenticated(true)
+        if (response.success && response.data) {
+          // User bilgisini hemen set et
+          const userData = response.data.user as User
 
-        // Remember me durumunu localStorage'a kaydet (3 gün süreli)
-        if (rememberMe) {
-          SessionTokenManager.setRememberMe(true, email)
+          // AuthProvider ve AuthStore'u senkronize et
+          syncWithStore(userData, true)
+
+          // Remember me durumunu localStorage'a kaydet (3 gün süreli)
+          if (rememberMe) {
+            SessionTokenManager.setRememberMe(true, email)
+          } else {
+            SessionTokenManager.clearRememberMe()
+          }
+
+          console.log(
+            '✅ Login successful for user:',
+            userData.email,
+            rememberMe ? '(Remember Me enabled for 3 days)' : '',
+          )
         } else {
-          SessionTokenManager.clearRememberMe()
+          throw new Error(response.message || 'Login failed')
         }
-
-        console.log(
-          '✅ Login successful for user:',
-          userData.email,
-          rememberMe ? '(Remember Me enabled for 3 days)' : '',
-        )
-      } else {
-        throw new Error(response.message || 'Login failed')
+      } catch (error) {
+        console.error('❌ Login failed:', error)
+        await handleLogout(false)
+        throw error
+      } finally {
+        setLoading(false)
       }
-    } catch (error) {
-      console.error('❌ Login failed:', error)
-      await handleLogout(false)
-      throw error
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+    },
+    [syncWithStore],
+  )
 
   // Logout işlemi
-  const handleLogout = useCallback(async (callApi: boolean = true): Promise<void> => {
-    try {
-      if (callApi) {
-        await AuthApiService.logoutUser()
-        console.log('✅ Logout API call successful')
-      }
-    } catch (error) {
-      console.error('❌ Logout API call failed:', error)
-    } finally {
-      // Remember me durumunu kontrol et
-      const shouldRememberEmail = SessionTokenManager.getRememberMeStatus()
-      const rememberedEmail = SessionTokenManager.getRememberedEmail()
+  const handleLogout = useCallback(
+    async (callApi: boolean = true): Promise<void> => {
+      try {
+        if (callApi) {
+          await AuthApiService.logoutUser()
+          console.log('✅ Logout API call successful')
+        }
+      } catch (error) {
+        console.error('❌ Logout API call failed:', error)
+      } finally {
+        // Remember me durumunu kontrol et
+        const shouldRememberEmail = SessionTokenManager.getRememberMeStatus()
+        const rememberedEmail = SessionTokenManager.getRememberedEmail()
 
-      // Local state'i temizle
-      setUser(null)
-      setIsAuthenticated(false)
-      SessionTokenManager.clearTokens()
+        // AuthProvider ve AuthStore'u senkronize et
+        syncWithStore(null, false)
+        SessionTokenManager.clearTokens()
 
-      // Eğer remember me aktifse email'i tekrar kaydet (3 gün süreli)
-      if (shouldRememberEmail && rememberedEmail) {
-        SessionTokenManager.setRememberMe(true, rememberedEmail)
-        console.log('✅ Local state cleared but email preserved for 3 days')
-      } else {
-        console.log('✅ Local state cleared completely')
+        // Eğer remember me aktifse email'i tekrar kaydet (3 gün süreli)
+        if (shouldRememberEmail && rememberedEmail) {
+          SessionTokenManager.setRememberMe(true, rememberedEmail)
+          console.log('✅ Local state cleared but email preserved for 3 days')
+        } else {
+          console.log('✅ Local state cleared completely')
+        }
       }
-    }
-  }, [])
+    },
+    [syncWithStore],
+  )
 
   const logout = useCallback(() => handleLogout(true), [handleLogout])
 
@@ -242,13 +264,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           await checkAuth()
         } else {
           console.log('❌ No tokens found during initialization')
-          setIsAuthenticated(false)
-          setUser(null)
+          syncWithStore(null, false)
         }
       } catch (error) {
         console.error('❌ Auth initialization failed:', error)
-        setIsAuthenticated(false)
-        setUser(null)
+        syncWithStore(null, false)
       } finally {
         setLoading(false)
         setIsInitialized(true)
@@ -257,48 +277,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
 
     initializeAuth()
-  }, [checkAuth, isInitialized])
+  }, [checkAuth, isInitialized, syncWithStore])
 
   // Token durumu değişikliklerini periyodik kontrol
   useEffect(() => {
     if (!isAuthenticated || !isInitialized) return
 
-    let retryCount = 0
-    const maxRetries = 3
-    const retryDelay = 5000 // 5 saniye
-
-    const performTokenRefresh = async () => {
-      try {
-        if (SessionTokenManager.isAccessTokenExpired()) {
-          await AuthApiService.refreshAccessToken()
-          console.log('✅ Background token refresh successful')
-          retryCount = 0 // Reset retry count on success
-        }
-      } catch {
-        retryCount++
-        console.warn(`⚠️ Background token refresh failed (attempt ${retryCount}/${maxRetries})`)
-
-        if (retryCount >= maxRetries) {
-          console.error('❌ Maximum retry attempts reached, checking auth status')
-          const authValid = await checkAuth()
-          if (!authValid) {
-            console.log('🔄 Auth invalid after retries, logging out')
-            await handleLogout(false)
-          }
-          retryCount = 0 // Reset for next cycle
-        } else {
-          // Retry after delay
-          setTimeout(performTokenRefresh, retryDelay)
-        }
+    const interval = setInterval(async () => {
+      const hasValidTokens = SessionTokenManager.hasValidTokens()
+      if (!hasValidTokens) {
+        console.log('⚠️ Token validation failed during periodic check')
+        await handleLogout(false)
       }
-    }
+    }, 60000) // Her dakika kontrol et
 
-    const interval = setInterval(performTokenRefresh, 5 * 60 * 1000) // 5 dakika
     return () => clearInterval(interval)
-  }, [isAuthenticated, isInitialized, handleLogout, checkAuth])
+  }, [isAuthenticated, isInitialized, handleLogout])
 
-  // Context value
-  const contextValue: AuthContextType = {
+  const value: AuthContextType = {
     user,
     isAuthenticated,
     loading,
@@ -309,5 +305,5 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     refreshToken,
   }
 
-  return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

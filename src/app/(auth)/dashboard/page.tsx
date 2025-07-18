@@ -1,44 +1,103 @@
-// src/app/dashboard/page.tsx
 'use client'
 
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { FileText, Upload, Wand2, Download, Trash2 } from 'lucide-react'
-import { useAuthStore } from '@/store/authStore'
+import { useTranslation } from 'react-i18next'
+import { FileText, Upload, Wand2, Download, Trash2, Plus, Eye, Save, Calendar, TrendingUp } from 'lucide-react'
+
 import { useCVStore } from '@/store/cvStore'
 import { useCoverLetterStore } from '@/store/coverLetterStore'
+
 import { Button } from '@/components/core/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/core/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/core/tabs'
 import { Badge } from '@/components/core/badge'
+import { LoadingSpinner } from '@/components/core/loading-spinner'
+
 import { CVUpload } from '@/components/ui/cv/CVUpload'
 import { CVGeneratorForm } from '@/components/ui/cv/CVGeneratorForm'
 import { CoverLetterGenerator } from '@/components/ui/cover-letter/CoverLetterGenerator'
 import { ContentViewer } from '@/components/ui/common/ContentViewer'
+import { PageHeader } from '@/components/ui/PageHeader/PageHeader'
+import { useAuth } from '@/providers/AuthProvider'
 
 export default function DashboardPage() {
   const router = useRouter()
-  const { user, isAuthenticated, getProfile } = useAuthStore()
-  const { uploadedCVs, savedCVs, getUploadedCVs, getSavedCVs, saveCV, deleteSavedCV, downloadCV } = useCVStore()
-  const { savedCoverLetters, getSavedCoverLetters, saveCoverLetter, deleteSavedCoverLetter, downloadCoverLetter } =
-    useCoverLetterStore()
+  const { t } = useTranslation()
+
+  const { user, isAuthenticated, loading } = useAuth()
+  const {
+    uploadedCVs = [],
+    savedCVs = [],
+    getUploadedCVs,
+    getSavedCVs,
+    saveCV,
+    deleteSavedCV,
+    downloadCV,
+    isLoading: cvLoading,
+  } = useCVStore()
+
+  const {
+    savedCoverLetters = [],
+    getSavedCoverLetters,
+    saveCoverLetter,
+    deleteSavedCoverLetter,
+    downloadCoverLetter,
+    isLoading: coverLetterLoading,
+  } = useCoverLetterStore()
 
   const [generatedCV, setGeneratedCV] = useState<string>('')
   const [generatedCoverLetter, setGeneratedCoverLetter] = useState<string>('')
-  const [activeTab, setActiveTab] = useState<string>('cv-upload')
+  const [activeTab, setActiveTab] = useState<string>('overview')
+  const [isDataLoading, setIsDataLoading] = useState(true)
+  const [dataLoaded, setDataLoaded] = useState(false)
 
+  // Safe stats calculation with fallbacks
+  const getDashboardStats = () => {
+    const safeUploadedCVs = Array.isArray(uploadedCVs) ? uploadedCVs : []
+    const safeSavedCVs = Array.isArray(savedCVs) ? savedCVs : []
+    const safeSavedCoverLetters = Array.isArray(savedCoverLetters) ? savedCoverLetters : []
+
+    return {
+      totalCVs: safeSavedCVs.length || 0,
+      totalCoverLetters: safeSavedCoverLetters.length || 0,
+      uploadedCVs: safeUploadedCVs.length || 0,
+      recentActivity: Math.max(
+        safeSavedCVs.length || 0,
+        safeSavedCoverLetters.length || 0,
+        safeUploadedCVs.length || 0,
+      ),
+    }
+  }
+
+  // Auth kontrolü için ayrı useEffect
   useEffect(() => {
+    if (loading) return
+
     if (!isAuthenticated) {
-      router.push('/auth/login')
+      router.push('/login')
       return
     }
+  }, [isAuthenticated, loading, router])
 
-    // Load user data and saved content
-    getProfile()
-    getUploadedCVs()
-    getSavedCVs()
-    getSavedCoverLetters()
-  }, [isAuthenticated, router, getProfile, getUploadedCVs, getSavedCVs, getSavedCoverLetters])
+  // Data loading için ayrı useEffect
+  useEffect(() => {
+    if (!isAuthenticated || loading || dataLoaded) return
+
+    const loadDashboardData = async () => {
+      try {
+        setIsDataLoading(true)
+        await Promise.all([getUploadedCVs(), getSavedCVs(), getSavedCoverLetters()])
+        setDataLoaded(true)
+      } catch (error) {
+        console.error('Dashboard veri yükleme hatası:', error)
+      } finally {
+        setIsDataLoading(false)
+      }
+    }
+
+    loadDashboardData()
+  }, [isAuthenticated, loading, dataLoaded])
 
   const handleCVUploadSuccess = () => {
     setActiveTab('cv-generate')
@@ -54,247 +113,538 @@ export default function DashboardPage() {
     setActiveTab('cover-letter-preview')
   }
 
-  const handleSaveCV = async (data: { title: string; content: string }) => {
-    await saveCV(data)
+  const handleSaveCV = async () => {
+    if (!generatedCV) return
+
+    try {
+      await saveCV({
+        title: `CV - ${new Date().toLocaleDateString('tr-TR')}`,
+        content: generatedCV,
+        cvType: 'ATS_OPTIMIZED',
+      })
+      setActiveTab('saved-content')
+    } catch (error) {
+      console.error('CV kaydetme hatası:', error)
+    }
   }
 
-  const handleSaveCoverLetter = async (data: { title: string; content: string }) => {
-    await saveCoverLetter(data)
+  const handleSaveCoverLetter = async () => {
+    if (!generatedCoverLetter) return
+
+    try {
+      await saveCoverLetter({
+        title: `Ön Yazı - ${new Date().toLocaleDateString('tr-TR')}`,
+        content: generatedCoverLetter,
+        category: 'GENERAL',
+        positionTitle: 'Genel Pozisyon',
+        companyName: 'Şirket',
+      })
+      setActiveTab('saved-content')
+    } catch (error) {
+      console.error('Ön yazı kaydetme hatası:', error)
+    }
   }
 
-  const handleDownloadCV = async (id: string, format: 'pdf' | 'docx') => {
-    await downloadCV(id, format)
-  }
+  const stats = getDashboardStats()
 
-  const handleDownloadCoverLetter = async (id: string, format: 'pdf' | 'docx') => {
-    await downloadCoverLetter(id, format)
-  }
-
-  if (!isAuthenticated) {
-    return null
+  // Loading durumunda spinner göster
+  if (loading || isDataLoading) {
+    return (
+      <div className='min-h-screen flex items-center justify-center bg-background'>
+        <div className='text-center space-y-4'>
+          <LoadingSpinner size='lg' />
+          <p className='text-muted-foreground'>{t('dashboard.loading', 'Dashboard yükleniyor...')}</p>
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className='min-h-screen bg-background'>
-      <div className='container mx-auto py-6 px-4'>
-        {/* Header */}
-        <div className='mb-8'>
-          <h1 className='text-3xl font-bold'>ATS CV & Ön Yazı Oluşturucu</h1>
-          <p className='text-muted-foreground mt-2'>
-            Hoş geldiniz, {user?.firstName}! Profesyonel CV ve ön yazılarınızı oluşturun.
-          </p>
+      <div className='container mx-auto px-4 py-6 space-y-6'>
+        <PageHeader
+          title={t('dashboard.title', 'Dashboard')}
+          subtitle={t('dashboard.subtitle', 'ATS uyumlu CV ve ön yazı oluşturma platformunuz')}
+          breadcrumbs={[
+            { title: t('navigation.home', 'Ana Sayfa'), href: '/' },
+            { title: t('dashboard.title', 'Dashboard') },
+          ]}
+          actions={[
+            {
+              label: 'Yeni CV Yükle',
+              onClick: () => setActiveTab('cv-upload'),
+              icon: <Upload className='h-4 w-4' />,
+              variant: 'outline',
+            },
+            {
+              label: 'CV Oluştur',
+              onClick: () => setActiveTab('cv-generate'),
+              icon: <Plus className='h-4 w-4' />,
+            },
+          ]}
+        />
+
+        {/* Welcome Section */}
+        <div className='bg-card rounded-lg shadow-sm border border-border p-6'>
+          <div className='flex items-center justify-between'>
+            <div>
+              <h2 className='text-2xl font-bold text-foreground'>
+                {t('dashboard.welcome', { name: user?.name || 'Kullanıcı' })}
+              </h2>
+              <p className='text-muted-foreground mt-1'>
+                Profesyonel CV ve ön yazılarınızı oluşturarak iş başvurularınızda öne çıkın
+              </p>
+            </div>
+            <div className='hidden md:flex items-center gap-4'>
+              <div className='text-center'>
+                <div className='text-2xl font-bold text-blue-600 dark:text-blue-400'>{stats.totalCVs}</div>
+                <div className='text-sm text-muted-foreground'>Kayıtlı CV</div>
+              </div>
+              <div className='text-center'>
+                <div className='text-2xl font-bold text-green-600 dark:text-green-400'>{stats.totalCoverLetters}</div>
+                <div className='text-sm text-muted-foreground'>Ön Yazı</div>
+              </div>
+              <div className='text-center'>
+                <div className='text-2xl font-bold text-purple-600 dark:text-purple-400'>{stats.uploadedCVs}</div>
+                <div className='text-sm text-muted-foreground'>Yüklenen</div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Main Content */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className='space-y-6'>
-          <TabsList className='grid w-full grid-cols-6'>
-            <TabsTrigger value='cv-upload' className='flex items-center gap-2'>
-              <Upload className='h-4 w-4' />
-              CV Yükle
-            </TabsTrigger>
-            <TabsTrigger value='cv-generate' className='flex items-center gap-2'>
-              <Wand2 className='h-4 w-4' />
-              CV Oluştur
-            </TabsTrigger>
-            <TabsTrigger value='cv-preview' className='flex items-center gap-2'>
-              <FileText className='h-4 w-4' />
-              CV Önizleme
-            </TabsTrigger>
-            <TabsTrigger value='cover-letter-generate' className='flex items-center gap-2'>
-              <Wand2 className='h-4 w-4' />
-              Ön Yazı
-            </TabsTrigger>
-            <TabsTrigger value='cover-letter-preview' className='flex items-center gap-2'>
-              <FileText className='h-4 w-4' />
-              Ön Yazı Önizleme
-            </TabsTrigger>
-            <TabsTrigger value='saved' className='flex items-center gap-2'>
-              <Download className='h-4 w-4' />
-              Kayıtlı
-            </TabsTrigger>
-          </TabsList>
+        {/* Quick Stats Cards */}
+        <div className='grid grid-cols-1 md:grid-cols-4 gap-6'>
+          <Card>
+            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+              <CardTitle className='text-sm font-medium'>Toplam CV</CardTitle>
+              <FileText className='h-4 w-4 text-muted-foreground' />
+            </CardHeader>
+            <CardContent>
+              <div className='text-2xl font-bold text-foreground'>{stats.totalCVs}</div>
+              <p className='text-xs text-muted-foreground'>Kayıtlı CV sayınız</p>
+            </CardContent>
+          </Card>
 
-          {/* CV Upload Tab */}
-          <TabsContent value='cv-upload' className='space-y-6'>
-            <div className='grid gap-6 md:grid-cols-2'>
-              <CVUpload onUploadSuccess={handleCVUploadSuccess} />
+          <Card>
+            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+              <CardTitle className='text-sm font-medium'>Ön Yazılar</CardTitle>
+              <Wand2 className='h-4 w-4 text-muted-foreground' />
+            </CardHeader>
+            <CardContent>
+              <div className='text-2xl font-bold text-foreground'>{stats.totalCoverLetters}</div>
+              <p className='text-xs text-muted-foreground'>Hazır ön yazı sayınız</p>
+            </CardContent>
+          </Card>
 
-              {/* Uploaded CVs */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Yüklenmiş CV&apos;ler</CardTitle>
-                  <CardDescription>Daha önce yüklediğiniz CV dosyaları</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {uploadedCVs.length === 0 ? (
-                    <p className='text-sm text-muted-foreground text-center py-4'>Henüz CV yüklememişsiniz</p>
-                  ) : (
-                    <div className='space-y-3'>
-                      {uploadedCVs.map((cv) => (
-                        <div key={cv.id} className='flex items-center justify-between p-3 border rounded-lg'>
-                          <div className='flex items-center gap-3'>
-                            <FileText className='h-5 w-5 text-muted-foreground' />
-                            <div>
-                              <p className='font-medium'>{cv.fileName}</p>
-                              <p className='text-xs text-muted-foreground'>
-                                {new Date(cv.uploadedAt).toLocaleDateString('tr-TR')}
-                              </p>
+          <Card>
+            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+              <CardTitle className='text-sm font-medium'>Yüklenen CV</CardTitle>
+              <Upload className='h-4 w-4 text-muted-foreground' />
+            </CardHeader>
+            <CardContent>
+              <div className='text-2xl font-bold text-foreground'>{stats.uploadedCVs}</div>
+              <p className='text-xs text-muted-foreground'>Analiz için yüklenen</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+              <CardTitle className='text-sm font-medium'>Son Aktivite</CardTitle>
+              <TrendingUp className='h-4 w-4 text-muted-foreground' />
+            </CardHeader>
+            <CardContent>
+              <div className='text-2xl font-bold text-foreground'>{stats.recentActivity}</div>
+              <p className='text-xs text-muted-foreground'>Bu ay oluşturulan</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Main Content Tabs */}
+        <Card>
+          <CardContent className='p-6'>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className='space-y-6'>
+              <TabsList className='grid w-full grid-cols-2 lg:grid-cols-6'>
+                <TabsTrigger value='overview'>Genel Bakış</TabsTrigger>
+                <TabsTrigger value='cv-upload'>CV Yükle</TabsTrigger>
+                <TabsTrigger value='cv-generate'>CV Oluştur</TabsTrigger>
+                <TabsTrigger value='cover-letter'>Ön Yazı</TabsTrigger>
+                <TabsTrigger value='cv-preview'>Önizleme</TabsTrigger>
+                <TabsTrigger value='saved-content'>Kayıtlı İçerik</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value='overview' className='space-y-6'>
+                <div className='grid gap-6 md:grid-cols-2'>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className='flex items-center gap-2'>
+                        <FileText className='h-5 w-5' />
+                        Son CV&apos;ler
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {savedCVs.length > 0 ? (
+                        <div className='space-y-3'>
+                          {savedCVs.slice(0, 3).map((cv) => (
+                            <div key={cv.id} className='flex items-center justify-between p-3 bg-muted/50 rounded-lg'>
+                              <div>
+                                <p className='font-medium text-foreground'>{cv.title}</p>
+                                <p className='text-sm text-muted-foreground flex items-center gap-1'>
+                                  <Calendar className='h-3 w-3' />
+                                  {new Date(cv.createdAt).toLocaleDateString('tr-TR')}
+                                </p>
+                              </div>
+                              <div className='flex gap-2'>
+                                <Button size='sm' variant='outline'>
+                                  <Eye className='h-3 w-3' />
+                                </Button>
+                                <Button
+                                  size='sm'
+                                  variant='outline'
+                                  onClick={() => downloadCV(cv.content, cv.title, 'pdf')}
+                                >
+                                  <Download className='h-3 w-3' />
+                                </Button>
+                              </div>
                             </div>
-                          </div>
-                          <Badge variant='secondary'>{cv.keywords.length} anahtar kelime</Badge>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          {/* CV Generate Tab */}
-          <TabsContent value='cv-generate'>
-            <CVGeneratorForm onGenerate={handleCVGenerate} />
-          </TabsContent>
-
-          {/* CV Preview Tab */}
-          <TabsContent value='cv-preview'>
-            {generatedCV ? (
-              <ContentViewer content={generatedCV} title='Oluşturulan CV' type='cv' onSave={handleSaveCV} />
-            ) : (
-              <Card>
-                <CardContent className='text-center py-8'>
-                  <FileText className='h-12 w-12 text-muted-foreground mx-auto mb-4' />
-                  <p className='text-lg font-medium'>Henüz CV oluşturulmadı</p>
-                  <p className='text-muted-foreground'>CV oluşturmak için &quot;CV Oluştur&quot; sekmesini kullanın</p>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-
-          {/* Cover Letter Generate Tab */}
-          <TabsContent value='cover-letter-generate'>
-            <CoverLetterGenerator onGenerate={handleCoverLetterGenerate} />
-          </TabsContent>
-
-          {/* Cover Letter Preview Tab */}
-          <TabsContent value='cover-letter-preview'>
-            {generatedCoverLetter ? (
-              <ContentViewer
-                content={generatedCoverLetter}
-                title='Oluşturulan Ön Yazı'
-                type='cover-letter'
-                onSave={handleSaveCoverLetter}
-              />
-            ) : (
-              <Card>
-                <CardContent className='text-center py-8'>
-                  <FileText className='h-12 w-12 text-muted-foreground mx-auto mb-4' />
-                  <p className='text-lg font-medium'>Henüz ön yazı oluşturulmadı</p>
-                  <p className='text-muted-foreground'>
-                    Ön yazı oluşturmak için &quot;Ön Yazı&quot; sekmesini kullanın
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-
-          {/* Saved Content Tab */}
-          <TabsContent value='saved' className='space-y-6'>
-            <div className='grid gap-6 md:grid-cols-2'>
-              {/* Saved CVs */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Kayıtlı CV&apos;ler</CardTitle>
-                  <CardDescription>Maksimum 5 CV kaydedebilirsiniz ({savedCVs.length}/5)</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {savedCVs.length === 0 ? (
-                    <p className='text-sm text-muted-foreground text-center py-4'>Henüz kayıtlı CV&apost;iniz yok</p>
-                  ) : (
-                    <div className='space-y-3'>
-                      {savedCVs.map((cv) => (
-                        <div key={cv.id} className='border rounded-lg p-4'>
-                          <div className='flex items-start justify-between mb-2'>
-                            <h4 className='font-medium'>{cv.title}</h4>
-                            <Button
-                              variant='ghost'
-                              size='sm'
-                              onClick={() => deleteSavedCV(cv.id)}
-                              className='text-destructive hover:text-destructive'
-                            >
-                              <Trash2 className='h-4 w-4' />
-                            </Button>
-                          </div>
-                          <p className='text-xs text-muted-foreground mb-3'>
-                            {new Date(cv.createdAt).toLocaleDateString('tr-TR')}
-                          </p>
-                          <div className='flex gap-2'>
-                            <Button variant='outline' size='sm' onClick={() => handleDownloadCV(cv.id, 'pdf')}>
-                              PDF İndir
-                            </Button>
-                            <Button variant='outline' size='sm' onClick={() => handleDownloadCV(cv.id, 'docx')}>
-                              DOCX İndir
-                            </Button>
-                          </div>
+                      ) : (
+                        <div className='text-center py-8 text-muted-foreground'>
+                          <FileText className='h-12 w-12 mx-auto mb-4 opacity-50' />
+                          <p>Henüz kayıtlı CV bulunmuyor</p>
+                          <Button className='mt-3' onClick={() => setActiveTab('cv-generate')} size='sm'>
+                            İlk CV&apos;nizi Oluşturun
+                          </Button>
                         </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+                      )}
+                    </CardContent>
+                  </Card>
 
-              {/* Saved Cover Letters */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Kayıtlı Ön Yazılar</CardTitle>
-                  <CardDescription>Maksimum 5 ön yazı kaydedebilirsiniz ({savedCoverLetters.length}/5)</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {savedCoverLetters.length === 0 ? (
-                    <p className='text-sm text-muted-foreground text-center py-4'>Henüz kayıtlı ön yazınız yok</p>
-                  ) : (
-                    <div className='space-y-3'>
-                      {savedCoverLetters.map((letter) => (
-                        <div key={letter.id} className='border rounded-lg p-4'>
-                          <div className='flex items-start justify-between mb-2'>
-                            <h4 className='font-medium'>{letter.title}</h4>
-                            <Button
-                              variant='ghost'
-                              size='sm'
-                              onClick={() => deleteSavedCoverLetter(letter.id)}
-                              className='text-destructive hover:text-destructive'
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className='flex items-center gap-2'>
+                        <Wand2 className='h-5 w-5' />
+                        Son Ön Yazılar
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {savedCoverLetters.length > 0 ? (
+                        <div className='space-y-3'>
+                          {savedCoverLetters.slice(0, 3).map((letter) => (
+                            <div
+                              key={letter.id}
+                              className='flex items-center justify-between p-3 bg-muted/50 rounded-lg'
                             >
-                              <Trash2 className='h-4 w-4' />
-                            </Button>
-                          </div>
-                          <p className='text-xs text-muted-foreground mb-3'>
-                            {new Date(letter.createdAt).toLocaleDateString('tr-TR')}
-                          </p>
-                          <div className='flex gap-2'>
-                            <Button
-                              variant='outline'
-                              size='sm'
-                              onClick={() => handleDownloadCoverLetter(letter.id, 'pdf')}
-                            >
-                              PDF İndir
-                            </Button>
-                            <Button
-                              variant='outline'
-                              size='sm'
-                              onClick={() => handleDownloadCoverLetter(letter.id, 'docx')}
-                            >
-                              DOCX İndir
-                            </Button>
-                          </div>
+                              <div>
+                                <p className='font-medium text-foreground'>{letter.title}</p>
+                                <p className='text-sm text-muted-foreground flex items-center gap-1'>
+                                  <Calendar className='h-3 w-3' />
+                                  {new Date(letter.createdAt).toLocaleDateString('tr-TR')}
+                                </p>
+                              </div>
+                              <div className='flex gap-2'>
+                                <Button size='sm' variant='outline'>
+                                  <Eye className='h-3 w-3' />
+                                </Button>
+                                <Button
+                                  size='sm'
+                                  variant='outline'
+                                  onClick={() => downloadCoverLetter(letter.content, letter.title, 'pdf')}
+                                >
+                                  <Download className='h-3 w-3' />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      ) : (
+                        <div className='text-center py-8 text-muted-foreground'>
+                          <Wand2 className='h-12 w-12 mx-auto mb-4 opacity-50' />
+                          <p>Henüz kayıtlı ön yazı bulunmuyor</p>
+                          <Button className='mt-3' onClick={() => setActiveTab('cover-letter')} size='sm'>
+                            İlk Ön Yazınızı Oluşturun
+                          </Button>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Hızlı İşlemler</CardTitle>
+                    <CardDescription>En sık kullanılan özelliklerle hızlı başlayın</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className='grid gap-4 md:grid-cols-3'>
+                      <Button
+                        className='h-24 flex-col gap-2'
+                        variant='outline'
+                        onClick={() => setActiveTab('cv-upload')}
+                      >
+                        <Upload className='h-6 w-6' />
+                        CV Yükle
+                      </Button>
+                      <Button
+                        className='h-24 flex-col gap-2'
+                        variant='outline'
+                        onClick={() => setActiveTab('cv-generate')}
+                      >
+                        <FileText className='h-6 w-6' />
+                        CV Oluştur
+                      </Button>
+                      <Button
+                        className='h-24 flex-col gap-2'
+                        variant='outline'
+                        onClick={() => setActiveTab('cover-letter')}
+                      >
+                        <Wand2 className='h-6 w-6' />
+                        Ön Yazı Oluştur
+                      </Button>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value='cv-upload'>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className='flex items-center gap-2'>
+                      <Upload className='h-5 w-5' />
+                      CV Yükle
+                    </CardTitle>
+                    <CardDescription>Mevcut CV&apos;nizi yükleyerek ATS optimizasyonu için analiz edin</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <CVUpload onUploadSuccess={handleCVUploadSuccess} />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value='cv-generate'>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className='flex items-center gap-2'>
+                      <Wand2 className='h-5 w-5' />
+                      CV Oluştur
+                    </CardTitle>
+                    <CardDescription>ATS uyumlu profesyonel CV oluşturun</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <CVGeneratorForm onGenerate={handleCVGenerate} />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value='cover-letter'>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className='flex items-center gap-2'>
+                      <FileText className='h-5 w-5' />
+                      Ön Yazı Oluştur
+                    </CardTitle>
+                    <CardDescription>Pozisyona özel etkileyici ön yazı oluşturun</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <CoverLetterGenerator onGenerate={handleCoverLetterGenerate} />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value='cv-preview'>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className='flex items-center justify-between'>
+                      <span className='flex items-center gap-2'>
+                        <Eye className='h-5 w-5' />
+                        CV Önizleme
+                      </span>
+                      {generatedCV && (
+                        <div className='flex gap-2'>
+                          <Button variant='outline' onClick={handleSaveCV} disabled={cvLoading}>
+                            {cvLoading ? <LoadingSpinner size='sm' /> : <Save className='h-4 w-4' />}
+                            Kaydet
+                          </Button>
+                          <Button onClick={() => downloadCV(generatedCV, 'cv', 'pdf')} disabled={cvLoading}>
+                            <Download className='h-4 w-4' />
+                            İndir
+                          </Button>
+                        </div>
+                      )}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {generatedCV ? (
+                      <ContentViewer content={generatedCV} title='CV Önizleme' type='cv' />
+                    ) : (
+                      <div className='text-center py-12 text-muted-foreground'>
+                        <FileText className='h-16 w-16 mx-auto mb-4 opacity-50' />
+                        <h3 className='text-lg font-medium mb-2 text-foreground'>Henüz CV oluşturulmamış</h3>
+                        <p className='mb-4'>Önizlemek için önce bir CV oluşturun</p>
+                        <Button onClick={() => setActiveTab('cv-generate')}>CV Oluşturmaya Başla</Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value='cover-letter-preview'>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className='flex items-center justify-between'>
+                      <span className='flex items-center gap-2'>
+                        <Eye className='h-5 w-5' />
+                        Ön Yazı Önizleme
+                      </span>
+                      {generatedCoverLetter && (
+                        <div className='flex gap-2'>
+                          <Button variant='outline' onClick={handleSaveCoverLetter} disabled={coverLetterLoading}>
+                            {coverLetterLoading ? <LoadingSpinner size='sm' /> : <Save className='h-4 w-4' />}
+                            Kaydet
+                          </Button>
+                          <Button
+                            onClick={() => downloadCoverLetter(generatedCoverLetter, 'cover-letter', 'pdf')}
+                            disabled={coverLetterLoading}
+                          >
+                            <Download className='h-4 w-4' />
+                            İndir
+                          </Button>
+                        </div>
+                      )}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {generatedCoverLetter ? (
+                      <ContentViewer content={generatedCoverLetter} title='Ön Yazı Önizleme' type='cover-letter' />
+                    ) : (
+                      <div className='text-center py-12 text-muted-foreground'>
+                        <Wand2 className='h-16 w-16 mx-auto mb-4 opacity-50' />
+                        <h3 className='text-lg font-medium mb-2 text-foreground'>Henüz ön yazı oluşturulmamış</h3>
+                        <p className='mb-4'>Önizlemek için önce bir ön yazı oluşturun</p>
+                        <Button onClick={() => setActiveTab('cover-letter')}>Ön Yazı Oluşturmaya Başla</Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value='saved-content'>
+                <div className='grid gap-6 lg:grid-cols-2'>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className='flex items-center gap-2'>
+                        <FileText className='h-5 w-5' />
+                        Kayıtlı CV&apos;ler ({savedCVs.length})
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {savedCVs.length > 0 ? (
+                        <div className='space-y-4'>
+                          {savedCVs.map((cv) => (
+                            <div
+                              key={cv.id}
+                              className='flex items-center justify-between p-4 border border-border rounded-lg'
+                            >
+                              <div className='flex-1'>
+                                <h4 className='font-medium text-foreground'>{cv.title}</h4>
+                                <div className='flex items-center gap-4 mt-1 text-sm text-muted-foreground'>
+                                  <span className='flex items-center gap-1'>
+                                    <Calendar className='h-3 w-3' />
+                                    {new Date(cv.createdAt).toLocaleDateString('tr-TR')}
+                                  </span>
+                                  <Badge variant='secondary'>{cv.cvType}</Badge>
+                                </div>
+                              </div>
+                              <div className='flex gap-2'>
+                                <Button
+                                  size='sm'
+                                  variant='outline'
+                                  onClick={() => downloadCV(cv.content, cv.title, 'pdf')}
+                                >
+                                  <Download className='h-3 w-3' />
+                                </Button>
+                                <Button
+                                  size='sm'
+                                  variant='outline'
+                                  onClick={() => deleteSavedCV(cv.id)}
+                                  className='text-destructive hover:text-destructive'
+                                >
+                                  <Trash2 className='h-3 w-3' />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className='text-center py-8 text-muted-foreground'>
+                          <FileText className='h-12 w-12 mx-auto mb-4 opacity-50' />
+                          <p>Henüz kayıtlı CV bulunmuyor</p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className='flex items-center gap-2'>
+                        <Wand2 className='h-5 w-5' />
+                        Kayıtlı Ön Yazılar ({savedCoverLetters.length})
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {savedCoverLetters.length > 0 ? (
+                        <div className='space-y-4'>
+                          {savedCoverLetters.map((letter) => (
+                            <div
+                              key={letter.id}
+                              className='flex items-center justify-between p-4 border border-border rounded-lg'
+                            >
+                              <div className='flex-1'>
+                                <h4 className='font-medium text-foreground'>{letter.title}</h4>
+                                <div className='flex items-center gap-4 mt-1 text-sm text-muted-foreground'>
+                                  <span className='flex items-center gap-1'>
+                                    <Calendar className='h-3 w-3' />
+                                    {new Date(letter.createdAt).toLocaleDateString('tr-TR')}
+                                  </span>
+                                  <Badge variant='secondary'>{letter.category}</Badge>
+                                </div>
+                                <p className='text-sm text-muted-foreground mt-1'>
+                                  {letter.positionTitle} - {letter.companyName}
+                                </p>
+                              </div>
+                              <div className='flex gap-2'>
+                                <Button
+                                  size='sm'
+                                  variant='outline'
+                                  onClick={() => downloadCoverLetter(letter.content, letter.title, 'pdf')}
+                                >
+                                  <Download className='h-3 w-3' />
+                                </Button>
+                                <Button
+                                  size='sm'
+                                  variant='outline'
+                                  onClick={() => deleteSavedCoverLetter(letter.id)}
+                                  className='text-destructive hover:text-destructive'
+                                >
+                                  <Trash2 className='h-3 w-3' />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className='text-center py-8 text-muted-foreground'>
+                          <Wand2 className='h-12 w-12 mx-auto mb-4 opacity-50' />
+                          <p>Henüz kayıtlı ön yazı bulunmuyor</p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
       </div>
     </div>
   )

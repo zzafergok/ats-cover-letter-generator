@@ -77,12 +77,18 @@ export const authApi = {
   },
 
   // Change password - mutation için kullanılacak
-  changePassword: async (passwordData: {
+  changePassword: async (data: {
     currentPassword: string
     newPassword: string
     confirmPassword: string
   }): Promise<ApiResponse> => {
-    const response: any = await api.put(API_ENDPOINTS.AUTH.CHANGE_PASSWORD, passwordData)
+    const response: any = await api.put(API_ENDPOINTS.AUTH.CHANGE_PASSWORD, data)
+    return response
+  },
+
+  // Logout - mutation için kullanılacak
+  logout: async (refreshToken: string): Promise<ApiResponse> => {
+    const response: any = await api.post(API_ENDPOINTS.AUTH.LOGOUT, { refreshToken })
     return response
   },
 }
@@ -90,8 +96,8 @@ export const authApi = {
 // CV API fonksiyonları
 export const cvApi = {
   // Upload CV - mutation için kullanılacak
-  uploadCV: async (file: FormData): Promise<ApiResponse> => {
-    const response: any = await api.post(API_ENDPOINTS.CV.UPLOAD, file, {
+  uploadCV: async (formData: FormData): Promise<ApiResponse> => {
+    const response: any = await api.post(API_ENDPOINTS.CV.UPLOAD, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -105,8 +111,14 @@ export const cvApi = {
     return response
   },
 
+  // Delete CV upload - mutation için kullanılacak
+  deleteCVUpload: async (uploadId: string): Promise<ApiResponse> => {
+    const response: any = await api.delete(API_ENDPOINTS.CV.DELETE_UPLOAD(uploadId))
+    return response
+  },
+
   // Generate CV - mutation için kullanılacak
-  generateCV: async (cvData: {
+  generateCV: async (data: {
     cvUploadId: string
     positionTitle: string
     companyName: string
@@ -115,13 +127,13 @@ export const cvApi = {
     additionalRequirements?: string
     targetKeywords?: string[]
   }): Promise<ApiResponse> => {
-    const response: any = await api.post(API_ENDPOINTS.CV.GENERATE, cvData)
+    const response: any = await api.post(API_ENDPOINTS.CV.GENERATE, data)
     return response
   },
 
   // Save CV - mutation için kullanılacak
-  saveCV: async (cvData: { title: string; content: string; cvType: string }): Promise<ApiResponse> => {
-    const response: any = await api.post(API_ENDPOINTS.CV.SAVE, cvData)
+  saveCV: async (data: { title: string; content: string; cvType: string }): Promise<ApiResponse> => {
+    const response: any = await api.post(API_ENDPOINTS.CV.SAVE, data)
     return response
   },
 
@@ -134,6 +146,14 @@ export const cvApi = {
   // Delete saved CV - mutation için kullanılacak
   deleteSavedCV: async (cvId: string): Promise<ApiResponse> => {
     const response: any = await api.delete(API_ENDPOINTS.CV.DELETE_SAVED(cvId))
+    return response
+  },
+
+  // Download CV - query için kullanılacak
+  downloadCV: async (uploadId: string): Promise<ApiResponse> => {
+    const response: any = await api.get(API_ENDPOINTS.CV.DOWNLOAD(uploadId), {
+      responseType: 'blob',
+    })
     return response
   },
 
@@ -164,7 +184,7 @@ export const coverLetterApi = {
 
   // Generate cover letter - mutation için kullanılacak
   generateCoverLetter: async (data: {
-    cvUploadId: string
+    cvUploadId?: string
     category: string
     positionTitle: string
     companyName: string
@@ -237,13 +257,10 @@ export const contactApi = {
     const response: any = await api.get(API_ENDPOINTS.CONTACT.LIMIT)
     return response
   },
-}
 
-// System API fonksiyonları
-export const systemApi = {
-  // Health check - query için kullanılacak
-  healthCheck: async (): Promise<ApiResponse> => {
-    const response: any = await api.get(API_ENDPOINTS.SYSTEM.HEALTH)
+  // Get messages (Admin) - query için kullanılacak
+  getMessages: async (params?: { page?: number; limit?: number }): Promise<ApiResponse> => {
+    const response: any = await api.get(API_ENDPOINTS.CONTACT.MESSAGES, { params })
     return response
   },
 }

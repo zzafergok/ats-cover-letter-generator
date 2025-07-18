@@ -19,10 +19,12 @@ export const API_ENDPOINTS = {
   CV: {
     UPLOAD: '/cv/upload',
     UPLOADS: '/cv/uploads',
+    DELETE_UPLOAD: (id: string) => `/cv/uploads/${id}`,
     GENERATE: '/cv/generate',
     SAVE: '/cv/save',
     SAVED: '/cv/saved',
     DELETE_SAVED: (id: string) => `/cv/saved/${id}`,
+    DOWNLOAD: (id: string) => `/cv/download/${id}`,
     DOWNLOAD_PDF: '/cv/download/pdf',
     DOWNLOAD_DOCX: '/cv/download/docx',
   },
@@ -38,9 +40,7 @@ export const API_ENDPOINTS = {
   CONTACT: {
     SEND: '/contact/send',
     LIMIT: '/contact/limit',
-  },
-  SYSTEM: {
-    HEALTH: '/health',
+    MESSAGES: '/contact/messages',
   },
 } as const
 

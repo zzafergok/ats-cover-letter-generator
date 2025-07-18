@@ -194,9 +194,7 @@ export const cvApi = {
   upload: (file: File): Promise<UploadedCV> => {
     const formData = new FormData()
     formData.append('cvFile', file)
-    return apiRequest.post('/cv/upload', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    })
+    return apiRequest.post('/cv/upload', formData)
   },
   getUploaded: (): Promise<UploadedCV[]> => apiRequest.get('/cv/uploads'),
   generate: (

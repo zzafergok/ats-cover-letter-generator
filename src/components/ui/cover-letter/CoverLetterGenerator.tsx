@@ -1,4 +1,4 @@
-// src/components/cover-letter/CoverLetterGenerator.tsx
+// src/components/ui/cover-letter/CoverLetterGenerator.tsx
 'use client'
 
 import React, { useEffect } from 'react'
@@ -72,10 +72,10 @@ export function CoverLetterGenerator({ onGenerate, selectedCVUpload, className }
   })
 
   useEffect(() => {
-    if (categories.length === 0) {
+    if (!categories || categories.length === 0) {
       getCategories()
     }
-  }, [categories.length, getCategories])
+  }, [getCategories])
 
   useEffect(() => {
     if (selectedCVUpload?.id) {
@@ -127,13 +127,12 @@ export function CoverLetterGenerator({ onGenerate, selectedCVUpload, className }
       <CardHeader>
         <CardTitle className='flex items-center gap-2'>
           <FileText className='h-5 w-5' />
-          Ön Yazı Oluşturucu
+          Ön Yazı Oluştur
         </CardTitle>
         <CardDescription>Seçtiğiniz pozisyon için profesyonel ve kişiselleştirilmiş ön yazı oluşturun</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
-          {/* CV Upload Selection */}
           <div className='space-y-2'>
             <Label htmlFor='cvUploadId'>CV Dosyası Seçimi *</Label>
             {selectedCVUpload ? (
@@ -151,8 +150,7 @@ export function CoverLetterGenerator({ onGenerate, selectedCVUpload, className }
                 <div className='flex items-center gap-2'>
                   <AlertCircle className='h-4 w-4 text-orange-600' />
                   <p className='text-sm text-orange-800'>
-                    Ön yazı oluşturmak için önce bir CV dosyası yüklemeniz gerekiyor. Lütfen &quot;CV Yükle&quot;
-                    sekmesinden bir dosya yükleyiniz.
+                    Ön yazı oluşturmak için önce bir CV dosyası yüklemeniz gerekiyor.
                   </p>
                 </div>
               </div>
@@ -160,7 +158,6 @@ export function CoverLetterGenerator({ onGenerate, selectedCVUpload, className }
             {errors.cvUploadId && <p className='text-sm text-destructive'>{errors.cvUploadId.message}</p>}
           </div>
 
-          {/* Category Selection */}
           <div className='space-y-2'>
             <Label htmlFor='category'>Meslek Kategorisi *</Label>
             <Select
@@ -172,26 +169,26 @@ export function CoverLetterGenerator({ onGenerate, selectedCVUpload, className }
                 <SelectValue placeholder='İlgili meslek kategorisini seçiniz' />
               </SelectTrigger>
               <SelectContent>
-                {categories.map((category, index) => (
-                  <SelectItem key={index} value={category.key}>
-                    <div className='space-y-1'>
-                      <p className='font-medium'>{getCategoryDisplayName(category.key)}</p>
-                    </div>
-                  </SelectItem>
-                ))}
+                {Array.isArray(categories) &&
+                  categories.map((category, index) => (
+                    <SelectItem key={index} value={category.key}>
+                      <div className='space-y-1'>
+                        <p className='font-medium'>{getCategoryDisplayName(category.key)}</p>
+                      </div>
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
             {errors.category && <p className='text-sm text-destructive'>{errors.category.message}</p>}
           </div>
 
-          {/* Position Title */}
           <div className='space-y-2'>
             <Label htmlFor='positionTitle'>İş Pozisyonu *</Label>
             <div className='relative'>
               <Briefcase className='absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4' />
               <Input
                 id='positionTitle'
-                placeholder='ör. Frontend Developer, Pazarlama Uzmanı'
+                placeholder='ör. Senior Frontend Developer'
                 className='pl-10'
                 {...register('positionTitle')}
                 disabled={isSubmitting || isGenerating || !selectedCVUpload}
@@ -200,14 +197,13 @@ export function CoverLetterGenerator({ onGenerate, selectedCVUpload, className }
             {errors.positionTitle && <p className='text-sm text-destructive'>{errors.positionTitle.message}</p>}
           </div>
 
-          {/* Company Name */}
           <div className='space-y-2'>
             <Label htmlFor='companyName'>Şirket Adı *</Label>
             <div className='relative'>
               <Building className='absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4' />
               <Input
                 id='companyName'
-                placeholder='ör. ABC Teknoloji, XYZ Holding'
+                placeholder='ör. Microsoft'
                 className='pl-10'
                 {...register('companyName')}
                 disabled={isSubmitting || isGenerating || !selectedCVUpload}
@@ -216,14 +212,13 @@ export function CoverLetterGenerator({ onGenerate, selectedCVUpload, className }
             {errors.companyName && <p className='text-sm text-destructive'>{errors.companyName.message}</p>}
           </div>
 
-          {/* Contact Person (Optional) */}
           <div className='space-y-2'>
-            <Label htmlFor='contactPerson'>İletişim Kişisi (Opsiyonel)</Label>
+            <Label htmlFor='contactPerson'>İletişim Kişisi</Label>
             <div className='relative'>
               <User className='absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4' />
               <Input
                 id='contactPerson'
-                placeholder='ör. İK Müdürü, Sayın Ahmet Bey'
+                placeholder='ör. Sayın İnsan Kaynakları Müdürü'
                 className='pl-10'
                 {...register('contactPerson')}
                 disabled={isSubmitting || isGenerating || !selectedCVUpload}
@@ -232,13 +227,13 @@ export function CoverLetterGenerator({ onGenerate, selectedCVUpload, className }
             {errors.contactPerson && <p className='text-sm text-destructive'>{errors.contactPerson.message}</p>}
           </div>
 
-          {/* Job Description */}
           <div className='space-y-2'>
             <Label htmlFor='jobDescription'>İş Tanımı *</Label>
             <Textarea
               id='jobDescription'
-              placeholder='İş ilanından iş tanımını ve gereksinimlerini buraya kopyalayınız. Bu bilgiler ön yazınızın pozisyona uygun şekilde hazırlanması için kullanılacaktır.'
-              rows={6}
+              placeholder='İş pozisyonu hakkında detaylı bilgi ve gereksinimleri giriniz...'
+              className='min-h-[120px]'
+              rows={5}
               {...register('jobDescription')}
               disabled={isSubmitting || isGenerating || !selectedCVUpload}
             />
@@ -246,12 +241,12 @@ export function CoverLetterGenerator({ onGenerate, selectedCVUpload, className }
             {errors.jobDescription && <p className='text-sm text-destructive'>{errors.jobDescription.message}</p>}
           </div>
 
-          {/* Additional Requirements (Optional) */}
           <div className='space-y-2'>
-            <Label htmlFor='additionalRequirements'>Ek Gereksinimler (Opsiyonel)</Label>
+            <Label htmlFor='additionalRequirements'>Ek Gereksinimler</Label>
             <Textarea
               id='additionalRequirements'
-              placeholder='Pozisyon için önemli olan ek beceriler, sertifikalar veya deneyimler hakkında bilgi verebilirsiniz.'
+              placeholder='Ek gereksinimler, özel talepler veya vurgular...'
+              className='min-h-[80px]'
               rows={3}
               {...register('additionalRequirements')}
               disabled={isSubmitting || isGenerating || !selectedCVUpload}
@@ -264,7 +259,6 @@ export function CoverLetterGenerator({ onGenerate, selectedCVUpload, className }
             )}
           </div>
 
-          {/* Error Message */}
           {error && (
             <div className='bg-destructive/10 border border-destructive/20 rounded-lg p-4'>
               <div className='flex items-center gap-2'>
@@ -274,7 +268,6 @@ export function CoverLetterGenerator({ onGenerate, selectedCVUpload, className }
             </div>
           )}
 
-          {/* Action Buttons */}
           <div className='flex gap-3'>
             <Button type='submit' disabled={isSubmitting || isGenerating || !selectedCVUpload} className='flex-1'>
               {isGenerating && <Wand2 className='mr-2 h-4 w-4 animate-spin' />}
@@ -291,7 +284,7 @@ export function CoverLetterGenerator({ onGenerate, selectedCVUpload, className }
               <div className='flex items-center gap-2'>
                 <AlertCircle className='h-4 w-4 text-muted-foreground' />
                 <p className='text-sm text-muted-foreground'>
-                  Ön yazı oluşturmak için önce &quot;CV Yükle&quot; sekmesinden bir CV dosyası yüklemeniz gerekmektedir.
+                  Ön yazı oluşturmak için önce CV Yükle sekmesinden bir CV dosyası yüklemeniz gerekmektedir.
                 </p>
               </div>
             </div>

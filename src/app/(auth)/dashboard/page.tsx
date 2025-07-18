@@ -407,48 +407,15 @@ export default function DashboardPage() {
               </TabsContent>
 
               <TabsContent value='cv-upload'>
-                <Card>
-                  <CardHeader>
-                    <CardTitle className='flex items-center gap-2'>
-                      <Upload className='h-5 w-5' />
-                      CV Yükle
-                    </CardTitle>
-                    <CardDescription>Mevcut CV&apos;nizi yükleyerek ATS optimizasyonu için analiz edin</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <CVUpload onUploadSuccess={handleCVUploadSuccess} />
-                  </CardContent>
-                </Card>
+                <CVUpload onUploadSuccess={handleCVUploadSuccess} />
               </TabsContent>
 
               <TabsContent value='cv-generate'>
-                <Card>
-                  <CardHeader>
-                    <CardTitle className='flex items-center gap-2'>
-                      <Wand2 className='h-5 w-5' />
-                      CV Oluştur
-                    </CardTitle>
-                    <CardDescription>ATS uyumlu profesyonel CV oluşturun</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <CVGeneratorForm onGenerate={handleCVGenerate} />
-                  </CardContent>
-                </Card>
+                <CVGeneratorForm onGenerate={handleCVGenerate} />
               </TabsContent>
 
               <TabsContent value='cover-letter'>
-                <Card>
-                  <CardHeader>
-                    <CardTitle className='flex items-center gap-2'>
-                      <FileText className='h-5 w-5' />
-                      Ön Yazı Oluştur
-                    </CardTitle>
-                    <CardDescription>Pozisyona özel etkileyici ön yazı oluşturun</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <CoverLetterGenerator onGenerate={handleCoverLetterGenerate} />
-                  </CardContent>
-                </Card>
+                <CoverLetterGenerator onGenerate={handleCoverLetterGenerate} />
               </TabsContent>
 
               <TabsContent value='cv-preview'>

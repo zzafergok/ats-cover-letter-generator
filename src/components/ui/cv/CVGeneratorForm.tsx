@@ -146,7 +146,7 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
       <CardHeader>
         <CardTitle className='flex items-center gap-2'>
           <Wand2 className='h-5 w-5' />
-          CV Oluşturucu
+          CV Oluştur
         </CardTitle>
         <CardDescription>Seçtiğiniz pozisyon için ATS uyumlu ve profesyonel CV oluşturun</CardDescription>
       </CardHeader>
@@ -239,8 +239,8 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
                 <SelectValue placeholder='CV tipini seçiniz' />
               </SelectTrigger>
               <SelectContent>
-                {Object.entries(cvTypeDisplayNames).map(([key, displayName]) => (
-                  <SelectItem key={key} value={key}>
+                {Object.entries(cvTypeDisplayNames).map(([key, displayName], index) => (
+                  <SelectItem key={`${key}-${index}`} value={key}>
                     <div className='space-y-1'>
                       <p className='font-medium'>{displayName}</p>
                       <p className='text-xs text-muted-foreground'>

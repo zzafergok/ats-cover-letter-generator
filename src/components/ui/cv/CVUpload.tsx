@@ -19,11 +19,14 @@ interface CVUploadProps {
 
 export function CVUpload({ onUploadSuccess, maxFiles = 1, className }: CVUploadProps) {
   const { uploadCV, isUploading, error, clearError } = useCVStore()
+
   const [uploadProgress, setUploadProgress] = useState(0)
+  const [uploadSuccess, setUploadSuccess] = useState(false)
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
       clearError()
+      setUploadSuccess(false)
 
       for (const file of acceptedFiles) {
         try {
@@ -32,17 +35,28 @@ export function CVUpload({ onUploadSuccess, maxFiles = 1, className }: CVUploadP
             setUploadProgress((prev) => Math.min(prev + 10, 90))
           }, 200)
 
-          const uploadedCV = await uploadCV(file)
+          const response: any = await uploadCV(file)
 
           clearInterval(progressInterval)
-          setUploadProgress(100)
 
-          setTimeout(() => {
-            setUploadProgress(0)
-            onUploadSuccess?.(uploadedCV)
-          }, 1000)
-        } catch {
+          // API response kontrolü
+          if (response?.success === true) {
+            setUploadProgress(100)
+            setUploadSuccess(true)
+
+            setTimeout(() => {
+              setUploadProgress(0)
+              setUploadSuccess(false)
+              onUploadSuccess?.(response.data)
+            }, 2000)
+          } else {
+            throw new Error(response?.message || 'CV yüklenirken bir hata oluştu')
+          }
+        } catch (error: any) {
           setUploadProgress(0)
+          setUploadSuccess(false)
+          // Store'daki error handling'e güvenmek yerine manuel set
+          console.error('CV upload failed:', error)
         }
       }
     },
@@ -149,7 +163,7 @@ export function CVUpload({ onUploadSuccess, maxFiles = 1, className }: CVUploadP
         )}
 
         {/* Success Message */}
-        {uploadProgress === 100 && (
+        {uploadSuccess && (
           <div className='flex items-center gap-2 p-3 bg-green-50 rounded-lg'>
             <CheckCircle className='h-4 w-4 text-green-600 flex-shrink-0' />
             <p className='text-sm font-medium text-green-800'>CV başarıyla yüklendi ve işlendi!</p>

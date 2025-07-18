@@ -75,11 +75,13 @@ export const useCVStore = create<CVStore>()(
       uploadCV: async (file: File) => {
         set({ isUploading: true, error: null })
         try {
-          const uploadedCV = await cvApi.upload(file)
+          const uploadedCV: UploadedCV = await cvApi.upload(file)
+
           set((state) => ({
-            uploadedCVs: [...state.uploadedCVs, uploadedCV],
+            uploadedCVs: Array.isArray(state.uploadedCVs) ? [...state.uploadedCVs, uploadedCV] : [uploadedCV],
             isUploading: false,
           }))
+
           return uploadedCV
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || 'CV yüklenirken hata oluştu'

@@ -64,6 +64,11 @@ const setupRequestInterceptor = (instance: AxiosInstance): void => {
         throw new Error('No access token available')
       }
 
+      // FormData için Content-Type header'ı otomatik ayarlanması
+      if (config.data instanceof FormData) {
+        delete config.headers['Content-Type']
+      }
+
       return config
     },
     (error: AxiosError) => Promise.reject(error),

@@ -9,7 +9,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     <ProtectedRoute requireAuth={true}>
       <div className='min-h-screen bg-gray-50'>
         <AuthHeader />
-        <main className='flex-1'>{children}</main>
+        <main className='min-h-screen bg-background'>{children}</main>
       </div>
     </ProtectedRoute>
   )

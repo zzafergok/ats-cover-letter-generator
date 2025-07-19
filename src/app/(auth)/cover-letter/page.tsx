@@ -1,9 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react/no-unescaped-entities */
 'use client'
 
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useTranslation } from 'react-i18next'
 import {
   FileText,
   Plus,
@@ -40,9 +40,8 @@ import { useAuth } from '@/providers/AuthProvider'
 
 export default function CoverLetterDashboardPage() {
   const router = useRouter()
-  const { t } = useTranslation()
 
-  const { user, isAuthenticated, loading } = useAuth()
+  const { isAuthenticated, loading } = useAuth()
   const {
     savedCoverLetters = [],
     getSavedCoverLetters,

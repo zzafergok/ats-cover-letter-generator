@@ -1,4 +1,4 @@
-// lib/api/api.ts
+// lib.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { User } from '@/types'
 import { apiRequest } from './axios'
@@ -307,14 +307,14 @@ export const coverLetterApi = {
 
 export const templateApi = {
   getCategories: (): Promise<TemplateCategory[]> =>
-    apiRequest.get('/api/cover-letter-templates/categories', { skipAuth: true }),
+    apiRequest.get('/cover-letter-templates/categories', { skipAuth: true }),
   getAllTemplates: (): Promise<TemplatePreview[]> =>
-    apiRequest.get('/api/cover-letter-templates/templates', { skipAuth: true }),
+    apiRequest.get('/cover-letter-templates/templates', { skipAuth: true }),
   getTemplatesByCategory: (category: string): Promise<TemplatePreview[]> =>
-    apiRequest.get(`/api/cover-letter-templates/templates/category/${category}`, { skipAuth: true }),
+    apiRequest.get(`/cover-letter-templates/templates/category/${category}`, { skipAuth: true }),
   getTemplateDetail: (templateId: string): Promise<TemplateDetail> =>
-    apiRequest.get(`/api/cover-letter-templates/templates/${templateId}`, { skipAuth: true }),
+    apiRequest.get(`/cover-letter-templates/templates/${templateId}`, { skipAuth: true }),
   generateCoverLetter: (data: GenerateCoverLetterFromTemplateData): Promise<GeneratedCoverLetterResponse> =>
-    apiRequest.post('/api/cover-letter-templates/generate', data),
-  getStatistics: (): Promise<TemplateStatistics> => apiRequest.get('/api/cover-letter-templates/statistics'),
+    apiRequest.post('/cover-letter-templates/generate', data),
+  getStatistics: (): Promise<TemplateStatistics> => apiRequest.get('/cover-letter-templates/statistics'),
 }

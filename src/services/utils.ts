@@ -39,12 +39,12 @@ export const API_ENDPOINTS = {
   },
   // Yeni Template API Endpoints
   COVER_LETTER_TEMPLATES: {
-    CATEGORIES: '/api/cover-letter-templates/categories',
-    TEMPLATES: '/api/cover-letter-templates/templates',
-    TEMPLATES_BY_CATEGORY: (category: string) => `/api/cover-letter-templates/templates/category/${category}`,
-    TEMPLATE_DETAIL: (templateId: string) => `/api/cover-letter-templates/templates/${templateId}`,
-    GENERATE: '/api/cover-letter-templates/generate',
-    STATISTICS: '/api/cover-letter-templates/statistics',
+    CATEGORIES: '/cover-letter-templates/categories',
+    TEMPLATES: '/cover-letter-templates/templates',
+    TEMPLATES_BY_CATEGORY: (category: string) => `/cover-letter-templates/templates/category/${category}`,
+    TEMPLATE_DETAIL: (templateId: string) => `/cover-letter-templates/templates/${templateId}`,
+    GENERATE: '/cover-letter-templates/generate',
+    STATISTICS: '/cover-letter-templates/statistics',
   },
   CONTACT: {
     SEND: '/contact/send',

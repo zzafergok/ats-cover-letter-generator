@@ -55,7 +55,7 @@ interface TemplateState {
 }
 
 const initialState = {
-  categories: [],
+  categories: [] as TemplateCategory[],
   templates: [],
   templateDetails: {},
   statistics: null,
@@ -336,8 +336,12 @@ export const useTemplateSelectors = () => {
     selectedTemplateDetail: store.selectedTemplate ? store.templateDetails[store.selectedTemplate] : null,
 
     filteredTemplates: store.selectedCategory
-      ? store.templates.filter((t) => t.category === store.selectedCategory)
-      : store.templates,
+      ? Array.isArray(store.templates)
+        ? store.templates.filter((t) => t.category === store.selectedCategory)
+        : []
+      : Array.isArray(store.templates)
+        ? store.templates
+        : [],
 
     hasValidationErrors: Object.keys(store.validationErrors).length > 0,
 

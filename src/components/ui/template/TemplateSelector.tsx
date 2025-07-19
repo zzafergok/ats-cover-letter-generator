@@ -1,7 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // src/components/ui/template/TemplateSelector.tsx
 'use client'
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { Search, Filter, Grid, List, Eye, Sparkles } from 'lucide-react'
 
 import { Button } from '@/components/core/button'
@@ -22,15 +23,9 @@ interface TemplateSelectorProps {
 export const TemplateSelector: React.FC<TemplateSelectorProps> = ({ onTemplateSelect, className = '' }) => {
   const { categories, templates, filteredTemplates, selectedCategory, selectedTemplate, isLoading, error } =
     useTemplateSelectors()
+  console.log('🚀 ~ templates:', templates)
 
-  const {
-    fetchCategories,
-    fetchTemplates,
-    fetchTemplatesByCategory,
-    setSelectedCategory,
-    setSelectedTemplate,
-    clearError,
-  } = useTemplateActions()
+  const { fetchCategories, fetchTemplates, setSelectedCategory, setSelectedTemplate, clearError } = useTemplateActions()
 
   const [searchTerm, setSearchTerm] = React.useState('')
   const [viewMode, setViewMode] = React.useState<'grid' | 'list'>('grid')
@@ -44,11 +39,6 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({ onTemplateSe
   // Handle category change
   const handleCategoryChange = async (category: string | null) => {
     setSelectedCategory(category)
-    if (category) {
-      await fetchTemplatesByCategory(category)
-    } else {
-      await fetchTemplates()
-    }
   }
 
   // Handle template selection
@@ -58,17 +48,32 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({ onTemplateSe
   }
 
   // Filter templates by search term
-  const searchFilteredTemplates = React.useMemo(() => {
-    if (!searchTerm) return filteredTemplates
+  const filteredAndSortedTemplates = useMemo(() => {
+    // Base templates array - use raw data not pre-filtered
+    const baseTemplates = Array.isArray(templates?.data) ? templates.data : []
 
-    return filteredTemplates.filter(
-      (template) =>
-        template.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        template.preview.toLowerCase().includes(searchTerm.toLowerCase()),
-    )
-  }, [filteredTemplates, searchTerm])
+    if (baseTemplates.length === 0) return []
 
-  if (isLoading && templates.length === 0) {
+    let filtered = baseTemplates
+
+    // Apply category filter
+    if (selectedCategory) {
+      filtered = filtered.filter((template: any) => template.category === selectedCategory)
+    }
+
+    // Apply search filter
+    if (searchTerm.trim()) {
+      const searchLower = searchTerm.toLowerCase()
+      filtered = filtered.filter(
+        (template: any) =>
+          template.title?.toLowerCase().includes(searchLower) || template.preview?.toLowerCase().includes(searchLower),
+      )
+    }
+
+    return filtered
+  }, [templates?.data, selectedCategory, searchTerm])
+
+  if (isLoading && templates?.data?.length === 0) {
     return (
       <div className='flex items-center justify-center p-8'>
         <LoadingSpinner size='lg' />
@@ -116,11 +121,12 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({ onTemplateSe
             </SelectTrigger>
             <SelectContent>
               <SelectItem value='all'>Tüm Kategoriler</SelectItem>
-              {categories.map((category) => (
-                <SelectItem key={category.key} value={category.key}>
-                  {category.label} ({category.templateCount})
-                </SelectItem>
-              ))}
+              {Array.isArray(categories) &&
+                categories.map((category) => (
+                  <SelectItem key={category.key} value={category.key}>
+                    {category.label} ({category.templateCount})
+                  </SelectItem>
+                ))}
             </SelectContent>
           </Select>
         </div>
@@ -142,31 +148,60 @@ export const TemplateSelector: React.FC<TemplateSelectorProps> = ({ onTemplateSe
 
       {/* Templates */}
       <div className='space-y-4'>
-        {isLoading ? (
-          <div className='flex items-center justify-center p-8'>
-            <LoadingSpinner />
-          </div>
-        ) : searchFilteredTemplates.length === 0 ? (
-          <Card>
-            <CardContent className='pt-6 text-center'>
-              <p className='text-muted-foreground'>
-                {searchTerm ? 'Arama kriterlerinize uygun template bulunamadı' : 'Template bulunamadı'}
-              </p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-4'}>
-            {searchFilteredTemplates.map((template) => (
-              <TemplateCard
-                key={template.id}
-                template={template}
-                isSelected={selectedTemplate === template.id}
-                viewMode={viewMode}
-                onSelect={() => handleTemplateSelect(template.id)}
-              />
-            ))}
-          </div>
-        )}
+        {(() => {
+          // Loading state
+          if (isLoading) {
+            return (
+              <div className='flex items-center justify-center p-8'>
+                <LoadingSpinner />
+              </div>
+            )
+          }
+
+          // Check if we have any templates at all
+          const hasBaseTemplates = Array.isArray(templates?.data) && templates.data.length > 0
+
+          // No templates loaded yet
+          if (!hasBaseTemplates) {
+            return (
+              <Card>
+                <CardContent className='pt-6 text-center'>
+                  <p className='text-muted-foreground'>Henüz template yüklenmedi</p>
+                </CardContent>
+              </Card>
+            )
+          }
+
+          // Templates exist but filtered results are empty
+          if (filteredAndSortedTemplates.length === 0) {
+            const hasActiveFilters = searchTerm.trim() || selectedCategory
+
+            return (
+              <Card>
+                <CardContent className='pt-6 text-center'>
+                  <p className='text-muted-foreground'>
+                    {hasActiveFilters ? 'Arama kriterlerinize uygun template bulunamadı' : 'Template bulunamadı'}
+                  </p>
+                </CardContent>
+              </Card>
+            )
+          }
+
+          // Render filtered templates
+          return (
+            <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-4'}>
+              {filteredAndSortedTemplates.map((template) => (
+                <TemplateCard
+                  key={template.id}
+                  template={template}
+                  isSelected={selectedTemplate === template.id}
+                  viewMode={viewMode}
+                  onSelect={() => handleTemplateSelect(template.id)}
+                />
+              ))}
+            </div>
+          )
+        })()}
       </div>
     </div>
   )

@@ -171,14 +171,17 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
                   <SelectValue placeholder='Yüklenmiş CV dosyalarınızdan birini seçiniz' />
                 </SelectTrigger>
                 <SelectContent>
-                  {uploadedCVs.map((cv) => (
-                    <SelectItem key={cv.id} value={cv.id}>
-                      <div className='flex items-center gap-2'>
-                        <FileText className='h-4 w-4' />
-                        <span>{cv.originalName}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
+                  {uploadedCVs.map((cv: any) => {
+                    console.log('🚀 ~ {uploadedCVs.map ~ cv:', cv)
+                    return (
+                      <SelectItem key={cv.data.id} value={cv.data.id}>
+                        <div className='flex items-center gap-2'>
+                          <FileText className='h-4 w-4' />
+                          <span>{cv.data.fileInfo.originalName}</span>
+                        </div>
+                      </SelectItem>
+                    )
+                  })}
                 </SelectContent>
               </Select>
             ) : (
@@ -194,7 +197,6 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
             )}
             {errors.cvUploadId && <p className='text-sm text-destructive'>{errors.cvUploadId.message}</p>}
           </div>
-
           {/* Position Title */}
           <div className='space-y-2'>
             <Label htmlFor='positionTitle'>İş Pozisyonu *</Label>
@@ -210,7 +212,6 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
             </div>
             {errors.positionTitle && <p className='text-sm text-destructive'>{errors.positionTitle.message}</p>}
           </div>
-
           {/* Company Name */}
           <div className='space-y-2'>
             <Label htmlFor='companyName'>Şirket Adı *</Label>
@@ -227,7 +228,7 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
             {errors.companyName && <p className='text-sm text-destructive'>{errors.companyName.message}</p>}
           </div>
 
-          {/* CV Type */}
+          {/* CV Type  */}
           <div className='space-y-2'>
             <Label htmlFor='cvType'>CV Tipi *</Label>
             <Select
@@ -239,8 +240,8 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
                 <SelectValue placeholder='CV tipini seçiniz' />
               </SelectTrigger>
               <SelectContent>
-                {Object.entries(cvTypeDisplayNames).map(([key, displayName], index) => (
-                  <SelectItem key={`${key}-${index}`} value={key}>
+                {Object.entries(cvTypeDisplayNames).map(([key, displayName]) => (
+                  <SelectItem key={key} value={key}>
                     <div className='space-y-1'>
                       <p className='font-medium'>{displayName}</p>
                       <p className='text-xs text-muted-foreground'>
@@ -253,7 +254,6 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
             </Select>
             {errors.cvType && <p className='text-sm text-destructive'>{errors.cvType.message}</p>}
           </div>
-
           {/* Job Description */}
           <div className='space-y-2'>
             <Label htmlFor='jobDescription'>İş Tanımı *</Label>
@@ -267,7 +267,6 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
             <p className='text-xs text-muted-foreground'>{watch('jobDescription')?.length || 0} / 5000 karakter</p>
             {errors.jobDescription && <p className='text-sm text-destructive'>{errors.jobDescription.message}</p>}
           </div>
-
           {/* Additional Requirements (Optional) */}
           <div className='space-y-2'>
             <Label htmlFor='additionalRequirements'>Ek Gereksinimler (Opsiyonel)</Label>
@@ -285,7 +284,6 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
               <p className='text-sm text-destructive'>{errors.additionalRequirements.message}</p>
             )}
           </div>
-
           {/* Target Keywords (Optional) */}
           <div className='space-y-2'>
             <Label htmlFor='targetKeywords'>Hedef Anahtar Kelimeler (Opsiyonel)</Label>
@@ -307,7 +305,6 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
             </p>
             {errors.targetKeywords && <p className='text-sm text-destructive'>{errors.targetKeywords.message}</p>}
           </div>
-
           {/* Error Message */}
           {error && (
             <div className='bg-destructive/10 border border-destructive/20 rounded-lg p-4'>
@@ -317,7 +314,6 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
               </div>
             </div>
           )}
-
           {/* Action Buttons */}
           <div className='flex gap-3'>
             <Button
@@ -333,7 +329,6 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
               Formu Temizle
             </Button>
           </div>
-
           {!selectedCVUpload && uploadedCVs.length === 0 && (
             <div className='bg-muted/50 border border-muted rounded-lg p-4'>
               <div className='flex items-center gap-2'>

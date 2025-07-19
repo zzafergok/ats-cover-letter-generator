@@ -93,8 +93,15 @@ export interface ContactResponse {
 export interface UploadedCV {
   id: string
   originalName: string
-  uploadDate: string
+  fileName: string
+  fileSize: number
+  filePath: string
+  mimeType: string
   markdownContent: string
+  uploadDate: string
+  userId: string
+  createdAt: string
+  updatedAt: string
 }
 
 export interface SavedCV {

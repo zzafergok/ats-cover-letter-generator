@@ -273,7 +273,7 @@ export default function DashboardPage() {
               </TabsList>
 
               <TabsContent value='overview' className='space-y-6'>
-                <div className='grid gap-6 md:grid-cols-2'>
+                <div className='grid gap-6 md:grid-cols-3'>
                   <Card>
                     <CardHeader>
                       <CardTitle className='flex items-center gap-2'>
@@ -363,6 +363,56 @@ export default function DashboardPage() {
                           <p>Henüz kayıtlı ön yazı bulunmuyor</p>
                           <Button className='mt-3' onClick={() => setActiveTab('cover-letter')} size='sm'>
                             İlk Ön Yazınızı Oluşturun
+                          </Button>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className='flex items-center gap-2'>
+                        <Upload className='h-5 w-5' />
+                        Yüklenmiş CV&apos;ler
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {uploadedCVs.length > 0 ? (
+                        <div className='space-y-3'>
+                          {uploadedCVs.slice(0, 3).map((cv) => (
+                            <div key={cv.id} className='flex items-center justify-between p-3 bg-muted/50 rounded-lg'>
+                              <div className='flex-1'>
+                                <h4 className='text-sm font-medium'>{cv.originalName}</h4>
+                                <div className='flex items-center gap-2 mt-1'>
+                                  <p className='text-xs text-muted-foreground'>
+                                    {cv.uploadDate ? new Date(cv.uploadDate).toLocaleDateString('tr-TR') : ''}
+                                  </p>
+                                  <Badge variant='outline' className='text-xs'>
+                                    {cv.mimeType === 'application/pdf'
+                                      ? 'PDF'
+                                      : cv.mimeType?.includes('word')
+                                        ? 'DOC'
+                                        : 'Dosya'}
+                                  </Badge>
+                                  {cv.fileSize && (
+                                    <span className='text-xs text-muted-foreground'>
+                                      {(cv.fileSize / 1024 / 1024).toFixed(2)} MB
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              <Button size='sm' variant='outline'>
+                                <Eye className='h-3 w-3' />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className='text-center py-8 text-muted-foreground'>
+                          <Upload className='h-12 w-12 mx-auto mb-4 opacity-50' />
+                          <p>Henüz CV yüklenmemiş</p>
+                          <Button className='mt-3' onClick={() => setActiveTab('cv-upload')} size='sm'>
+                            İlk CV&apos;nizi Yükleyin
                           </Button>
                         </div>
                       )}

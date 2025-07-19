@@ -37,11 +37,67 @@ export const API_ENDPOINTS = {
     DOWNLOAD_PDF: '/cover-letter/download/pdf',
     DOWNLOAD_DOCX: '/cover-letter/download/docx',
   },
+  // Yeni Template API Endpoints
+  COVER_LETTER_TEMPLATES: {
+    CATEGORIES: '/api/cover-letter-templates/categories',
+    TEMPLATES: '/api/cover-letter-templates/templates',
+    TEMPLATES_BY_CATEGORY: (category: string) => `/api/cover-letter-templates/templates/category/${category}`,
+    TEMPLATE_DETAIL: (templateId: string) => `/api/cover-letter-templates/templates/${templateId}`,
+    GENERATE: '/api/cover-letter-templates/generate',
+    STATISTICS: '/api/cover-letter-templates/statistics',
+  },
   CONTACT: {
     SEND: '/contact/send',
     LIMIT: '/contact/limit',
     MESSAGES: '/contact/messages',
   },
+} as const
+
+export const TEMPLATE_CATEGORY = {
+  WEB_DEVELOPER: 'WEB_DEVELOPER',
+  ACCOUNT_EXECUTIVE: 'ACCOUNT_EXECUTIVE',
+  DATA_ANALYST: 'DATA_ANALYST',
+  MARKETING: 'MARKETING',
+  SALES: 'SALES',
+  HUMAN_RESOURCES: 'HUMAN_RESOURCES',
+  GENERAL: 'GENERAL',
+} as const
+
+export const TEMPLATE_VALIDATION = {
+  COMPANY_NAME: {
+    MIN_LENGTH: 2,
+    MAX_LENGTH: 100,
+  },
+  POSITION_TITLE: {
+    MIN_LENGTH: 2,
+    MAX_LENGTH: 100,
+  },
+  APPLICANT_NAME: {
+    MIN_LENGTH: 2,
+    MAX_LENGTH: 50,
+  },
+  CONTACT_PERSON: {
+    MIN_LENGTH: 2,
+    MAX_LENGTH: 50,
+  },
+  SPECIFIC_SKILLS: {
+    MAX_COUNT: 10,
+    MAX_LENGTH: 30,
+  },
+  ADDITIONAL_INFO: {
+    MAX_LENGTH: 500,
+  },
+} as const
+
+export const TEMPLATE_PLACEHOLDERS = {
+  CONTACT_PERSON: '{{contactPerson}}',
+  COMPANY_NAME: '{{companyName}}',
+  POSITION_TITLE: '{{positionTitle}}',
+  APPLICANT_NAME: '{{applicantName}}',
+  APPLICANT_EMAIL: '{{applicantEmail}}',
+  EXPERIENCE_YEARS: '{{experienceYears}}',
+  SPECIFIC_SKILLS: '{{specificSkills}}',
+  ADDITIONAL_INFO: '{{additionalInfo}}',
 } as const
 
 // HTTP Status Codes
@@ -81,6 +137,12 @@ export const ERROR_CODES = {
   INVALID_CV_DATA: 'INVALID_CV_DATA',
   INVALID_FILE_FORMAT: 'INVALID_FILE_FORMAT',
   FILE_TOO_LARGE: 'FILE_TOO_LARGE',
+  // Yeni template error kodları
+  TEMPLATE_NOT_FOUND: 'TEMPLATE_NOT_FOUND',
+  TEMPLATE_GENERATION_FAILED: 'TEMPLATE_GENERATION_FAILED',
+  INVALID_TEMPLATE_DATA: 'INVALID_TEMPLATE_DATA',
+  MISSING_PLACEHOLDERS: 'MISSING_PLACEHOLDERS',
+  TEMPLATE_CATEGORY_NOT_FOUND: 'TEMPLATE_CATEGORY_NOT_FOUND',
 } as const
 
 // Request Timeout
@@ -91,6 +153,8 @@ export const REQUEST_TIMEOUT = {
   LONG_RUNNING: 120000,
   CV_GENERATION: 60000,
   COVER_LETTER_GENERATION: 60000,
+  TEMPLATE_GENERATION: 30000,
+  TEMPLATE_FETCH: 10000,
 } as const
 
 // CV Type Constants
@@ -110,6 +174,10 @@ export const COVER_LETTER_CATEGORY = {
   FINANCE: 'FINANCE',
   HUMAN_RESOURCES: 'HUMAN_RESOURCES',
   GENERAL: 'GENERAL',
+  // Yeni template kategorileri
+  WEB_DEVELOPER: 'WEB_DEVELOPER',
+  ACCOUNT_EXECUTIVE: 'ACCOUNT_EXECUTIVE',
+  DATA_ANALYST: 'DATA_ANALYST',
 } as const
 
 // Contact Message Type Constants
@@ -152,7 +220,7 @@ export const CV_VALIDATION = {
 // File Upload Validation
 export const FILE_VALIDATION = {
   CV_UPLOAD: {
-    MAX_SIZE: 10 * 1024 * 1024, // 10MB
+    MAX_SIZE: 10 * 1024 * 1024,
     ALLOWED_TYPES: [
       'application/pdf',
       'application/msword',
@@ -216,152 +284,145 @@ export interface CVRequestConfig extends RequestConfig {
 
 // Utility Functions for ATS CV project
 export const cvUtils = {
-  // CV tipi için renk döndür
   getCVTypeColor: (type: string): string => {
     switch (type) {
       case CV_TYPE.ATS_OPTIMIZED:
-        return '#10b981' // green
+        return '#10b981'
       case CV_TYPE.CREATIVE:
-        return '#8b5cf6' // purple
+        return '#8b5cf6'
       case CV_TYPE.EXECUTIVE:
-        return '#3b82f6' // blue
+        return '#3b82f6'
       case CV_TYPE.ACADEMIC:
-        return '#f59e0b' // yellow
+        return '#f59e0b'
       default:
-        return '#6b7280' // gray
+        return '#6b7280'
     }
   },
 
-  // Cover letter kategorisi için renk döndür
   getCategoryColor: (category: string): string => {
     switch (category) {
       case COVER_LETTER_CATEGORY.SOFTWARE_DEVELOPER:
-        return '#3b82f6' // blue
+        return '#3b82f6'
       case COVER_LETTER_CATEGORY.DATA_SCIENTIST:
-        return '#8b5cf6' // purple
+        return '#8b5cf6'
       case COVER_LETTER_CATEGORY.MARKETING:
-        return '#f97316' // orange
+        return '#f97316'
       case COVER_LETTER_CATEGORY.SALES:
-        return '#ef4444' // red
+        return '#ef4444'
       case COVER_LETTER_CATEGORY.FINANCE:
-        return '#10b981' // green
+        return '#10b981'
       case COVER_LETTER_CATEGORY.HUMAN_RESOURCES:
-        return '#ec4899' // pink
+        return '#ec4899'
       default:
-        return '#6b7280' // gray
+        return '#6b7280'
     }
   },
 
-  // Dosya boyutunu formatla
   formatFileSize: (bytes: number): string => {
     if (bytes === 0) return '0 Bytes'
-
     const k = 1024
     const sizes = ['Bytes', 'KB', 'MB', 'GB']
     const i = Math.floor(Math.log(bytes) / Math.log(k))
-
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
   },
 
-  // Dosya tipini kontrol et
   isValidFileType: (file: File): boolean => {
     return FILE_VALIDATION.CV_UPLOAD.ALLOWED_TYPES.includes(
       file.type as (typeof FILE_VALIDATION.CV_UPLOAD.ALLOWED_TYPES)[number],
     )
   },
 
-  // Dosya boyutunu kontrol et
   isValidFileSize: (file: File): boolean => {
     return file.size <= FILE_VALIDATION.CV_UPLOAD.MAX_SIZE
   },
+}
 
-  // Tarih formatla
-  formatDate: (date: string | Date): string => {
-    const d = new Date(date)
-    return d.toLocaleDateString('tr-TR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+export const templateUtils = {
+  // Template kategorisi için renk döndür
+  getTemplateCategoryColor: (category: string): string => {
+    switch (category) {
+      case TEMPLATE_CATEGORY.WEB_DEVELOPER:
+        return '#3b82f6' // blue
+      case TEMPLATE_CATEGORY.ACCOUNT_EXECUTIVE:
+        return '#ef4444' // red
+      case TEMPLATE_CATEGORY.DATA_ANALYST:
+        return '#8b5cf6' // purple
+      case TEMPLATE_CATEGORY.MARKETING:
+        return '#f97316' // orange
+      case TEMPLATE_CATEGORY.SALES:
+        return '#10b981' // green
+      case TEMPLATE_CATEGORY.HUMAN_RESOURCES:
+        return '#ec4899' // pink
+      default:
+        return '#6b7280' // gray
+    }
+  },
+
+  // Template kategorisi için ikon döndür
+  getTemplateCategoryIcon: (category: string): string => {
+    const iconMap: Record<string, string> = {
+      [TEMPLATE_CATEGORY.WEB_DEVELOPER]: 'Code',
+      [TEMPLATE_CATEGORY.ACCOUNT_EXECUTIVE]: 'Users',
+      [TEMPLATE_CATEGORY.DATA_ANALYST]: 'BarChart3',
+      [TEMPLATE_CATEGORY.MARKETING]: 'Megaphone',
+      [TEMPLATE_CATEGORY.SALES]: 'TrendingUp',
+      [TEMPLATE_CATEGORY.HUMAN_RESOURCES]: 'Heart',
+      [TEMPLATE_CATEGORY.GENERAL]: 'FileText',
+    }
+    return iconMap[category] || iconMap[TEMPLATE_CATEGORY.GENERAL]
+  },
+
+  // Template içindeki placeholder'ları çıkar
+  extractPlaceholders: (content: string): string[] => {
+    const placeholderRegex = /\{\{([^}]+)\}\}/g
+    const matches = content.match(placeholderRegex)
+    return matches ? [...new Set(matches)] : []
+  },
+
+  // Template content'ini placeholder'larla doldur
+  replacePlaceholders: (content: string, data: Record<string, string>): string => {
+    let result = content
+    Object.entries(data).forEach(([key, value]) => {
+      const placeholder = `{{${key}}}`
+      result = result.replace(new RegExp(placeholder, 'g'), value || placeholder)
     })
+    return result
   },
 
-  // Relative time formatla
-  formatRelativeTime: (date: string | Date): string => {
-    const d = new Date(date)
-    const now = new Date()
-    const diffMs = now.getTime() - d.getTime()
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
-    const diffMinutes = Math.floor(diffMs / (1000 * 60))
-
-    if (diffDays > 0) {
-      return `${diffDays} gün önce`
-    } else if (diffHours > 0) {
-      return `${diffHours} saat önce`
-    } else if (diffMinutes > 0) {
-      return `${diffMinutes} dakika önce`
-    } else {
-      return 'Az önce'
-    }
+  // Template preview'ını kısalt
+  truncateTemplatePreview: (content: string, maxLength: number = 150): string => {
+    // Placeholder'ları temizle
+    const cleanContent = content.replace(/\{\{[^}]+\}\}/g, '[...]')
+    if (cleanContent.length <= maxLength) return cleanContent
+    return cleanContent.substring(0, maxLength).trim() + '...'
   },
 
-  // CV içeriğini validate et
-  validateCVContent: (content: string): { isValid: boolean; errors: string[] } => {
-    const errors: string[] = []
+  // Template istatistiklerini formatla
+  formatTemplateStatistics: (wordCount: number, characterCount: number) => ({
+    wordCount,
+    characterCount,
+    estimatedReadingTime: Math.ceil(wordCount / 200), // 200 kelime/dakika ortalama okuma hızı
+    characterCountFormatted: characterCount.toLocaleString('tr-TR'),
+    wordCountFormatted: wordCount.toLocaleString('tr-TR'),
+  }),
 
-    if (!content || content.trim().length === 0) {
-      errors.push('CV içeriği boş olamaz')
-    }
-
-    if (content.length > CV_VALIDATION.CONTENT.MAX_LENGTH) {
-      errors.push(`CV içeriği maksimum ${CV_VALIDATION.CONTENT.MAX_LENGTH} karakter olabilir`)
-    }
-
-    return { isValid: errors.length === 0, errors }
-  },
-
-  // Target keywords validate et
-  validateTargetKeywords: (keywords: string[]): { isValid: boolean; errors: string[] } => {
-    const errors: string[] = []
-
-    if (keywords.length > CV_VALIDATION.TARGET_KEYWORDS.MAX_COUNT) {
-      errors.push(`Maksimum ${CV_VALIDATION.TARGET_KEYWORDS.MAX_COUNT} anahtar kelime eklenebilir`)
-    }
-
-    keywords.forEach((keyword, index) => {
-      if (keyword.length > CV_VALIDATION.TARGET_KEYWORDS.MAX_LENGTH) {
-        errors.push(
-          `Anahtar kelime ${index + 1} maksimum ${CV_VALIDATION.TARGET_KEYWORDS.MAX_LENGTH} karakter olabilir`,
-        )
+  // Placeholder validation
+  validateTemplateData: (placeholders: string[], data: Record<string, any>): string[] => {
+    const missingFields: string[] = []
+    placeholders.forEach((placeholder) => {
+      const field = placeholder.replace(/\{\{|\}\}/g, '')
+      if (!data[field] || (typeof data[field] === 'string' && data[field].trim() === '')) {
+        missingFields.push(field)
       }
     })
-
-    return { isValid: errors.length === 0, errors }
+    return missingFields
   },
+}
 
-  // Random hex color generator
-  generateRandomColor: (): string => {
-    const colors = [
-      '#ef4444',
-      '#f97316',
-      '#f59e0b',
-      '#eab308',
-      '#84cc16',
-      '#22c55e',
-      '#10b981',
-      '#14b8a6',
-      '#06b6d4',
-      '#0ea5e9',
-      '#3b82f6',
-      '#6366f1',
-      '#8b5cf6',
-      '#a855f7',
-      '#d946ef',
-      '#ec4899',
-      '#f43f5e',
-    ]
-    return colors[Math.floor(Math.random() * colors.length)]
-  },
+export interface CVRequestConfig extends RequestConfig {
+  validateBeforeSend?: boolean
+  optimisticUpdate?: boolean
+  includeAnalytics?: boolean
 }
 
 // Request Queue for handling multiple requests during token refresh

@@ -167,6 +167,78 @@ export interface CoverLetterSaveData {
   contactPerson?: string
 }
 
+// Template type tanımları
+export interface TemplateCategory {
+  key: string
+  label: string
+  description: string
+  templateCount: number
+}
+
+export interface TemplatePreview {
+  id: string
+  category: string
+  title: string
+  placeholders: string[]
+  preview: string
+  createdAt: string
+}
+
+export interface TemplateDetail {
+  id: string
+  category: string
+  title: string
+  content: string
+  placeholders: string[]
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface GenerateCoverLetterFromTemplateData {
+  templateId: string
+  companyName: string
+  positionTitle: string
+  applicantName: string
+  applicantEmail: string
+  contactPerson: string
+  specificSkills?: string[]
+  additionalInfo?: string
+}
+
+export interface GeneratedCoverLetterResponse {
+  content: string
+  templateUsed: {
+    id: string
+    title: string
+    category: string
+  }
+  generatedFor: {
+    companyName: string
+    positionTitle: string
+    applicantName: string
+    contactPerson: string
+  }
+  generatedAt: string
+  statistics: {
+    wordCount: number
+    characterCount: number
+    estimatedReadingTime: number
+  }
+}
+
+export interface TemplateStatistics {
+  totalTemplates: number
+  categoryBreakdown: Record<string, number>
+  averagePlaceholders: number
+  mostUsedCategory: string
+  recentlyAdded: Array<{
+    id: string
+    title: string
+    category: string
+  }>
+}
+
 export const authApi = {
   login: (credentials: { email: string; password: string }): Promise<any> =>
     apiRequest.post('/auth/login', credentials, { skipAuth: true }),
@@ -231,4 +303,18 @@ export const coverLetterApi = {
   delete: (id: string): Promise<void> => apiRequest.delete(`/cover-letter/saved/${id}`),
   download: (format: 'pdf' | 'docx', content: string, fileName: string): Promise<Blob> =>
     apiRequest.post(`/cover-letter/download/${format}`, { content, fileName }, { responseType: 'blob' }),
+}
+
+export const templateApi = {
+  getCategories: (): Promise<TemplateCategory[]> =>
+    apiRequest.get('/api/cover-letter-templates/categories', { skipAuth: true }),
+  getAllTemplates: (): Promise<TemplatePreview[]> =>
+    apiRequest.get('/api/cover-letter-templates/templates', { skipAuth: true }),
+  getTemplatesByCategory: (category: string): Promise<TemplatePreview[]> =>
+    apiRequest.get(`/api/cover-letter-templates/templates/category/${category}`, { skipAuth: true }),
+  getTemplateDetail: (templateId: string): Promise<TemplateDetail> =>
+    apiRequest.get(`/api/cover-letter-templates/templates/${templateId}`, { skipAuth: true }),
+  generateCoverLetter: (data: GenerateCoverLetterFromTemplateData): Promise<GeneratedCoverLetterResponse> =>
+    apiRequest.post('/api/cover-letter-templates/generate', data),
+  getStatistics: (): Promise<TemplateStatistics> => apiRequest.get('/api/cover-letter-templates/statistics'),
 }

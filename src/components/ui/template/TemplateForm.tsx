@@ -94,12 +94,44 @@ export const TemplateForm: React.FC<TemplateFormProps> = ({ onSubmit, onPreview,
   }, [selectedTemplate, setValue, fetchTemplateDetail])
 
   // Update form data in store when form values change
+  // Update form data in store when form values change
   useEffect(() => {
-    setFormData({
-      ...watchedValues,
+    const currentData = {
+      templateId: watchedValues.templateId,
+      companyName: watchedValues.companyName,
+      positionTitle: watchedValues.positionTitle,
+      applicantName: watchedValues.applicantName,
+      applicantEmail: watchedValues.applicantEmail,
+      contactPerson: watchedValues.contactPerson,
       specificSkills: skills,
-    })
-  }, [watchedValues, skills, setFormData])
+      additionalInfo: watchedValues.additionalInfo,
+    }
+
+    const hasChanged =
+      formData.templateId !== currentData.templateId ||
+      formData.companyName !== currentData.companyName ||
+      formData.positionTitle !== currentData.positionTitle ||
+      formData.applicantName !== currentData.applicantName ||
+      formData.applicantEmail !== currentData.applicantEmail ||
+      formData.contactPerson !== currentData.contactPerson ||
+      formData.additionalInfo !== currentData.additionalInfo ||
+      JSON.stringify(formData.specificSkills) !== JSON.stringify(currentData.specificSkills)
+
+    if (hasChanged) {
+      setFormData(currentData)
+    }
+  }, [
+    watchedValues.templateId,
+    watchedValues.companyName,
+    watchedValues.positionTitle,
+    watchedValues.applicantName,
+    watchedValues.applicantEmail,
+    watchedValues.contactPerson,
+    watchedValues.additionalInfo,
+    skills,
+    formData,
+    setFormData,
+  ])
 
   // Handle skill management
   const addSkill = () => {
@@ -160,7 +192,7 @@ export const TemplateForm: React.FC<TemplateFormProps> = ({ onSubmit, onPreview,
               <Sparkles className='h-5 w-5 text-primary' />
               <span>{selectedTemplateDetail.title}</span>
             </CardTitle>
-            <CardDescription>{selectedTemplateDetail.placeholders.length} alan doldurulacak</CardDescription>
+            <CardDescription>{selectedTemplateDetail.placeholders?.length || 0} alan doldurulacak</CardDescription>
           </CardHeader>
         </Card>
       )}

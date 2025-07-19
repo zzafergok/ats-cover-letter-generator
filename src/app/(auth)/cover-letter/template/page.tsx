@@ -159,7 +159,7 @@ export default function TemplateCoverLetterPage() {
                   <CardContent>
                     <ContentViewer
                       content={generatedContent.content}
-                      title={generatedContent.templateUsed.title}
+                      title={generatedContent.templateUsed?.title || 'Cover Letter'}
                       type='cover-letter'
                     />
                   </CardContent>
@@ -306,13 +306,13 @@ export default function TemplateCoverLetterPage() {
           <DialogHeader>
             <DialogTitle>Template Önizleme</DialogTitle>
             <DialogDescription>
-              {selectedTemplateDetail?.title} template&apos;inin nasıl görüneceğini kontrol edin
+              {selectedTemplateDetail?.title || 'Template'} önizlemesini kontrol edin
             </DialogDescription>
           </DialogHeader>
           {selectedTemplateDetail && (
             <ContentViewer
-              content={selectedTemplateDetail.content}
-              title={selectedTemplateDetail.title}
+              content={selectedTemplateDetail?.content || ''}
+              title={selectedTemplateDetail?.title || 'Template Önizleme'}
               type='cover-letter'
             />
           )}

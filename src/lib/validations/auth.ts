@@ -159,6 +159,28 @@ export const resetPasswordSchema = z
     }
   })
 
+// Reset password şeması - i18n destekli versiyon
+export const createResetPasswordSchema = (t: (key: string) => string) =>
+  z
+    .object({
+      newPassword: z
+        .string()
+        .min(1, { message: t('auth.resetPassword.validation.newPasswordRequired') })
+        .min(8, { message: t('auth.resetPassword.validation.passwordTooShort') })
+        .regex(/[A-Za-z]/, { message: t('auth.resetPassword.validation.passwordRequirements') })
+        .regex(/[0-9]/, { message: t('auth.resetPassword.validation.passwordRequirements') }),
+      confirmPassword: z.string().min(1, { message: t('auth.resetPassword.validation.confirmPasswordRequired') }),
+    })
+    .superRefine((data, ctx) => {
+      if (data.newPassword !== data.confirmPassword) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t('auth.resetPassword.validation.passwordsDoNotMatch'),
+          path: ['confirmPassword'],
+        })
+      }
+    })
+
 // Type exports
 export type LoginFormValues = z.infer<typeof loginSchema>
 export type RegisterFormValues = z.infer<typeof registerSchema>

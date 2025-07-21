@@ -3,14 +3,14 @@
 
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
+
 import { useState, useCallback, useMemo, useEffect } from 'react'
 
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { Lock, Eye, EyeOff, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react'
-
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Lock, Eye, EyeOff, CheckCircle, AlertCircle, ArrowLeft } from 'lucide-react'
 
 import { Label } from '@/components/core/label'
 import { Input } from '@/components/core/input'
@@ -20,30 +20,10 @@ import { LanguageSwitcher } from '@/components/ui/language/language-switcher'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/core/card'
 
 import { authApi } from '@/lib/api/api'
+import { createResetPasswordSchema } from '@/lib/validations'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'edge'
-
-const createResetPasswordSchema = (t: (key: string) => string) =>
-  z
-    .object({
-      newPassword: z
-        .string()
-        .min(1, { message: t('auth.resetPassword.validation.newPasswordRequired') })
-        .min(8, { message: t('auth.resetPassword.validation.passwordTooShort') })
-        .regex(/[A-Za-z]/, { message: t('auth.resetPassword.validation.passwordRequirements') })
-        .regex(/[0-9]/, { message: t('auth.resetPassword.validation.passwordRequirements') }),
-      confirmPassword: z.string().min(1, { message: t('auth.resetPassword.validation.confirmPasswordRequired') }),
-    })
-    .superRefine((data, ctx) => {
-      if (data.newPassword !== data.confirmPassword) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: t('auth.resetPassword.validation.passwordsDoNotMatch'),
-          path: ['confirmPassword'],
-        })
-      }
-    })
 
 const SuccessScreen = ({ t }: { t: (key: string) => string }) => (
   <div className='w-full max-w-md'>

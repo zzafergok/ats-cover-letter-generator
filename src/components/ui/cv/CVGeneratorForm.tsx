@@ -1,18 +1,21 @@
-// src/components/cv/CVGeneratorForm.tsx
 'use client'
 
 import React, { useEffect } from 'react'
+
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import { Briefcase, FileText, Wand2, AlertCircle, Building, Tags } from 'lucide-react'
+
 import { useCVStore } from '@/store/cvStore'
-import { Button } from '@/components/core/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/core/card'
+
 import { Input } from '@/components/core/input'
 import { Label } from '@/components/core/label'
+import { Button } from '@/components/core/button'
 import { Textarea } from '@/components/core/textarea'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/core/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/core/select'
+
+import { cvFromUploadSchema, type CVFromUploadFormValues, type CVType } from '@/lib/validations'
 
 interface CVUpload {
   id: string
@@ -21,28 +24,7 @@ interface CVUpload {
   markdownContent: string
 }
 
-const cvGeneratorSchema = z.object({
-  cvUploadId: z.string().min(1, 'CV seçimi gereklidir'),
-  positionTitle: z.string().min(1, 'İş pozisyonu gereklidir').max(100, 'İş pozisyonu maksimum 100 karakter olabilir'),
-  companyName: z.string().min(1, 'Şirket adı gereklidir').max(100, 'Şirket adı maksimum 100 karakter olabilir'),
-  cvType: z.enum(['ATS_OPTIMIZED', 'CREATIVE', 'TECHNICAL'], {
-    required_error: 'CV tipi seçimi gereklidir',
-  }),
-  jobDescription: z
-    .string()
-    .min(10, 'İş tanımı en az 10 karakter olmalıdır')
-    .max(5000, 'İş tanımı maksimum 5000 karakter olabilir'),
-  additionalRequirements: z
-    .string()
-    .optional()
-    .refine((val) => !val || val.length <= 2000, 'Ek gereksinimler maksimum 2000 karakter olabilir'),
-  targetKeywords: z
-    .string()
-    .optional()
-    .refine((val) => !val || val.split(',').length <= 20, 'Maksimum 20 anahtar kelime ekleyebilirsiniz'),
-})
-
-type CVGeneratorFormData = z.infer<typeof cvGeneratorSchema>
+type CVGeneratorFormData = CVFromUploadFormValues
 
 interface CVGeneratorFormProps {
   onGenerate: (content: string, data?: CVGeneratorFormData) => void
@@ -61,7 +43,7 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
     watch,
     reset,
   } = useForm<CVGeneratorFormData>({
-    resolver: zodResolver(cvGeneratorSchema),
+    resolver: zodResolver(cvFromUploadSchema),
     defaultValues: {
       cvUploadId: selectedCVUpload?.id || '',
       positionTitle: '',
@@ -113,13 +95,13 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
   const cvType = watch('cvType')
   const targetKeywords = watch('targetKeywords')
 
-  const cvTypeDescriptions = {
+  const cvTypeDescriptions: Record<CVType, string> = {
     ATS_OPTIMIZED: 'ATS sistemlerine uygun, anahtar kelime odaklı profesyonel CV formatı',
     CREATIVE: 'Yaratıcı sektörler için görsel ve etkileyici tasarım odaklı CV',
     TECHNICAL: 'Teknik pozisyonlar için detaylı beceri ve proje odaklı CV formatı',
   }
 
-  const cvTypeDisplayNames = {
+  const cvTypeDisplayNames: Record<CVType, string> = {
     ATS_OPTIMIZED: 'ATS Uyumlu',
     CREATIVE: 'Yaratıcı',
     TECHNICAL: 'Teknik',

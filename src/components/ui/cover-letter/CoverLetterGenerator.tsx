@@ -3,49 +3,43 @@
 'use client'
 
 import React, { useState } from 'react'
+
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import { FileText, User, Briefcase, Star, Send, Download, Loader2 } from 'lucide-react'
-import { Button } from '@/components/core/button'
+
 import { Input } from '@/components/core/input'
 import { Label } from '@/components/core/label'
+import { Button } from '@/components/core/button'
 import { Textarea } from '@/components/core/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/core/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/core/select'
 
-const coverLetterSchema = z.object({
-  personalInfo: z.object({
-    fullName: z.string().min(1, 'Ad soyad gereklidir'),
-    email: z.string().email('Geçerli bir e-posta adresi giriniz'),
-    phone: z.string().min(1, 'Telefon numarası gereklidir'),
-    city: z.string().min(1, 'Şehir gereklidir'),
-    linkedin: z.string().optional(),
-  }),
-  jobInfo: z.object({
-    positionTitle: z.string().min(1, 'Pozisyon başlığı gereklidir'),
-    companyName: z.string().min(1, 'Şirket adı gereklidir'),
-    department: z.string().optional(),
-    hiringManagerName: z.string().optional(),
-    jobDescription: z.string().min(1, 'İş tanımı gereklidir'),
-  }),
-  experience: z.object({
-    currentPosition: z.string().min(1, 'Mevcut pozisyon gereklidir'),
-    yearsOfExperience: z.string().min(1, 'Deneyim yılı gereklidir'),
-    relevantSkills: z.string().min(1, 'Yetenekler gereklidir'),
-    achievements: z.string().optional(),
-    previousCompanies: z.string().optional(),
-  }),
-  coverLetterType: z.enum(['TECHNICAL', 'CREATIVE', 'MANAGEMENT', 'SALES']),
-  tone: z.enum(['CONFIDENT', 'PROFESSIONAL', 'ENTHUSIASTIC', 'MODEST']),
-  additionalInfo: z.object({
-    reasonForApplying: z.string().optional(),
-    companyKnowledge: z.string().optional(),
-    careerGoals: z.string().optional(),
-  }),
-})
+import {
+  coverLetterSchema,
+  coverLetterTypes,
+  coverLetterTones,
+  type CoverLetterFormValues,
+  type CoverLetterType,
+  type CoverLetterTone,
+} from '@/lib/validations'
 
-type CoverLetterFormData = z.infer<typeof coverLetterSchema>
+type CoverLetterFormData = CoverLetterFormValues
+
+// Display name mappings
+const coverLetterTypeDisplayNames: Record<CoverLetterType, string> = {
+  TECHNICAL: 'Teknik',
+  CREATIVE: 'Yaratıcı',
+  MANAGEMENT: 'Yönetim',
+  SALES: 'Satış',
+}
+
+const coverLetterToneDisplayNames: Record<CoverLetterTone, string> = {
+  CONFIDENT: 'Kendine Güvenli',
+  PROFESSIONAL: 'Profesyonel',
+  ENTHUSIASTIC: 'Hevesli',
+  MODEST: 'Alçakgönüllü',
+}
 
 interface GeneratedLetterAnalysis {
   wordCount: number
@@ -94,8 +88,8 @@ const CoverLetterGenerator = () => {
         achievements: '',
         previousCompanies: '',
       },
-      coverLetterType: 'TECHNICAL',
-      tone: 'CONFIDENT',
+      coverLetterType: coverLetterTypes[0],
+      tone: coverLetterTones[0],
       additionalInfo: {
         reasonForApplying: '',
         companyKnowledge: '',
@@ -384,10 +378,11 @@ const CoverLetterGenerator = () => {
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value='TECHNICAL'>Teknik</SelectItem>
-                              <SelectItem value='CREATIVE'>Yaratıcı</SelectItem>
-                              <SelectItem value='MANAGEMENT'>Yönetim</SelectItem>
-                              <SelectItem value='SALES'>Satış</SelectItem>
+                              {coverLetterTypes.map((type) => (
+                                <SelectItem key={type} value={type}>
+                                  {coverLetterTypeDisplayNames[type]}
+                                </SelectItem>
+                              ))}
                             </SelectContent>
                           </Select>
                         )}
@@ -404,10 +399,11 @@ const CoverLetterGenerator = () => {
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value='CONFIDENT'>Kendine Güvenli</SelectItem>
-                              <SelectItem value='PROFESSIONAL'>Profesyonel</SelectItem>
-                              <SelectItem value='ENTHUSIASTIC'>Hevesli</SelectItem>
-                              <SelectItem value='MODEST'>Alçakgönüllü</SelectItem>
+                              {coverLetterTones.map((tone) => (
+                                <SelectItem key={tone} value={tone}>
+                                  {coverLetterToneDisplayNames[tone]}
+                                </SelectItem>
+                              ))}
                             </SelectContent>
                           </Select>
                         )}

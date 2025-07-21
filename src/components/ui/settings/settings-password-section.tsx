@@ -13,7 +13,7 @@ import { Button } from '@/components/core/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/core/card'
 
 import { userApi } from '@/lib/api/api'
-import { changePasswordSchema, type ChangePasswordRequest } from '@/lib/validations/profile'
+import { changePasswordSchema, type ChangePasswordRequest } from '@/lib/validations'
 
 export default function SettingsPasswordSection() {
   const { t } = useTranslation()

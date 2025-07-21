@@ -18,7 +18,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 
 import { userApi } from '@/lib/api/api'
 import AuthApiService from '@/lib/services/authApiService'
-import { updateUserProfileSchema, type UpdateUserProfileRequest } from '@/lib/validations/profile'
+import { updateUserProfileSchema, type UpdateUserProfileRequest } from '@/lib/validations'
 
 export default function ProfilePage() {
   const { t } = useTranslation()

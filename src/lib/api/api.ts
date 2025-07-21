@@ -135,19 +135,6 @@ export interface CoverLetterCategory {
   label: string
 }
 
-export interface SavedCoverLetter {
-  id: string
-  title: string
-  content: string
-  category: string
-  positionTitle: string
-  companyName: string
-  contactPerson?: string
-  applicationDate: string
-  createdAt: string
-  updatedAt: string
-}
-
 export interface CoverLetterGenerateData {
   cvUploadId: string
   category: string
@@ -239,6 +226,271 @@ export interface TemplateStatistics {
   }>
 }
 
+export interface PersonalInfo {
+  fullName: string
+  email: string
+  phone: string
+  city: string
+  state: string
+  linkedin?: string
+}
+
+export interface JobInfo {
+  positionTitle: string
+  companyName: string
+  department?: string
+  hiringManagerName?: string
+  jobDescription: string
+  requirements: string[]
+}
+
+export interface Experience {
+  currentPosition: string
+  yearsOfExperience: number
+  relevantSkills: string[]
+  achievements: string[]
+  previousCompanies: string[]
+}
+
+export interface AdditionalInfo {
+  reasonForApplying?: string
+  companyKnowledge?: string
+  careerGoals?: string
+}
+
+export type CoverLetterType = 'TECHNICAL' | 'CREATIVE' | 'FORMAL' | 'CASUAL'
+export type ToneType = 'CONFIDENT' | 'PROFESSIONAL' | 'FRIENDLY' | 'ENTHUSIASTIC'
+
+export interface GenerateCoverLetterData {
+  personalInfo: PersonalInfo
+  jobInfo: JobInfo
+  experience: Experience
+  coverLetterType: CoverLetterType
+  tone: ToneType
+  additionalInfo?: AdditionalInfo
+}
+
+export interface GenerateCoverLetterResponse {
+  success: boolean
+  data: {
+    content: string
+    metadata: {
+      personalInfo: PersonalInfo
+      jobInfo: JobInfo
+      coverLetterType: CoverLetterType
+      tone: ToneType
+      generatedAt: string
+      wordCount: number
+      characterCount: number
+    }
+  }
+  message?: string
+}
+
+export interface SaveCoverLetterData {
+  title: string
+  content: string
+  coverLetterType: CoverLetterType
+  positionTitle: string
+  companyName: string
+  category?: string
+}
+
+export interface SavedCoverLetter {
+  id: string
+  title: string
+  content: string
+  coverLetterType: CoverLetterType
+  positionTitle: string
+  companyName: string
+  category?: string
+  createdAt: string
+  updatedAt: string
+  userId: string
+}
+
+export interface SavedCoverLettersResponse {
+  success: boolean
+  data: SavedCoverLetter[]
+  message?: string
+}
+
+export interface CoverLetterByIdResponse {
+  success: boolean
+  data: SavedCoverLetter
+  message?: string
+}
+
+export interface DeleteCoverLetterResponse {
+  success: boolean
+  message: string
+}
+
+export type DownloadFormat = 'pdf' | 'docx'
+
+export interface DownloadCoverLetterResponse {
+  success: boolean
+  data: Blob
+  filename?: string
+}
+
+export interface AnalyzeCoverLetterData {
+  content: string
+}
+
+export interface CoverLetterAnalysis {
+  score: number
+  strengths: string[]
+  weaknesses: string[]
+  suggestions: string[]
+  readabilityScore: number
+  keywordMatching: {
+    matchedKeywords: string[]
+    missedKeywords: string[]
+    keywordDensity: number
+  }
+  structure: {
+    hasIntroduction: boolean
+    hasBody: boolean
+    hasConclusion: boolean
+    paragraphCount: number
+  }
+  tone: {
+    detectedTone: string
+    confidence: number
+    recommendations: string[]
+  }
+}
+
+export interface AnalyzeCoverLetterResponse {
+  success: boolean
+  data: CoverLetterAnalysis
+  message?: string
+}
+
+export type TemplateCategoryType =
+  | 'SOFTWARE_DEVELOPER'
+  | 'MARKETING_SPECIALIST'
+  | 'PROJECT_MANAGER'
+  | 'DATA_ANALYST'
+  | 'SALES_REPRESENTATIVE'
+  | 'HUMAN_RESOURCES'
+  | 'FINANCE'
+  | 'DESIGN'
+  | 'GENERAL'
+
+export interface CoverLetterTemplate {
+  id: string
+  category: TemplateCategoryType
+  title: string
+  description: string
+  content: string
+  placeholders: string[]
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface TemplateResponse {
+  success: boolean
+  data: CoverLetterTemplate
+  message?: string
+}
+
+export interface TemplatesResponse {
+  success: boolean
+  data: CoverLetterTemplate[]
+  message?: string
+}
+
+// Cover Letter API Servisleri
+export const coverLetterApi = {
+  // Cover Letter oluşturma
+  generate: async (data: GenerateCoverLetterData): Promise<GenerateCoverLetterResponse> => {
+    const response = await apiRequest.post('/cover-letter/generate', data)
+    return response
+  },
+
+  // Template'e göre template alma
+  getTemplate: async (category: TemplateCategoryType): Promise<TemplateResponse> => {
+    const response = await apiRequest.get(`/cover-letter/template/${category}`)
+    return response
+  },
+
+  // Cover Letter kaydetme
+  save: async (data: SaveCoverLetterData): Promise<{ success: boolean; data: SavedCoverLetter; message?: string }> => {
+    const response = await apiRequest.post('/cover-letter/save', data)
+    return response
+  },
+
+  // Kaydedilmiş cover letter'ları alma
+  getSaved: async (): Promise<SavedCoverLettersResponse> => {
+    const response = await apiRequest.get('/cover-letter/saved')
+    return response
+  },
+
+  // ID'ye göre cover letter alma
+  getById: async (id: string): Promise<CoverLetterByIdResponse> => {
+    const response = await apiRequest.get(`/cover-letter/saved/${id}`)
+    return response
+  },
+
+  // Cover Letter silme
+  delete: async (id: string): Promise<DeleteCoverLetterResponse> => {
+    const response = await apiRequest.delete(`/cover-letter/saved/${id}`)
+    return response
+  },
+
+  // PDF olarak indirme
+  downloadPdf: async (id: string): Promise<DownloadCoverLetterResponse> => {
+    const response = await apiRequest.get(`/cover-letter/download/${id}?format=pdf`, {
+      responseType: 'blob',
+    })
+    return response
+  },
+
+  // DOCX olarak indirme
+  downloadDocx: async (id: string): Promise<DownloadCoverLetterResponse> => {
+    const response = await apiRequest.get(`/cover-letter/download/${id}?format=docx`, {
+      responseType: 'blob',
+    })
+    return response
+  },
+
+  // Cover Letter analizi
+  analyze: async (data: AnalyzeCoverLetterData): Promise<AnalyzeCoverLetterResponse> => {
+    const response = await apiRequest.post('/cover-letter/analyze', data)
+    return response
+  },
+}
+
+// Template API Servisleri
+export const templateApi = {
+  // Software Developer template
+  getSoftwareDeveloperTemplate: async (): Promise<TemplateResponse> => {
+    const response = await apiRequest.get('/cover-letter/template/SOFTWARE_DEVELOPER')
+    return response
+  },
+
+  // Marketing Specialist template
+  getMarketingSpecialistTemplate: async (): Promise<TemplateResponse> => {
+    const response = await apiRequest.get('/cover-letter/template/MARKETING_SPECIALIST')
+    return response
+  },
+
+  // Project Manager template
+  getProjectManagerTemplate: async (): Promise<TemplateResponse> => {
+    const response = await apiRequest.get('/cover-letter/template/PROJECT_MANAGER')
+    return response
+  },
+
+  // Genel template alma metodu
+  getTemplateByCategory: async (category: TemplateCategoryType): Promise<TemplateResponse> => {
+    const response = await apiRequest.get(`/cover-letter/template/${category}`)
+    return response
+  },
+}
+
 export const authApi = {
   login: (credentials: { email: string; password: string }): Promise<any> =>
     apiRequest.post('/auth/login', credentials, { skipAuth: true }),
@@ -285,36 +537,4 @@ export const cvApi = {
   delete: (id: string): Promise<void> => apiRequest.delete(`/cv/saved/${id}`),
   download: (format: 'pdf' | 'docx', content: string, fileName: string): Promise<Blob> =>
     apiRequest.post(`/cv/download/${format}`, { content, fileName }, { responseType: 'blob' }),
-}
-
-export const coverLetterApi = {
-  getCategories: (): Promise<CoverLetterCategory[]> => apiRequest.get('/cover-letter/categories'),
-  generate: (
-    data: CoverLetterGenerateData,
-  ): Promise<{
-    content: string
-    category: string
-    positionTitle: string
-    companyName: string
-    contactPerson?: string
-  }> => apiRequest.post('/cover-letter/generate', data),
-  save: (data: CoverLetterSaveData): Promise<SavedCoverLetter> => apiRequest.post('/cover-letter/save', data),
-  getSaved: (): Promise<SavedCoverLetter[]> => apiRequest.get('/cover-letter/saved'),
-  delete: (id: string): Promise<void> => apiRequest.delete(`/cover-letter/saved/${id}`),
-  download: (format: 'pdf' | 'docx', content: string, fileName: string): Promise<Blob> =>
-    apiRequest.post(`/cover-letter/download/${format}`, { content, fileName }, { responseType: 'blob' }),
-}
-
-export const templateApi = {
-  getCategories: (): Promise<TemplateCategory[]> =>
-    apiRequest.get('/cover-letter-templates/categories', { skipAuth: true }),
-  getAllTemplates: (): Promise<TemplatePreview[]> =>
-    apiRequest.get('/cover-letter-templates/templates', { skipAuth: true }),
-  getTemplatesByCategory: (category: string): Promise<TemplatePreview[]> =>
-    apiRequest.get(`/cover-letter-templates/templates/category/${category}`, { skipAuth: true }),
-  getTemplateDetail: (templateId: string): Promise<TemplateDetail> =>
-    apiRequest.get(`/cover-letter-templates/templates/${templateId}`, { skipAuth: true }),
-  generateCoverLetter: (data: GenerateCoverLetterFromTemplateData): Promise<GeneratedCoverLetterResponse> =>
-    apiRequest.post('/cover-letter-templates/generate', data),
-  getStatistics: (): Promise<TemplateStatistics> => apiRequest.get('/cover-letter-templates/statistics'),
 }

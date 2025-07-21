@@ -462,6 +462,19 @@ export const coverLetterApi = {
     const response = await apiRequest.post('/cover-letter/analyze', data)
     return response
   },
+
+  // Missing methods for coverLetterStore
+  getCategories: async () => {
+    const response = await apiRequest.get('/cover-letter/categories')
+    return response
+  },
+
+  download: async (id: string, format: 'pdf' | 'docx' = 'pdf') => {
+    const response = await apiRequest.get(`/cover-letter/download/${id}?format=${format}`, {
+      responseType: 'blob',
+    })
+    return response
+  },
 }
 
 // Template API Servisleri
@@ -487,6 +500,37 @@ export const templateApi = {
   // Genel template alma metodu
   getTemplateByCategory: async (category: TemplateCategoryType): Promise<TemplateResponse> => {
     const response = await apiRequest.get(`/cover-letter/template/${category}`)
+    return response
+  },
+
+  // Missing methods that hooks are trying to call
+  getCategories: async (): Promise<TemplateCategory[]> => {
+    const response = await apiRequest.get('/cover-letter/template/categories')
+    return response
+  },
+
+  getAllTemplates: async (): Promise<TemplatePreview[]> => {
+    const response = await apiRequest.get('/cover-letter/template/all')
+    return response
+  },
+
+  getTemplatesByCategory: async (category: string): Promise<TemplatePreview[]> => {
+    const response = await apiRequest.get(`/cover-letter/template/category/${category}`)
+    return response
+  },
+
+  getTemplateDetail: async (templateId: string): Promise<any> => {
+    const response = await apiRequest.get(`/cover-letter/template/detail/${templateId}`)
+    return response
+  },
+
+  getStatistics: async (): Promise<any> => {
+    const response = await apiRequest.get('/cover-letter/template/statistics')
+    return response
+  },
+
+  generateCoverLetter: async (data: GenerateCoverLetterFromTemplateData): Promise<any> => {
+    const response = await apiRequest.post('/cover-letter/generate', data)
     return response
   },
 }

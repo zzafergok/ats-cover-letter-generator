@@ -6,7 +6,6 @@ import React, { createContext, useContext, useEffect, useState, ReactNode, useCa
 
 import AuthApiService from '@/lib/services/authApiService'
 import { SessionTokenManager } from '@/lib/services/sessionTokenManager'
-import { useAuthStore } from '@/store/authStore'
 
 interface User {
   id: string
@@ -15,7 +14,7 @@ interface User {
   role?: string
 }
 
-interface AuthContextType {
+export interface AuthContextType {
   user: User | null
   isAuthenticated: boolean
   loading: boolean
@@ -26,7 +25,7 @@ interface AuthContextType {
   refreshToken: () => Promise<void>
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const useAuth = () => {
   const context = useContext(AuthContext)
@@ -42,27 +41,17 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const accessToken = SessionTokenManager.getAccessToken()
-  const authStore = useAuthStore()
 
   const [user, setUser] = useState<User | null>(null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
   const [isInitialized, setIsInitialized] = useState(false)
 
-  // AuthStore ile senkronizasyon
-  const syncWithStore = useCallback(
-    (userData: User | null, authStatus: boolean) => {
-      setUser(userData)
-      setIsAuthenticated(authStatus)
-
-      // AuthStore'u güncelle
-      authStore.setUser(userData)
-      if (userData && authStatus) {
-        authStore.setLoading(false)
-      }
-    },
-    [authStore],
-  )
+  // State güncellemesi
+  const updateAuthState = useCallback((userData: User | null, authStatus: boolean) => {
+    setUser(userData)
+    setIsAuthenticated(authStatus)
+  }, [])
 
   // Kullanıcı bilgilerini API'den al - response format handling ile
   const fetchCurrentUser = useCallback(async (): Promise<User | null> => {
@@ -146,7 +135,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       // AuthProvider ve AuthStore'u senkronize et
-      syncWithStore(userData, true)
+      updateAuthState(userData, true)
       console.log('✅ Authentication verified for user:', userData.email)
 
       return true
@@ -155,7 +144,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       await handleLogout(false)
       return false
     }
-  }, [isAuthenticated, syncWithStore])
+  }, [isAuthenticated, updateAuthState])
 
   // Login işlemi
   const login = useCallback(
@@ -171,7 +160,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           const userData = response.data.user as User
 
           // AuthProvider ve AuthStore'u senkronize et
-          syncWithStore(userData, true)
+          updateAuthState(userData, true)
 
           // Remember me durumunu localStorage'a kaydet (3 gün süreli)
           if (rememberMe) {
@@ -196,7 +185,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setLoading(false)
       }
     },
-    [syncWithStore],
+    [updateAuthState],
   )
 
   // Logout işlemi
@@ -215,7 +204,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const rememberedEmail = SessionTokenManager.getRememberedEmail()
 
         // AuthProvider ve AuthStore'u senkronize et
-        syncWithStore(null, false)
+        updateAuthState(null, false)
         SessionTokenManager.clearTokens()
 
         // Eğer remember me aktifse email'i tekrar kaydet (3 gün süreli)
@@ -227,7 +216,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       }
     },
-    [syncWithStore],
+    [updateAuthState],
   )
 
   const logout = useCallback(() => handleLogout(true), [handleLogout])
@@ -264,11 +253,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           await checkAuth()
         } else {
           console.log('❌ No tokens found during initialization')
-          syncWithStore(null, false)
+          updateAuthState(null, false)
         }
       } catch (error) {
         console.error('❌ Auth initialization failed:', error)
-        syncWithStore(null, false)
+        updateAuthState(null, false)
       } finally {
         setLoading(false)
         setIsInitialized(true)
@@ -277,7 +266,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
 
     initializeAuth()
-  }, [checkAuth, isInitialized, syncWithStore])
+  }, [checkAuth, isInitialized, updateAuthState])
 
   // Token durumu değişikliklerini periyodik kontrol
   useEffect(() => {

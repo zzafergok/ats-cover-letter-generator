@@ -12,6 +12,7 @@ import { useLocale } from '@/hooks/useLocale'
 import TermsModal from '@/components/ui/register/TermsModal'
 import PrivacyModal from '@/components/ui/register/PrivacyModal'
 import { LoadingSpinner } from '@/components/core/loading-spinner'
+import AuthApiService from '@/lib/services/authApiService'
 
 interface RegisterFormData {
   fullName: string
@@ -111,29 +112,17 @@ const RegisterForm = () => {
     setIsLoading(true)
 
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fullName: formData.fullName.trim(),
-          email: formData.email.toLowerCase().trim(),
-          password: formData.password,
-          agreedToTerms,
-          agreedToPrivacy,
-          registrationDate: new Date().toISOString(),
-        }),
+      const response = await AuthApiService.registerUser({
+        name: formData.fullName.trim(),
+        email: formData.email.toLowerCase().trim(),
+        password: formData.password,
       })
 
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || 'Kayıt işlemi başarısız')
+      if (!response.success) {
+        throw new Error(response.message || 'Kayıt işlemi başarısız')
       }
 
-      const data = await response.json()
-      console.log('Registration successful:', data)
-
+      console.log('Registration successful:', response.data)
       alert(t('auth.register.success'))
       router.push('/login?registered=true')
     } catch (error) {

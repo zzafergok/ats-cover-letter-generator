@@ -16,7 +16,6 @@ import { LoadingSpinner } from '@/components/core/loading-spinner'
 
 import { CVUpload } from '@/components/ui/cv/CVUpload'
 import { CVGeneratorForm } from '@/components/ui/cv/CVGeneratorForm'
-import { CoverLetterGenerator } from '@/components/ui/cover-letter/CoverLetterGenerator'
 import { ContentViewer } from '@/components/ui/common/ContentViewer'
 import { PageHeader } from '@/components/ui/PageHeader/PageHeader'
 import { useAuth } from '@/providers/AuthProvider'
@@ -40,14 +39,14 @@ export default function DashboardPage() {
   const {
     savedCoverLetters = [],
     getSavedCoverLetters,
-    saveCoverLetter,
+    // saveCoverLetter,
     deleteSavedCoverLetter,
     downloadCoverLetter,
-    isLoading: coverLetterLoading,
+    // isLoading: coverLetterLoading,
   } = useCoverLetterStore()
 
   const [generatedCV, setGeneratedCV] = useState<string>('')
-  const [generatedCoverLetter, setGeneratedCoverLetter] = useState<string>('')
+  // const [generatedCoverLetter, setGeneratedCoverLetter] = useState<string>('')
   const [activeTab, setActiveTab] = useState<string>('overview')
   const [isDataLoading, setIsDataLoading] = useState(true)
   const [dataLoaded, setDataLoaded] = useState(false)
@@ -108,10 +107,10 @@ export default function DashboardPage() {
     setActiveTab('cv-preview')
   }
 
-  const handleCoverLetterGenerate = (content: string) => {
-    setGeneratedCoverLetter(content)
-    setActiveTab('cover-letter-preview')
-  }
+  // const handleCoverLetterGenerate = (content: string) => {
+  //   setGeneratedCoverLetter(content)
+  //   setActiveTab('cover-letter-preview')
+  // }
 
   const handleSaveCV = async () => {
     if (!generatedCV) return
@@ -128,22 +127,22 @@ export default function DashboardPage() {
     }
   }
 
-  const handleSaveCoverLetter = async () => {
-    if (!generatedCoverLetter) return
+  // const handleSaveCoverLetter = async () => {
+  //   if (!generatedCoverLetter) return
 
-    try {
-      await saveCoverLetter({
-        title: `Ön Yazı - ${new Date().toLocaleDateString('tr-TR')}`,
-        content: generatedCoverLetter,
-        category: 'GENERAL',
-        positionTitle: 'Genel Pozisyon',
-        companyName: 'Şirket',
-      })
-      setActiveTab('saved-content')
-    } catch (error) {
-      console.error('Ön yazı kaydetme hatası:', error)
-    }
-  }
+  //   try {
+  //     await saveCoverLetter({
+  //       title: `Ön Yazı - ${new Date().toLocaleDateString('tr-TR')}`,
+  //       content: generatedCoverLetter,
+  //       category: 'GENERAL',
+  //       positionTitle: 'Genel Pozisyon',
+  //       companyName: 'Şirket',
+  //     })
+  //     setActiveTab('saved-content')
+  //   } catch (error) {
+  //     console.error('Ön yazı kaydetme hatası:', error)
+  //   }
+  // }
 
   const stats = getDashboardStats()
 
@@ -377,7 +376,7 @@ export default function DashboardPage() {
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      {uploadedCVs.length > 0 ? (
+                      {/* {uploadedCVs.length > 0 ? (
                         <div className='space-y-3'>
                           {uploadedCVs.slice(0, 3).map((cv) => (
                             <div key={cv.id} className='flex items-center justify-between p-3 bg-muted/50 rounded-lg'>
@@ -415,7 +414,7 @@ export default function DashboardPage() {
                             İlk CV&apos;nizi Yükleyin
                           </Button>
                         </div>
-                      )}
+                      )} */}
                     </CardContent>
                   </Card>
                 </div>
@@ -464,9 +463,7 @@ export default function DashboardPage() {
                 <CVGeneratorForm onGenerate={handleCVGenerate} />
               </TabsContent>
 
-              <TabsContent value='cover-letter'>
-                <CoverLetterGenerator onGenerate={handleCoverLetterGenerate} />
-              </TabsContent>
+              <TabsContent value='cover-letter'>boş</TabsContent>
 
               <TabsContent value='cv-preview'>
                 <Card>
@@ -513,7 +510,7 @@ export default function DashboardPage() {
                         <Eye className='h-5 w-5' />
                         Ön Yazı Önizleme
                       </span>
-                      {generatedCoverLetter && (
+                      {/* {generatedCoverLetter && (
                         <div className='flex gap-2'>
                           <Button variant='outline' onClick={handleSaveCoverLetter} disabled={coverLetterLoading}>
                             {coverLetterLoading ? <LoadingSpinner size='sm' /> : <Save className='h-4 w-4' />}
@@ -527,11 +524,11 @@ export default function DashboardPage() {
                             İndir
                           </Button>
                         </div>
-                      )}
+                      )} */}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {generatedCoverLetter ? (
+                    {/* {generatedCoverLetter ? (
                       <ContentViewer content={generatedCoverLetter} title='Ön Yazı Önizleme' type='cover-letter' />
                     ) : (
                       <div className='text-center py-12 text-muted-foreground'>
@@ -540,7 +537,7 @@ export default function DashboardPage() {
                         <p className='mb-4'>Önizlemek için önce bir ön yazı oluşturun</p>
                         <Button onClick={() => setActiveTab('cover-letter')}>Ön Yazı Oluşturmaya Başla</Button>
                       </div>
-                    )}
+                    )} */}
                   </CardContent>
                 </Card>
               </TabsContent>

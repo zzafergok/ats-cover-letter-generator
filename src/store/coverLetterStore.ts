@@ -2,25 +2,19 @@
 // src/store/coverLetterStore.ts
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { coverLetterApi } from '@/lib/api/api'
+import {
+  coverLetterApi,
+  type GenerateCoverLetterData,
+  type SaveCoverLetterData,
+  type SavedCoverLetter,
+} from '@/lib/api/api'
 
 interface CoverLetterCategory {
   key: string
   label: string
 }
 
-interface SavedCoverLetter {
-  id: string
-  title: string
-  content: string
-  category: string
-  positionTitle: string
-  companyName: string
-  contactPerson?: string
-  applicationDate: string
-  createdAt: string
-  updatedAt: string
-}
+// Remove duplicate interface since it's imported from api.ts
 
 interface CoverLetterState {
   categories: CoverLetterCategory[]
@@ -34,23 +28,8 @@ interface CoverLetterState {
 interface CoverLetterActions {
   getCategories: () => Promise<void>
   selectCategory: (category: CoverLetterCategory) => void
-  generateCoverLetter: (data: {
-    cvUploadId: string
-    category: string
-    positionTitle: string
-    companyName: string
-    contactPerson?: string
-    jobDescription: string
-    additionalRequirements?: string
-  }) => Promise<string>
-  saveCoverLetter: (data: {
-    title: string
-    content: string
-    category: string
-    positionTitle: string
-    companyName: string
-    contactPerson?: string
-  }) => Promise<void>
+  generateCoverLetter: (data: GenerateCoverLetterData) => Promise<string>
+  saveCoverLetter: (data: SaveCoverLetterData) => Promise<void>
   getSavedCoverLetters: () => Promise<void>
   deleteSavedCoverLetter: (id: string) => Promise<void>
   downloadCoverLetter: (content: string, fileName: string, format: 'pdf' | 'docx') => Promise<void>
@@ -94,7 +73,7 @@ export const useCoverLetterStore = create<CoverLetterStore>()(
         try {
           const result = await coverLetterApi.generate(data)
           set({ isGenerating: false })
-          return result.content
+          return result.data.content
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || 'Ön yazı oluşturulurken hata oluştu'
           set({ isGenerating: false, error: errorMessage })
@@ -118,7 +97,8 @@ export const useCoverLetterStore = create<CoverLetterStore>()(
       getSavedCoverLetters: async () => {
         set({ isLoading: true, error: null })
         try {
-          const coverLetters = await coverLetterApi.getSaved()
+          const response = await coverLetterApi.getSaved()
+          const coverLetters = response.data || []
           set({ savedCoverLetters: coverLetters, isLoading: false })
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || 'Kayıtlı ön yazılar yüklenirken hata oluştu'
@@ -140,10 +120,10 @@ export const useCoverLetterStore = create<CoverLetterStore>()(
         }
       },
 
-      downloadCoverLetter: async (content, fileName, format) => {
+      downloadCoverLetter: async (_content, fileName, format) => {
         set({ isLoading: true, error: null })
         try {
-          const blob = await coverLetterApi.download(format, content, fileName)
+          const blob = await coverLetterApi.download(fileName, format)
           const url = window.URL.createObjectURL(blob)
           const a = document.createElement('a')
           a.href = url

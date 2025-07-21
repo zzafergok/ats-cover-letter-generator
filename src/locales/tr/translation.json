@@ -40,44 +40,6 @@
       "loading": "Gönderiliyor...",
       "error": "Destek talebi gönderilemedi. Lütfen tekrar deneyin."
     },
-    "dashboard": {
-      "title": "Dashboard",
-      "welcome": "Hoş geldiniz, {{userName}}",
-      "subtitle": "Proje yönetimi dashboard'unuzda tüm istatistikleri görüntüleyin",
-      "totalProjects": "Toplam Proje",
-      "backlogTasks": "Backlog Görevleri",
-      "totalTasks": "Toplam Görevler",
-      "completedTasks": "Tamamlanan Görevler",
-      "inProgressTasks": "Devam Eden Görevler",
-      "overdueTasks": "Süresi Geçmiş Görevler",
-      "activeProjects": "aktif proje",
-      "pendingTasksDesc": "Bekleyen görev sayısı",
-      "allTasksDesc": "Sistemdeki tüm görevler",
-      "completedTasksDesc": "Başarıyla tamamlanan",
-      "inProgressTasksDesc": "Şu anda üzerinde çalışılan",
-      "overdueTasksDesc": "Teslim tarihi geçen görevler",
-      "generalStats": "Genel İstatistikler",
-      "detailStats": "Detay İstatistikler",
-      "projectActivities": "Proje Aktiviteleri",
-      "viewAll": "Tümünü Gör",
-      "tasksCount": "{{count}} görev • {{columns}} kolon",
-      "noProjects": "Henüz proje bulunmuyor",
-      "noProjectsDesc": "İlk projenizi oluşturarak başlayın",
-      "newProject": "Yeni Proje",
-      "dataLoadError": "Veri Yüklenemedi",
-      "dataLoadErrorDesc": "Dashboard verilerini yüklerken bir hata oluştu. Lütfen sayfayı yenileyerek tekrar deneyin.",
-      "tryAgain": "Tekrar Dene",
-      "periodData": "{{period}} verileri",
-      "comparative": "Karşılaştırmalı",
-      "periods": {
-        "thisWeek": "Bu Hafta",
-        "thisMonth": "Bu Ay",
-        "thisQuarter": "Bu Çeyrek",
-        "week": "Bu hafta",
-        "month": "Bu ay",
-        "quarter": "Bu çeyrek"
-      }
-    },
     "notFound": {
       "title": "404",
       "heading": "Sayfa Bulunamadı",
@@ -493,18 +455,6 @@
     "authChecking": "Yetkilendirme kontrol ediliyor...",
     "pleaseWait": "Lütfen bekleyiniz..."
   },
-  "confirm": {
-    "title": "Emin misiniz?",
-    "description": "Bu işlem geri alınamaz.",
-    "confirm": "Evet",
-    "cancel": "İptal"
-  },
-  "skeleton": {
-    "basicTypes": "Temel Skeleton Tipleri",
-    "text": "Text",
-    "avatar": "Avatar",
-    "button": "Button"
-  },
   "navigation": {
     "dashboard": "Dashboard",
     "dashboardDescription": "Ana kontrol paneli",
@@ -569,33 +519,6 @@
     "profile": "Profil",
     "settings": "Ayarlar",
     "logout": "Çıkış Yap"
-  },
-  "colorPicker": {
-    "custom": "Özel",
-    "presetColors": "Hazır Renkler",
-    "recentColors": "Son Kullanılan",
-    "customColor": "Özel Renk",
-    "openColorPicker": "Renk Seçici Aç"
-  },
-  "colors": {
-    "slate": "Arduvaz",
-    "red": "Kırmızı",
-    "orange": "Turuncu",
-    "amber": "Kehribar",
-    "yellow": "Sarı",
-    "lime": "Misket Limonu",
-    "green": "Yeşil",
-    "emerald": "Zümrüt",
-    "teal": "Cam Göbeği",
-    "cyan": "Cyan",
-    "sky": "Gök Mavisi",
-    "blue": "Mavi",
-    "indigo": "Çivit Mavisi",
-    "violet": "Menekşe",
-    "purple": "Mor",
-    "fuchsia": "Fuşya",
-    "pink": "Pembe",
-    "rose": "Gül Kurusu"
   },
   "common": {
     "deleteWarning": "Bu işlem geri alınamaz.",

@@ -6,7 +6,18 @@ import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
 
 import { useTranslation } from 'react-i18next'
-import { LogOut, Settings, FolderOpen, LayoutDashboard, UserCircle, Menu, X, ChevronDown } from 'lucide-react'
+import {
+  LogOut,
+  Settings,
+  LayoutDashboard,
+  UserCircle,
+  Menu,
+  X,
+  ChevronDown,
+  FileText,
+  Users,
+  Layout,
+} from 'lucide-react'
 
 import {
   DropdownMenu,
@@ -30,6 +41,12 @@ interface NavigationItem {
   icon: React.ComponentType<{ className?: string }>
   description?: string
   badge?: string
+  submenu?: {
+    name: string
+    href: string
+    icon: React.ComponentType<{ className?: string }>
+    description?: string
+  }[]
 }
 
 export function AuthHeader() {
@@ -48,10 +65,30 @@ export function AuthHeader() {
       description: t('navigation.dashboardDescription'),
     },
     {
-      name: t('navigation.projects'),
-      href: '/projects',
-      icon: FolderOpen,
-      description: t('navigation.projectsDescription'),
+      name: t('navigation.coverLetter'),
+      href: '/cover-letter',
+      icon: FileText,
+      description: t('navigation.coverLetterDescription'),
+      submenu: [
+        {
+          name: t('navigation.coverLetterGenerator'),
+          href: '/cover-letter',
+          icon: FileText,
+          description: t('navigation.coverLetterGeneratorDescription'),
+        },
+        {
+          name: t('navigation.coverLetterTemplates'),
+          href: '/cover-letter/template',
+          icon: Layout,
+          description: t('navigation.coverLetterTemplatesDescription'),
+        },
+      ],
+    },
+    {
+      name: t('navigation.users'),
+      href: '/users',
+      icon: Users,
+      description: t('navigation.usersDescription'),
     },
   ]
 
@@ -112,6 +149,46 @@ export function AuthHeader() {
                 {navigation.map((item) => {
                   const isActive =
                     pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
+
+                  if (item.submenu) {
+                    return (
+                      <DropdownMenu key={item.href}>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant='ghost'
+                            className={cn(
+                              'flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200',
+                              isActive
+                                ? 'bg-primary/10 text-primary shadow-sm'
+                                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
+                            )}
+                          >
+                            <item.icon className={cn('h-4 w-4', isActive ? 'text-primary' : 'text-muted-foreground')} />
+                            <span>{item.name}</span>
+                            <ChevronDown className='h-3 w-3' />
+                            {item.badge && (
+                              <Badge variant='secondary' className='ml-1 h-5 text-xs'>
+                                {item.badge}
+                              </Badge>
+                            )}
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align='start' className='w-56'>
+                          {item.submenu.map((subItem) => (
+                            <DropdownMenuItem key={subItem.href} asChild>
+                              <Link href={subItem.href} className='flex items-center cursor-pointer'>
+                                <subItem.icon className='mr-2 h-4 w-4' />
+                                <div className='flex-1'>
+                                  <div className='font-medium text-sm'>{subItem.name}</div>
+                                  <div className='text-xs text-muted-foreground'>{subItem.description}</div>
+                                </div>
+                              </Link>
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )
+                  }
 
                   return (
                     <Link
@@ -222,30 +299,62 @@ export function AuthHeader() {
                     pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
 
                   return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={cn(
-                        'flex items-center space-x-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors',
-                        isActive
-                          ? 'bg-primary/10 text-primary'
-                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
-                      )}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      <item.icon className={cn('h-5 w-5', isActive ? 'text-primary' : 'text-muted-foreground')} />
-                      <div className='flex-1'>
-                        <div className='flex items-center justify-between'>
-                          <span>{item.name}</span>
-                          {item.badge && (
-                            <Badge variant='secondary' className='ml-2'>
-                              {item.badge}
-                            </Badge>
+                    <div key={item.href}>
+                      <Link
+                        href={item.href}
+                        className={cn(
+                          'flex items-center space-x-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors',
+                          isActive
+                            ? 'bg-primary/10 text-primary'
+                            : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
+                        )}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <item.icon className={cn('h-5 w-5', isActive ? 'text-primary' : 'text-muted-foreground')} />
+                        <div className='flex-1'>
+                          <div className='flex items-center justify-between'>
+                            <span>{item.name}</span>
+                            {item.badge && (
+                              <Badge variant='secondary' className='ml-2'>
+                                {item.badge}
+                              </Badge>
+                            )}
+                          </div>
+                          {item.description && (
+                            <p className='text-xs text-muted-foreground mt-0.5'>{item.description}</p>
                           )}
                         </div>
-                        {item.description && <p className='text-xs text-muted-foreground mt-0.5'>{item.description}</p>}
-                      </div>
-                    </Link>
+                      </Link>
+
+                      {item.submenu && (
+                        <div className='ml-8 mt-2 space-y-1'>
+                          {item.submenu.map((subItem) => {
+                            const isSubActive = pathname === subItem.href
+                            return (
+                              <Link
+                                key={subItem.href}
+                                href={subItem.href}
+                                className={cn(
+                                  'flex items-center space-x-2 px-3 py-2 rounded-md text-sm transition-colors',
+                                  isSubActive
+                                    ? 'bg-primary/5 text-primary border-l-2 border-primary'
+                                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/30',
+                                )}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                              >
+                                <subItem.icon
+                                  className={cn('h-4 w-4', isSubActive ? 'text-primary' : 'text-muted-foreground')}
+                                />
+                                <div className='flex-1'>
+                                  <div className='font-medium'>{subItem.name}</div>
+                                  <div className='text-xs text-muted-foreground'>{subItem.description}</div>
+                                </div>
+                              </Link>
+                            )
+                          })}
+                        </div>
+                      )}
+                    </div>
                   )
                 })}
               </nav>

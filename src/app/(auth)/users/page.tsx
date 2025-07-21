@@ -20,6 +20,8 @@ import {
   Download,
   ChevronDown,
   MoreVertical,
+  Table,
+  Grid3X3,
 } from 'lucide-react'
 
 import {
@@ -275,15 +277,15 @@ export default function UsersPage() {
                 <p className='text-neutral-600 dark:text-neutral-400'>Sistem kullanıcılarını yönetin ve izleyin</p>
               </div>
               <div className='flex flex-col sm:flex-row gap-3'>
-                <Button variant='outline' className='flex items-center gap-2'>
+                <Button variant='outline' className='flex items-center justify-center gap-2 min-h-[40px]'>
                   <Download className='h-4 w-4' />
                   Dışa Aktar
                 </Button>
-                <Button variant='outline' className='flex items-center gap-2'>
+                <Button variant='outline' className='flex items-center justify-center gap-2 min-h-[40px]'>
                   <Upload className='h-4 w-4' />
                   İçe Aktar
                 </Button>
-                <Button onClick={handleAddUser} className='flex items-center gap-2'>
+                <Button onClick={handleAddUser} className='flex items-center justify-center gap-2 min-h-[40px]'>
                   <UserPlus className='h-4 w-4' />
                   Yeni Kullanıcı
                 </Button>
@@ -361,7 +363,7 @@ export default function UsersPage() {
             <CardContent className='p-6'>
               <div className='space-y-6'>
                 {/* Primary Controls */}
-                <div className='flex flex-col lg:flex-row gap-4'>
+                <div className='flex flex-col sm:flex-row lg:flex-row gap-4'>
                   {/* Search */}
                   <div className='flex-1 relative'>
                     <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-400' />
@@ -386,15 +388,15 @@ export default function UsersPage() {
                   {/* Desktop Filters */}
                   <div className='hidden lg:flex items-center gap-3'>
                     <Select value={selectedRole} onValueChange={setSelectedRole}>
-                      <SelectTrigger className='w-[180px]'>
-                        <SelectValue />
+                      <SelectTrigger className='w-[200px]'>
+                        <SelectValue placeholder='Rol filtrele' />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className='w-[200px]'>
                         {roleOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            <div className='flex items-center justify-between w-full'>
-                              <span>{option.label}</span>
-                              <Badge variant='secondary' className='ml-2 text-xs'>
+                          <SelectItem key={option.value} value={option.value} className='cursor-pointer'>
+                            <div className='flex items-center justify-between w-full pr-2'>
+                              <span className='truncate'>{option.label}</span>
+                              <Badge variant='secondary' className='ml-2 text-xs shrink-0 min-w-[24px] justify-center'>
                                 {option.count}
                               </Badge>
                             </div>
@@ -404,15 +406,15 @@ export default function UsersPage() {
                     </Select>
 
                     <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                      <SelectTrigger className='w-[160px]'>
-                        <SelectValue />
+                      <SelectTrigger className='w-[180px]'>
+                        <SelectValue placeholder='Durum filtrele' />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className='w-[180px]'>
                         {statusOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            <div className='flex items-center justify-between w-full'>
-                              <span>{option.label}</span>
-                              <Badge variant='secondary' className='ml-2 text-xs'>
+                          <SelectItem key={option.value} value={option.value} className='cursor-pointer'>
+                            <div className='flex items-center justify-between w-full pr-2'>
+                              <span className='truncate'>{option.label}</span>
+                              <Badge variant='secondary' className='ml-2 text-xs shrink-0 min-w-[24px] justify-center'>
                                 {option.count}
                               </Badge>
                             </div>
@@ -428,26 +430,28 @@ export default function UsersPage() {
                         size='sm'
                         onClick={() => setViewMode('table')}
                         className='p-2'
+                        title='Tablo görünümü'
                       >
-                        <Filter className='h-4 w-4' />
+                        <Table className='h-4 w-4' />
                       </Button>
                       <Button
                         variant={viewMode === 'grid' ? 'default' : 'ghost'}
                         size='sm'
                         onClick={() => setViewMode('grid')}
                         className='p-2'
+                        title='Kart görünümü'
                       >
-                        <Users className='h-4 w-4' />
+                        <Grid3X3 className='h-4 w-4' />
                       </Button>
                     </div>
                   </div>
 
                   {/* Mobile Filter Toggle */}
-                  <div className='lg:hidden'>
+                  <div className='lg:hidden sm:w-auto w-full'>
                     <Button
                       variant='outline'
                       onClick={() => setIsFilterOpen(!isFilterOpen)}
-                      className='w-full flex items-center justify-center gap-2'
+                      className='w-full sm:w-auto flex items-center justify-center gap-2 min-w-[120px]'
                     >
                       <Filter className='h-4 w-4' />
                       Filtreler
@@ -458,53 +462,71 @@ export default function UsersPage() {
 
                 {/* Mobile Filters */}
                 {isFilterOpen && (
-                  <div className='lg:hidden space-y-4 p-4 bg-neutral-50/50 dark:bg-neutral-800/50 rounded-lg'>
-                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-                      <Select value={selectedRole} onValueChange={setSelectedRole}>
-                        <SelectTrigger>
-                          <SelectValue placeholder='Rol seçin' />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {roleOptions.map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label} ({option.count})
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                  <div className='lg:hidden space-y-4 p-4 bg-neutral-50/50 dark:bg-neutral-800/50 rounded-lg border border-neutral-200/50 dark:border-neutral-700/30'>
+                    <div className='space-y-4'>
+                      <div className='space-y-2'>
+                        <label className='text-sm font-medium text-neutral-700 dark:text-neutral-300'>Rol</label>
+                        <Select value={selectedRole} onValueChange={setSelectedRole}>
+                          <SelectTrigger>
+                            <SelectValue placeholder='Rol seçin' />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {roleOptions.map((option) => (
+                              <SelectItem key={option.value} value={option.value} className='cursor-pointer'>
+                                <div className='flex items-center justify-between w-full'>
+                                  <span>{option.label}</span>
+                                  <Badge variant='secondary' className='ml-2 text-xs shrink-0'>
+                                    {option.count}
+                                  </Badge>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
 
-                      <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                        <SelectTrigger>
-                          <SelectValue placeholder='Durum seçin' />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {statusOptions.map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label} ({option.count})
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <div className='space-y-2'>
+                        <label className='text-sm font-medium text-neutral-700 dark:text-neutral-300'>Durum</label>
+                        <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                          <SelectTrigger>
+                            <SelectValue placeholder='Durum seçin' />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {statusOptions.map((option) => (
+                              <SelectItem key={option.value} value={option.value} className='cursor-pointer'>
+                                <div className='flex items-center justify-between w-full'>
+                                  <span>{option.label}</span>
+                                  <Badge variant='secondary' className='ml-2 text-xs shrink-0'>
+                                    {option.count}
+                                  </Badge>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
 
                     <div className='flex items-center justify-between'>
                       <span className='text-sm font-medium'>Görünüm</span>
-                      <div className='flex items-center gap-4 p-1 bg-neutral-100 dark:bg-neutral-700 rounded-lg'>
+                      <div className='flex items-center gap-1 p-1 bg-neutral-100 dark:bg-neutral-700 rounded-lg'>
                         <Button
                           variant={viewMode === 'table' ? 'default' : 'ghost'}
                           size='sm'
                           onClick={() => setViewMode('table')}
-                          className='p-2'
+                          className='px-3 py-2 text-xs'
                         >
-                          <Filter className='h-4 w-4' />
+                          <Table className='h-4 w-4 mr-1' />
+                          Tablo
                         </Button>
                         <Button
                           variant={viewMode === 'grid' ? 'default' : 'ghost'}
                           size='sm'
                           onClick={() => setViewMode('grid')}
-                          className='p-2'
+                          className='px-3 py-2 text-xs'
                         >
-                          <Users className='h-4 w-4' />
+                          <Grid3X3 className='h-4 w-4 mr-1' />
+                          Kart
                         </Button>
                       </div>
                     </div>

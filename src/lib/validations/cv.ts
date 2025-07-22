@@ -4,7 +4,28 @@ import { z } from 'zod'
 export const cvTypes = ['ATS_OPTIMIZED', 'CREATIVE', 'TECHNICAL'] as const
 export type CVType = (typeof cvTypes)[number]
 
-// CV generator schema (for generating CV from uploaded CV)
+// CV generator schema (matching API CVGenerateData)
+export const cvGenerateSchema = z.object({
+  positionTitle: z.string().min(1, 'İş pozisyonu gereklidir').max(100, 'İş pozisyonu maksimum 100 karakter olabilir'),
+  companyName: z.string().min(1, 'Şirket adı gereklidir').max(100, 'Şirket adı maksimum 100 karakter olabilir'),
+  cvType: z.enum(cvTypes, {
+    required_error: 'CV tipi seçimi gereklidir',
+  }),
+  jobDescription: z
+    .string()
+    .min(10, 'İş tanımı en az 10 karakter olmalıdır')
+    .max(5000, 'İş tanımı maksimum 5000 karakter olabilir'),
+  additionalRequirements: z
+    .string()
+    .optional()
+    .refine((val) => !val || val.length <= 2000, 'Ek gereksinimler maksimum 2000 karakter olabilir'),
+  targetKeywords: z
+    .string()
+    .optional()
+    .refine((val) => !val || val.split(',').length <= 20, 'Maksimum 20 anahtar kelime ekleyebilirsiniz'),
+})
+
+// CV generator schema with upload ID (deprecated - kept for compatibility)
 export const cvFromUploadSchema = z.object({
   cvUploadId: z.string().min(1, 'CV seçimi gereklidir'),
   positionTitle: z.string().min(1, 'İş pozisyonu gereklidir').max(100, 'İş pozisyonu maksimum 100 karakter olabilir'),
@@ -98,6 +119,7 @@ export const cvCreationSchema = z.object({
 })
 
 // Type exports
+export type CVGenerateFormValues = z.infer<typeof cvGenerateSchema>
 export type CVFromUploadFormValues = z.infer<typeof cvFromUploadSchema>
 export type CVCreationFormValues = z.infer<typeof cvCreationSchema>
 export type CVPersonalInfo = z.infer<typeof cvCreationSchema>['personalInfo']

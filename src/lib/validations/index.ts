@@ -43,6 +43,7 @@ export {
 
 // CV schemas and types
 export {
+  cvGenerateSchema,
   cvFromUploadSchema,
   cvCreationSchema,
   partialCVUploadSchema,
@@ -51,6 +52,7 @@ export {
   validateCVUploadData,
   validateCVCreationData,
   type CVType,
+  type CVGenerateFormValues,
   type CVFromUploadFormValues,
   type CVCreationFormValues,
   type PartialCVUploadFormValues,

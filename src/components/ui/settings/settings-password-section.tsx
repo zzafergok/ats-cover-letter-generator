@@ -12,7 +12,7 @@ import { Lock, Eye, EyeOff } from 'lucide-react'
 import { Button } from '@/components/core/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/core/card'
 
-import { userApi } from '@/lib/api/api'
+import { authApi } from '@/lib/api/api'
 import { changePasswordSchema, type ChangePasswordRequest } from '@/lib/validations'
 
 export default function SettingsPasswordSection() {
@@ -37,7 +37,7 @@ export default function SettingsPasswordSection() {
   const onSubmit = async (data: ChangePasswordRequest) => {
     setIsLoading(true)
     try {
-      await userApi.changePassword(data)
+      await authApi.changePassword(data)
       reset()
     } catch (error) {
       console.log('🚀 ~ onSubmit ~ error:', error)

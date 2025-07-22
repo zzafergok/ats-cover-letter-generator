@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React, { useState } from 'react'
 
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -16,24 +16,34 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/core/select'
 
 import { cvFromUploadSchema, type CVFromUploadFormValues, type CVType } from '@/lib/validations'
+import { ContentViewer } from '@/components/ui/common/ContentViewer'
+
+type CVGeneratorFormData = CVFromUploadFormValues
 
 interface CVUpload {
   id: string
   originalName: string
-  uploadDate: string
-  markdownContent: string
+  uploadedAt: string
 }
 
-type CVGeneratorFormData = CVFromUploadFormValues
+interface UseCVStoreReturn {
+  uploadedCVs: CVUpload[]
+  selectedCV: CVUpload | null
+  generateCV: (data: unknown) => Promise<string>
+  isGenerating: boolean
+  error: string | null
+  clearError: () => void
+}
 
 interface CVGeneratorFormProps {
-  onGenerate: (content: string, data?: CVGeneratorFormData) => void
-  selectedCVUpload?: CVUpload | null
+  onGenerate?: (content: string, data?: CVGeneratorFormData) => void
   className?: string
 }
 
-export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVGeneratorFormProps) {
-  const { uploadedCVs, generateCV, isGenerating, error, clearError } = useCVStore()
+export function CVGeneratorForm({ onGenerate, className }: CVGeneratorFormProps) {
+  const [generatedContent, setGeneratedContent] = useState<string | null>(null)
+
+  const { uploadedCVs, selectedCV, generateCV, isGenerating, error, clearError } = useCVStore() as UseCVStoreReturn
 
   const {
     register,
@@ -45,7 +55,7 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
   } = useForm<CVGeneratorFormData>({
     resolver: zodResolver(cvFromUploadSchema),
     defaultValues: {
-      cvUploadId: selectedCVUpload?.id || '',
+      cvUploadId: '',
       positionTitle: '',
       companyName: '',
       cvType: 'ATS_OPTIMIZED',
@@ -54,12 +64,6 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
       targetKeywords: '',
     },
   })
-
-  useEffect(() => {
-    if (selectedCVUpload?.id) {
-      setValue('cvUploadId', selectedCVUpload.id)
-    }
-  }, [selectedCVUpload, setValue])
 
   const onSubmit = async (data: CVGeneratorFormData) => {
     try {
@@ -81,7 +85,8 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
       }
 
       const content = await generateCV(cvData)
-      onGenerate(content, data)
+      setGeneratedContent(content)
+      onGenerate?.(content, data)
     } catch (error) {
       console.error('CV oluşturma hatası:', error)
     }
@@ -90,6 +95,7 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
   const handleReset = () => {
     reset()
     clearError()
+    setGeneratedContent(null)
   }
 
   const cvType = watch('cvType')
@@ -105,14 +111,6 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
     ATS_OPTIMIZED: 'ATS Uyumlu',
     CREATIVE: 'Yaratıcı',
     TECHNICAL: 'Teknik',
-  }
-
-  const _formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return '0 Bytes'
-    const k = 1024
-    const sizes = ['Bytes', 'KB', 'MB', 'GB']
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
   }
 
   const formatDate = (dateString: string): string => {
@@ -137,33 +135,32 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
           {/* CV Upload Selection */}
           <div className='space-y-2'>
             <Label htmlFor='cvUploadId'>CV Dosyası Seçimi *</Label>
-            {selectedCVUpload ? (
+            {selectedCV ? (
               <div className='p-3 border rounded-lg bg-muted/50'>
                 <div className='flex items-center gap-2'>
                   <FileText className='h-4 w-4 text-muted-foreground' />
-                  <span className='font-medium text-sm'>{selectedCVUpload.originalName}</span>
+                  <span className='font-medium text-sm'>{selectedCV.originalName}</span>
                 </div>
                 <p className='text-xs text-muted-foreground mt-1'>
-                  Yükleme tarihi: {formatDate(selectedCVUpload.uploadDate)}
+                  Yükleme tarihi: {formatDate(selectedCV.uploadedAt)}
                 </p>
               </div>
-            ) : uploadedCVs.length > 0 ? (
-              <Select value={watch('cvUploadId')} onValueChange={(value) => setValue('cvUploadId', value)}>
+            ) : uploadedCVs && uploadedCVs.length > 0 ? (
+              <Select value={watch('cvUploadId') || ''} onValueChange={(value) => setValue('cvUploadId', value)}>
                 <SelectTrigger>
                   <SelectValue placeholder='Yüklenmiş CV dosyalarınızdan birini seçiniz' />
                 </SelectTrigger>
                 <SelectContent>
-                  {uploadedCVs.map((cv: any) => {
-                    console.log('🚀 ~ {uploadedCVs.map ~ cv:', cv)
-                    return (
-                      <SelectItem key={cv.data.id} value={cv.data.id}>
-                        <div className='flex items-center gap-2'>
-                          <FileText className='h-4 w-4' />
-                          <span>{cv.data.fileInfo.originalName}</span>
-                        </div>
-                      </SelectItem>
-                    )
-                  })}
+                  {uploadedCVs.map((cv: CVUpload) => (
+                    <SelectItem key={cv.id} value={cv.id}>
+                      <div className='flex items-center gap-2'>
+                        <FileText className='h-4 w-4' />
+                        <span>
+                          {cv.originalName} ({formatDate(cv.uploadedAt)})
+                        </span>
+                      </div>
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             ) : (
@@ -189,7 +186,7 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
                 placeholder='ör. Frontend Developer, Pazarlama Uzmanı'
                 className='pl-10'
                 {...register('positionTitle')}
-                disabled={isSubmitting || isGenerating || (!selectedCVUpload && uploadedCVs.length === 0)}
+                disabled={isSubmitting || isGenerating || (!selectedCV && (!uploadedCVs || uploadedCVs.length === 0))}
               />
             </div>
             {errors.positionTitle && <p className='text-sm text-destructive'>{errors.positionTitle.message}</p>}
@@ -204,7 +201,7 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
                 placeholder='ör. ABC Teknoloji, XYZ Holding'
                 className='pl-10'
                 {...register('companyName')}
-                disabled={isSubmitting || isGenerating || (!selectedCVUpload && uploadedCVs.length === 0)}
+                disabled={isSubmitting || isGenerating || (!selectedCV && (!uploadedCVs || uploadedCVs.length === 0))}
               />
             </div>
             {errors.companyName && <p className='text-sm text-destructive'>{errors.companyName.message}</p>}
@@ -216,7 +213,7 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
             <Select
               value={cvType}
               onValueChange={(value) => setValue('cvType', value as 'ATS_OPTIMIZED' | 'CREATIVE' | 'TECHNICAL')}
-              disabled={isSubmitting || isGenerating || (!selectedCVUpload && uploadedCVs.length === 0)}
+              disabled={isSubmitting || isGenerating || (!selectedCV && (!uploadedCVs || uploadedCVs.length === 0))}
             >
               <SelectTrigger>
                 <SelectValue placeholder='CV tipini seçiniz' />
@@ -244,7 +241,7 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
               placeholder="İş ilanından iş tanımını ve gereksinimlerini buraya kopyalayınız. Bu bilgiler CV'nizin pozisyona uygun şekilde optimize edilmesi için kullanılacaktır."
               rows={6}
               {...register('jobDescription')}
-              disabled={isSubmitting || isGenerating || (!selectedCVUpload && uploadedCVs.length === 0)}
+              disabled={isSubmitting || isGenerating || (!selectedCV && (!uploadedCVs || uploadedCVs.length === 0))}
             />
             <p className='text-xs text-muted-foreground'>{watch('jobDescription')?.length || 0} / 5000 karakter</p>
             {errors.jobDescription && <p className='text-sm text-destructive'>{errors.jobDescription.message}</p>}
@@ -257,7 +254,7 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
               placeholder='Pozisyon için önemli olan ek beceriler, sertifikalar veya deneyimler hakkında bilgi verebilirsiniz.'
               rows={3}
               {...register('additionalRequirements')}
-              disabled={isSubmitting || isGenerating || (!selectedCVUpload && uploadedCVs.length === 0)}
+              disabled={isSubmitting || isGenerating || (!selectedCV && (!uploadedCVs || uploadedCVs.length === 0))}
             />
             <p className='text-xs text-muted-foreground'>
               {watch('additionalRequirements')?.length || 0} / 2000 karakter
@@ -277,7 +274,7 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
                 rows={2}
                 className='pl-10'
                 {...register('targetKeywords')}
-                disabled={isSubmitting || isGenerating || (!selectedCVUpload && uploadedCVs.length === 0)}
+                disabled={isSubmitting || isGenerating || (!selectedCV && (!uploadedCVs || uploadedCVs.length === 0))}
               />
             </div>
             <p className='text-xs text-muted-foreground'>
@@ -300,7 +297,7 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
           <div className='flex gap-3'>
             <Button
               type='submit'
-              disabled={isSubmitting || isGenerating || (!selectedCVUpload && uploadedCVs.length === 0)}
+              disabled={isSubmitting || isGenerating || (!selectedCV && (!uploadedCVs || uploadedCVs.length === 0))}
               className='flex-1'
             >
               {isGenerating && <Wand2 className='mr-2 h-4 w-4 animate-spin' />}
@@ -311,7 +308,7 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
               Formu Temizle
             </Button>
           </div>
-          {!selectedCVUpload && uploadedCVs.length === 0 && (
+          {!selectedCV && (!uploadedCVs || uploadedCVs.length === 0) && (
             <div className='bg-muted/50 border border-muted rounded-lg p-4'>
               <div className='flex items-center gap-2'>
                 <AlertCircle className='h-4 w-4 text-muted-foreground' />
@@ -323,6 +320,34 @@ export function CVGeneratorForm({ onGenerate, selectedCVUpload, className }: CVG
           )}
         </form>
       </CardContent>
+
+      {/* Generated CV Content */}
+      {generatedContent && (
+        <>
+          <div className='border-t border-border mt-6' />
+          <CardContent className='pt-6'>
+            <ContentViewer
+              content={generatedContent}
+              title={`${watch('positionTitle')} - ${watch('companyName')}`}
+              type='cv'
+              metadata={{
+                createdAt: new Date().toISOString(),
+                wordCount: generatedContent.split(' ').length,
+                characterCount: generatedContent.length,
+                estimatedReadTime: Math.ceil(generatedContent.split(' ').length / 200),
+              }}
+              onSave={async ({ title, content }) => {
+                // Save CV functionality can be implemented here
+                console.log('Save CV:', { title, content })
+              }}
+              onDownload={async (format) => {
+                // Download functionality can be implemented here
+                console.log('Download CV as:', format)
+              }}
+            />
+          </CardContent>
+        </>
+      )}
     </Card>
   )
 }

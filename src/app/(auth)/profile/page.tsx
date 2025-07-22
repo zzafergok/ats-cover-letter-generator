@@ -16,7 +16,7 @@ import { Label } from '@/components/core/label'
 import { Button } from '@/components/core/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/core/card'
 
-import { userApi } from '@/lib/api/api'
+import { authApi } from '@/lib/api/api'
 import AuthApiService from '@/lib/services/authApiService'
 import { updateUserProfileSchema, type UpdateUserProfileRequest } from '@/lib/validations'
 
@@ -52,7 +52,12 @@ export default function ProfilePage() {
   const onSubmit = async (data: UpdateUserProfileRequest) => {
     setIsLoading(true)
     try {
-      await userApi.updateProfile(data)
+      // Split name into firstName and lastName for API call
+      const nameParts = data.name.trim().split(' ')
+      const firstName = nameParts[0] || ''
+      const lastName = nameParts.slice(1).join(' ') || ''
+
+      await authApi.updateProfile({ firstName, lastName })
       await AuthApiService.getCurrentUser() // Auth provider'dan user bilgilerini yenile
       setIsEditing(false)
     } catch (error) {

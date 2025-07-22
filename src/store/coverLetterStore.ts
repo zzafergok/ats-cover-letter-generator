@@ -2,37 +2,48 @@
 // src/store/coverLetterStore.ts
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import {
-  coverLetterApi,
-  type GenerateCoverLetterData,
-  type SaveCoverLetterData,
-  type SavedCoverLetter,
-} from '@/lib/api/api'
+import { coverLetterApi } from '@/lib/api/api'
+import type {
+  CoverLetterBasic,
+  CoverLetterDetailed,
+  CoverLetterBasicGenerateData,
+  CoverLetterDetailedGenerateData,
+  CoverLetterBasicUpdateData,
+  CoverLetterDetailedUpdateData,
+} from '@/types/api.types'
 
-interface CoverLetterCategory {
-  key: string
-  label: string
-}
+type CoverLetterType = 'basic' | 'detailed'
 
 // Remove duplicate interface since it's imported from api.ts
 
 interface CoverLetterState {
-  categories: CoverLetterCategory[]
-  savedCoverLetters: SavedCoverLetter[]
-  selectedCategory: CoverLetterCategory | null
+  basicCoverLetters: CoverLetterBasic[]
+  detailedCoverLetters: CoverLetterDetailed[]
+  selectedType: CoverLetterType
   isGenerating: boolean
   isLoading: boolean
   error: string | null
 }
 
 interface CoverLetterActions {
-  getCategories: () => Promise<void>
-  selectCategory: (category: CoverLetterCategory) => void
-  generateCoverLetter: (data: GenerateCoverLetterData) => Promise<string>
-  saveCoverLetter: (data: SaveCoverLetterData) => Promise<void>
-  getSavedCoverLetters: () => Promise<void>
-  deleteSavedCoverLetter: (id: string) => Promise<void>
-  downloadCoverLetter: (content: string, fileName: string, format: 'pdf' | 'docx') => Promise<void>
+  // Basic Cover Letter Actions
+  createBasicCoverLetter: (data: CoverLetterBasicGenerateData) => Promise<CoverLetterBasic>
+  getBasicCoverLetters: () => Promise<void>
+  getBasicCoverLetter: (id: string) => Promise<CoverLetterBasic>
+  updateBasicCoverLetter: (id: string, data: CoverLetterBasicUpdateData) => Promise<CoverLetterBasic>
+  deleteBasicCoverLetter: (id: string) => Promise<void>
+  downloadBasicCoverLetterPdf: (id: string) => Promise<void>
+
+  // Detailed Cover Letter Actions
+  createDetailedCoverLetter: (data: CoverLetterDetailedGenerateData) => Promise<CoverLetterDetailed>
+  getDetailedCoverLetters: () => Promise<void>
+  getDetailedCoverLetter: (id: string) => Promise<CoverLetterDetailed>
+  updateDetailedCoverLetter: (id: string, data: CoverLetterDetailedUpdateData) => Promise<CoverLetterDetailed>
+  deleteDetailedCoverLetter: (id: string) => Promise<void>
+  downloadDetailedCoverLetterPdf: (id: string) => Promise<void>
+
+  // Utility Actions
+  setSelectedType: (type: CoverLetterType) => void
   clearError: () => void
   reset: () => void
 }
@@ -40,9 +51,9 @@ interface CoverLetterActions {
 type CoverLetterStore = CoverLetterState & CoverLetterActions
 
 const initialState: CoverLetterState = {
-  categories: [],
-  savedCoverLetters: [],
-  selectedCategory: null,
+  basicCoverLetters: [],
+  detailedCoverLetters: [],
+  selectedType: 'basic',
   isGenerating: false,
   isLoading: false,
   error: null,
@@ -53,90 +64,183 @@ export const useCoverLetterStore = create<CoverLetterStore>()(
     (set, get) => ({
       ...initialState,
 
-      getCategories: async () => {
-        set({ isLoading: true, error: null })
-        try {
-          const categories = await coverLetterApi.getCategories()
-          set({ categories, isLoading: false })
-        } catch (error: any) {
-          const errorMessage = error.response?.data?.message || 'Kategoriler yüklenirken hata oluştu'
-          set({ isLoading: false, error: errorMessage })
-        }
-      },
-
-      selectCategory: (category: CoverLetterCategory) => {
-        set({ selectedCategory: category })
-      },
-
-      generateCoverLetter: async (data) => {
+      // Basic Cover Letter Actions
+      createBasicCoverLetter: async (data) => {
         set({ isGenerating: true, error: null })
         try {
-          const result = await coverLetterApi.generate(data)
+          const response = await coverLetterApi.basic.create(data)
           set({ isGenerating: false })
-          return result.data.content
+          await get().getBasicCoverLetters() // Refresh the list
+          return response.data
         } catch (error: any) {
-          const errorMessage = error.response?.data?.message || 'Ön yazı oluşturulurken hata oluştu'
+          const errorMessage = error.response?.data?.message || 'Temel ön yazı oluşturulurken hata oluştu'
           set({ isGenerating: false, error: errorMessage })
           throw error
         }
       },
 
-      saveCoverLetter: async (data) => {
+      getBasicCoverLetters: async () => {
         set({ isLoading: true, error: null })
         try {
-          await coverLetterApi.save(data)
-          await get().getSavedCoverLetters()
-          set({ isLoading: false })
+          const response = await coverLetterApi.basic.getAll()
+          const basicCoverLetters = response.data || []
+          set({ basicCoverLetters, isLoading: false })
         } catch (error: any) {
-          const errorMessage = error.response?.data?.message || 'Ön yazı kaydedilirken hata oluştu'
+          const errorMessage = error.response?.data?.message || 'Temel ön yazılar yüklenirken hata oluştu'
+          set({ isLoading: false, error: errorMessage })
+        }
+      },
+
+      getBasicCoverLetter: async (id) => {
+        set({ isLoading: true, error: null })
+        try {
+          const response = await coverLetterApi.basic.get(id)
+          set({ isLoading: false })
+          return response.data
+        } catch (error: any) {
+          const errorMessage = error.response?.data?.message || 'Temel ön yazı yüklenirken hata oluştu'
           set({ isLoading: false, error: errorMessage })
           throw error
         }
       },
 
-      getSavedCoverLetters: async () => {
+      updateBasicCoverLetter: async (id, data) => {
         set({ isLoading: true, error: null })
         try {
-          const response = await coverLetterApi.getSaved()
-          const coverLetters = response.data || []
-          set({ savedCoverLetters: coverLetters, isLoading: false })
+          const response = await coverLetterApi.basic.update(id, data)
+          set({ isLoading: false })
+          await get().getBasicCoverLetters() // Refresh the list
+          return response.data
         } catch (error: any) {
-          const errorMessage = error.response?.data?.message || 'Kayıtlı ön yazılar yüklenirken hata oluştu'
+          const errorMessage = error.response?.data?.message || 'Temel ön yazı güncellenirken hata oluştu'
           set({ isLoading: false, error: errorMessage })
+          throw error
         }
       },
 
-      deleteSavedCoverLetter: async (id) => {
+      deleteBasicCoverLetter: async (id) => {
         set({ isLoading: true, error: null })
         try {
-          await coverLetterApi.delete(id)
+          await coverLetterApi.basic.delete(id)
           set((state) => ({
-            savedCoverLetters: state.savedCoverLetters.filter((letter) => letter.id !== id),
+            basicCoverLetters: state.basicCoverLetters.filter((letter) => letter.id !== id),
             isLoading: false,
           }))
         } catch (error: any) {
-          const errorMessage = error.response?.data?.message || 'Ön yazı silinirken hata oluştu'
+          const errorMessage = error.response?.data?.message || 'Temel ön yazı silinirken hata oluştu'
           set({ isLoading: false, error: errorMessage })
         }
       },
 
-      downloadCoverLetter: async (_content, fileName, format) => {
+      downloadBasicCoverLetterPdf: async (id) => {
         set({ isLoading: true, error: null })
         try {
-          const blob = await coverLetterApi.download(fileName, format)
+          const blob = await coverLetterApi.basic.downloadPdf(id)
           const url = window.URL.createObjectURL(blob)
           const a = document.createElement('a')
           a.href = url
-          a.download = `${fileName}.${format}`
+          a.download = `temel-on-yazi-${id}.pdf`
           document.body.appendChild(a)
           a.click()
           window.URL.revokeObjectURL(url)
           document.body.removeChild(a)
           set({ isLoading: false })
         } catch (error: any) {
-          const errorMessage = error.response?.data?.message || 'Ön yazı indirilirken hata oluştu'
+          const errorMessage = error.response?.data?.message || 'PDF indirilirken hata oluştu'
           set({ isLoading: false, error: errorMessage })
         }
+      },
+
+      // Detailed Cover Letter Actions
+      createDetailedCoverLetter: async (data) => {
+        set({ isGenerating: true, error: null })
+        try {
+          const response = await coverLetterApi.detailed.create(data)
+          set({ isGenerating: false })
+          await get().getDetailedCoverLetters() // Refresh the list
+          return response.data
+        } catch (error: any) {
+          const errorMessage = error.response?.data?.message || 'Detaylı ön yazı oluşturulurken hata oluştu'
+          set({ isGenerating: false, error: errorMessage })
+          throw error
+        }
+      },
+
+      getDetailedCoverLetters: async () => {
+        set({ isLoading: true, error: null })
+        try {
+          const response = await coverLetterApi.detailed.getAll()
+          const detailedCoverLetters = response.data || []
+          set({ detailedCoverLetters, isLoading: false })
+        } catch (error: any) {
+          const errorMessage = error.response?.data?.message || 'Detaylı ön yazılar yüklenirken hata oluştu'
+          set({ isLoading: false, error: errorMessage })
+        }
+      },
+
+      getDetailedCoverLetter: async (id) => {
+        set({ isLoading: true, error: null })
+        try {
+          const response = await coverLetterApi.detailed.get(id)
+          set({ isLoading: false })
+          return response.data
+        } catch (error: any) {
+          const errorMessage = error.response?.data?.message || 'Detaylı ön yazı yüklenirken hata oluştu'
+          set({ isLoading: false, error: errorMessage })
+          throw error
+        }
+      },
+
+      updateDetailedCoverLetter: async (id, data) => {
+        set({ isLoading: true, error: null })
+        try {
+          const response = await coverLetterApi.detailed.update(id, data)
+          set({ isLoading: false })
+          await get().getDetailedCoverLetters() // Refresh the list
+          return response.data
+        } catch (error: any) {
+          const errorMessage = error.response?.data?.message || 'Detaylı ön yazı güncellenirken hata oluştu'
+          set({ isLoading: false, error: errorMessage })
+          throw error
+        }
+      },
+
+      deleteDetailedCoverLetter: async (id) => {
+        set({ isLoading: true, error: null })
+        try {
+          await coverLetterApi.detailed.delete(id)
+          set((state) => ({
+            detailedCoverLetters: state.detailedCoverLetters.filter((letter) => letter.id !== id),
+            isLoading: false,
+          }))
+        } catch (error: any) {
+          const errorMessage = error.response?.data?.message || 'Detaylı ön yazı silinirken hata oluştu'
+          set({ isLoading: false, error: errorMessage })
+        }
+      },
+
+      downloadDetailedCoverLetterPdf: async (id) => {
+        set({ isLoading: true, error: null })
+        try {
+          const blob = await coverLetterApi.detailed.downloadPdf(id)
+          const url = window.URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = `detayli-on-yazi-${id}.pdf`
+          document.body.appendChild(a)
+          a.click()
+          window.URL.revokeObjectURL(url)
+          document.body.removeChild(a)
+          set({ isLoading: false })
+        } catch (error: any) {
+          const errorMessage = error.response?.data?.message || 'PDF indirilirken hata oluştu'
+          set({ isLoading: false, error: errorMessage })
+        }
+      },
+
+      // Utility Actions
+      setSelectedType: (type) => {
+        set({ selectedType: type })
       },
 
       clearError: () => set({ error: null }),
@@ -146,9 +250,9 @@ export const useCoverLetterStore = create<CoverLetterStore>()(
     {
       name: 'cover-letter-store',
       partialize: (state) => ({
-        categories: state.categories,
-        savedCoverLetters: state.savedCoverLetters,
-        selectedCategory: state.selectedCategory,
+        basicCoverLetters: state.basicCoverLetters,
+        detailedCoverLetters: state.detailedCoverLetters,
+        selectedType: state.selectedType,
       }),
     },
   ),

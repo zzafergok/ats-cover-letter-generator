@@ -3,27 +3,28 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { cvApi } from '@/lib/api/api'
+import type {
+  CVUpload,
+  SavedCV,
+  DetailedCV,
+  CVGenerateData,
+  CVSaveData,
+  CVDetailedGenerateData,
+  CVUploadResponse,
+  CVUploadsResponse,
+  CVGenerateResponse,
+  SavedCVsResponse,
+  DetailedCVsResponse,
+  DetailedCVResponse,
+} from '@/types/api.types'
 
-interface UploadedCV {
-  id: string
-  originalName: string
-  uploadDate: string
-  markdownContent: string
-}
-
-interface SavedCV {
-  id: string
-  title: string
-  content: string
-  cvType: string
-  createdAt: string
-  updatedAt: string
-}
+// Using types from API instead of local interfaces
 
 interface CVState {
-  uploadedCVs: UploadedCV[]
+  uploadedCVs: CVUpload[]
   savedCVs: SavedCV[]
-  selectedCV: UploadedCV | null
+  detailedCVs: DetailedCV[]
+  selectedCV: CVUpload | null
   isUploading: boolean
   isGenerating: boolean
   isLoading: boolean
@@ -31,26 +32,29 @@ interface CVState {
 }
 
 interface CVActions {
-  uploadCV: (file: File) => Promise<UploadedCV>
+  // Upload CV Actions
+  uploadCV: (file: File) => Promise<CVUpload>
   getUploadedCVs: () => Promise<void>
-  selectCV: (cv: UploadedCV) => void
-  generateCV: (data: {
-    cvUploadId: string
-    positionTitle: string
-    companyName: string
-    cvType: 'ATS_OPTIMIZED' | 'CREATIVE' | 'TECHNICAL'
-    jobDescription: string
-    additionalRequirements?: string
-    targetKeywords?: string[]
-  }) => Promise<string>
-  saveCV: (data: {
-    title: string
-    content: string
-    cvType: 'ATS_OPTIMIZED' | 'CREATIVE' | 'TECHNICAL'
-  }) => Promise<void>
+  deleteUploadedCV: (id: string) => Promise<void>
+
+  // Generate CV Actions
+  generateCV: (data: CVGenerateData) => Promise<string>
+
+  // Save CV Actions
+  saveCV: (data: CVSaveData) => Promise<void>
   getSavedCVs: () => Promise<void>
   deleteSavedCV: (id: string) => Promise<void>
-  downloadCV: (content: string, fileName: string, format: 'pdf' | 'docx') => Promise<void>
+  downloadSavedCV: (id: string) => Promise<void>
+
+  // Detailed CV Actions
+  generateDetailedCV: (data: CVDetailedGenerateData) => Promise<DetailedCV>
+  getDetailedCVs: () => Promise<void>
+  getDetailedCV: (id: string) => Promise<DetailedCV>
+  deleteDetailedCV: (id: string) => Promise<void>
+  downloadDetailedCVPdf: (id: string) => Promise<void>
+
+  // Utility Actions
+  selectCV: (cv: CVUpload) => void
   clearError: () => void
   reset: () => void
 }
@@ -60,6 +64,7 @@ type CVStore = CVState & CVActions
 const initialState: CVState = {
   uploadedCVs: [],
   savedCVs: [],
+  detailedCVs: [],
   selectedCV: null,
   isUploading: false,
   isGenerating: false,
@@ -72,10 +77,12 @@ export const useCVStore = create<CVStore>()(
     (set, get) => ({
       ...initialState,
 
+      // Upload CV Actions
       uploadCV: async (file: File) => {
         set({ isUploading: true, error: null })
         try {
-          const uploadedCV: UploadedCV = await cvApi.upload(file)
+          const response: CVUploadResponse = await cvApi.upload(file)
+          const uploadedCV = response.data
 
           set((state) => ({
             uploadedCVs: Array.isArray(state.uploadedCVs) ? [...state.uploadedCVs, uploadedCV] : [uploadedCV],
@@ -93,24 +100,36 @@ export const useCVStore = create<CVStore>()(
       getUploadedCVs: async () => {
         set({ isLoading: true, error: null })
         try {
-          const cvs = await cvApi.getUploaded()
-          set({ uploadedCVs: cvs, isLoading: false })
+          const response: CVUploadsResponse = await cvApi.getUploads()
+          const uploadedCVs = response.data || []
+          set({ uploadedCVs, isLoading: false })
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || "CV'ler yüklenirken hata oluştu"
           set({ isLoading: false, error: errorMessage })
         }
       },
 
-      selectCV: (cv: UploadedCV) => {
-        set({ selectedCV: cv })
+      deleteUploadedCV: async (id) => {
+        set({ isLoading: true, error: null })
+        try {
+          await cvApi.deleteUpload(id)
+          set((state) => ({
+            uploadedCVs: state.uploadedCVs.filter((cv) => cv.id !== id),
+            isLoading: false,
+          }))
+        } catch (error: any) {
+          const errorMessage = error.response?.data?.message || 'Yüklenen CV silinirken hata oluştu'
+          set({ isLoading: false, error: errorMessage })
+        }
       },
 
+      // Generate CV Actions
       generateCV: async (data) => {
         set({ isGenerating: true, error: null })
         try {
-          const result = await cvApi.generate(data)
+          const response: CVGenerateResponse = await cvApi.generate(data)
           set({ isGenerating: false })
-          return result.content
+          return response.data.content
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || 'CV oluşturulurken hata oluştu'
           set({ isGenerating: false, error: errorMessage })
@@ -118,6 +137,7 @@ export const useCVStore = create<CVStore>()(
         }
       },
 
+      // Save CV Actions
       saveCV: async (data) => {
         set({ isLoading: true, error: null })
         try {
@@ -134,8 +154,9 @@ export const useCVStore = create<CVStore>()(
       getSavedCVs: async () => {
         set({ isLoading: true, error: null })
         try {
-          const cvs = await cvApi.getSaved()
-          set({ savedCVs: cvs, isLoading: false })
+          const response: SavedCVsResponse = await cvApi.getSaved()
+          const savedCVs = response.data || []
+          set({ savedCVs, isLoading: false })
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || "Kayıtlı CV'ler yüklenirken hata oluştu"
           set({ isLoading: false, error: errorMessage })
@@ -145,7 +166,7 @@ export const useCVStore = create<CVStore>()(
       deleteSavedCV: async (id) => {
         set({ isLoading: true, error: null })
         try {
-          await cvApi.delete(id)
+          await cvApi.deleteSaved(id)
           set((state) => ({
             savedCVs: state.savedCVs.filter((cv) => cv.id !== id),
             isLoading: false,
@@ -156,14 +177,14 @@ export const useCVStore = create<CVStore>()(
         }
       },
 
-      downloadCV: async (content, fileName, format) => {
+      downloadSavedCV: async (id) => {
         set({ isLoading: true, error: null })
         try {
-          const blob = await cvApi.download(format, content, fileName)
+          const blob = await cvApi.download(id)
           const url = window.URL.createObjectURL(blob)
           const a = document.createElement('a')
           a.href = url
-          a.download = `${fileName}.${format}`
+          a.download = `cv-${id}.pdf`
           document.body.appendChild(a)
           a.click()
           window.URL.revokeObjectURL(url)
@@ -175,6 +196,84 @@ export const useCVStore = create<CVStore>()(
         }
       },
 
+      // Detailed CV Actions
+      generateDetailedCV: async (data) => {
+        set({ isGenerating: true, error: null })
+        try {
+          const response = await cvApi.generateDetailed(data)
+          set({ isGenerating: false })
+          await get().getDetailedCVs() // Refresh the list
+          return response.data
+        } catch (error: any) {
+          const errorMessage = error.response?.data?.message || 'Detaylı CV oluşturulurken hata oluştu'
+          set({ isGenerating: false, error: errorMessage })
+          throw error
+        }
+      },
+
+      getDetailedCVs: async () => {
+        set({ isLoading: true, error: null })
+        try {
+          const response: DetailedCVsResponse = await cvApi.getDetailed()
+          const detailedCVs = response.data || []
+          set({ detailedCVs, isLoading: false })
+        } catch (error: any) {
+          const errorMessage = error.response?.data?.message || "Detaylı CV'ler yüklenirken hata oluştu"
+          set({ isLoading: false, error: errorMessage })
+        }
+      },
+
+      getDetailedCV: async (id) => {
+        set({ isLoading: true, error: null })
+        try {
+          const response: DetailedCVResponse = await cvApi.getDetailedById(id)
+          set({ isLoading: false })
+          return response.data
+        } catch (error: any) {
+          const errorMessage = error.response?.data?.message || 'Detaylı CV yüklenirken hata oluştu'
+          set({ isLoading: false, error: errorMessage })
+          throw error
+        }
+      },
+
+      deleteDetailedCV: async (id) => {
+        set({ isLoading: true, error: null })
+        try {
+          await cvApi.deleteDetailed(id)
+          set((state) => ({
+            detailedCVs: state.detailedCVs.filter((cv) => cv.id !== id),
+            isLoading: false,
+          }))
+        } catch (error: any) {
+          const errorMessage = error.response?.data?.message || 'Detaylı CV silinirken hata oluştu'
+          set({ isLoading: false, error: errorMessage })
+        }
+      },
+
+      downloadDetailedCVPdf: async (id) => {
+        set({ isLoading: true, error: null })
+        try {
+          const blob = await cvApi.downloadDetailedPdf(id)
+          const url = window.URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = `detayli-cv-${id}.pdf`
+          document.body.appendChild(a)
+          a.click()
+          window.URL.revokeObjectURL(url)
+          document.body.removeChild(a)
+          set({ isLoading: false })
+        } catch (error: any) {
+          const errorMessage = error.response?.data?.message || 'PDF indirilirken hata oluştu'
+          set({ isLoading: false, error: errorMessage })
+        }
+      },
+
+      // Utility Actions
+      selectCV: (cv: CVUpload) => {
+        set({ selectedCV: cv })
+      },
+
       clearError: () => set({ error: null }),
 
       reset: () => set(initialState),
@@ -184,6 +283,7 @@ export const useCVStore = create<CVStore>()(
       partialize: (state) => ({
         uploadedCVs: state.uploadedCVs,
         savedCVs: state.savedCVs,
+        detailedCVs: state.detailedCVs,
         selectedCV: state.selectedCV,
       }),
     },

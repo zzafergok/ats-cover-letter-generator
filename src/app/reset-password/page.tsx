@@ -111,7 +111,7 @@ export default function ResetPasswordPage() {
       setError('')
 
       try {
-        await authApi.resetPassword(token, { newPassword: data.newPassword, confirmPassword: data.confirmPassword })
+        await authApi.resetPassword({ token, newPassword: data.newPassword, confirmPassword: data.confirmPassword })
         setIsSuccess(true)
         reset()
 

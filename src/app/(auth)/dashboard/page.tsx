@@ -7,6 +7,7 @@ import { FileText, Upload, Wand2, Download, Trash2, Plus, Eye, Save, Calendar, T
 
 import { useCVStore } from '@/store/cvStore'
 import { useCoverLetterStore } from '@/store/coverLetterStore'
+import type { CoverLetterBasic } from '@/types/api.types'
 
 import { Button } from '@/components/core/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/core/card'
@@ -32,17 +33,16 @@ export default function DashboardPage() {
     getSavedCVs,
     saveCV,
     deleteSavedCV,
-    downloadCV,
+    downloadSavedCV,
     isLoading: cvLoading,
   } = useCVStore()
 
   const {
-    savedCoverLetters = [],
-    getSavedCoverLetters,
-    // saveCoverLetter,
-    deleteSavedCoverLetter,
-    downloadCoverLetter,
-    // isLoading: coverLetterLoading,
+    basicCoverLetters = [],
+    getBasicCoverLetters,
+    deleteBasicCoverLetter,
+    downloadBasicCoverLetterPdf,
+    isLoading: _coverLetterLoading,
   } = useCoverLetterStore()
 
   const [generatedCV, setGeneratedCV] = useState<string>('')
@@ -55,7 +55,7 @@ export default function DashboardPage() {
   const getDashboardStats = () => {
     const safeUploadedCVs = Array.isArray(uploadedCVs) ? uploadedCVs : []
     const safeSavedCVs = Array.isArray(savedCVs) ? savedCVs : []
-    const safeSavedCoverLetters = Array.isArray(savedCoverLetters) ? savedCoverLetters : []
+    const safeSavedCoverLetters = Array.isArray(basicCoverLetters) ? basicCoverLetters : []
 
     return {
       totalCVs: safeSavedCVs.length || 0,
@@ -86,7 +86,7 @@ export default function DashboardPage() {
     const loadDashboardData = async () => {
       try {
         setIsDataLoading(true)
-        await Promise.all([getUploadedCVs(), getSavedCVs(), getSavedCoverLetters()])
+        await Promise.all([getUploadedCVs(), getSavedCVs(), getBasicCoverLetters()])
         setDataLoaded(true)
       } catch (error) {
         console.error('Dashboard veri yükleme hatası:', error)
@@ -96,7 +96,7 @@ export default function DashboardPage() {
     }
 
     loadDashboardData()
-  }, [isAuthenticated, loading, dataLoaded])
+  }, [isAuthenticated, loading, dataLoaded, getUploadedCVs, getSavedCVs, getBasicCoverLetters])
 
   const handleCVUploadSuccess = () => {
     setActiveTab('cv-generate')
@@ -296,11 +296,7 @@ export default function DashboardPage() {
                                 <Button size='sm' variant='outline'>
                                   <Eye className='h-3 w-3' />
                                 </Button>
-                                <Button
-                                  size='sm'
-                                  variant='outline'
-                                  onClick={() => downloadCV(cv.content, cv.title, 'pdf')}
-                                >
+                                <Button size='sm' variant='outline' onClick={() => downloadSavedCV(cv.id)}>
                                   <Download className='h-3 w-3' />
                                 </Button>
                               </div>
@@ -327,15 +323,15 @@ export default function DashboardPage() {
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      {savedCoverLetters.length > 0 ? (
+                      {basicCoverLetters.length > 0 ? (
                         <div className='space-y-3'>
-                          {savedCoverLetters.slice(0, 3).map((letter) => (
+                          {basicCoverLetters.slice(0, 3).map((letter: CoverLetterBasic) => (
                             <div
                               key={letter.id}
                               className='flex items-center justify-between p-3 bg-muted/50 rounded-lg'
                             >
                               <div>
-                                <p className='font-medium text-foreground'>{letter.title}</p>
+                                <p className='font-medium text-foreground'>{letter.positionTitle}</p>
                                 <p className='text-sm text-muted-foreground flex items-center gap-1'>
                                   <Calendar className='h-3 w-3' />
                                   {new Date(letter.createdAt).toLocaleDateString('tr-TR')}
@@ -348,7 +344,7 @@ export default function DashboardPage() {
                                 <Button
                                   size='sm'
                                   variant='outline'
-                                  onClick={() => downloadCoverLetter(letter.content, letter.title, 'pdf')}
+                                  onClick={() => downloadBasicCoverLetterPdf(letter.id)}
                                 >
                                   <Download className='h-3 w-3' />
                                 </Button>
@@ -479,7 +475,12 @@ export default function DashboardPage() {
                             {cvLoading ? <LoadingSpinner size='sm' /> : <Save className='h-4 w-4' />}
                             Kaydet
                           </Button>
-                          <Button onClick={() => downloadCV(generatedCV, 'cv', 'pdf')} disabled={cvLoading}>
+                          <Button
+                            onClick={() => {
+                              /* Generated CV download logic needs implementation */
+                            }}
+                            disabled={cvLoading}
+                          >
                             <Download className='h-4 w-4' />
                             İndir
                           </Button>
@@ -517,7 +518,7 @@ export default function DashboardPage() {
                             Kaydet
                           </Button>
                           <Button
-                            onClick={() => downloadCoverLetter(generatedCoverLetter, 'cover-letter', 'pdf')}
+                            onClick={() => downloadBasicCoverLetterPdf(generatedCoverLetter, 'cover-letter', 'pdf')}
                             disabled={coverLetterLoading}
                           >
                             <Download className='h-4 w-4' />
@@ -570,11 +571,7 @@ export default function DashboardPage() {
                                 </div>
                               </div>
                               <div className='flex gap-2'>
-                                <Button
-                                  size='sm'
-                                  variant='outline'
-                                  onClick={() => downloadCV(cv.content, cv.title, 'pdf')}
-                                >
+                                <Button size='sm' variant='outline' onClick={() => downloadSavedCV(cv.id)}>
                                   <Download className='h-3 w-3' />
                                 </Button>
                                 <Button
@@ -602,25 +599,25 @@ export default function DashboardPage() {
                     <CardHeader>
                       <CardTitle className='flex items-center gap-2'>
                         <Wand2 className='h-5 w-5' />
-                        Kayıtlı Ön Yazılar ({savedCoverLetters.length})
+                        Kayıtlı Ön Yazılar ({basicCoverLetters.length})
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      {savedCoverLetters.length > 0 ? (
+                      {basicCoverLetters.length > 0 ? (
                         <div className='space-y-4'>
-                          {savedCoverLetters.map((letter) => (
+                          {basicCoverLetters.map((letter: CoverLetterBasic) => (
                             <div
                               key={letter.id}
                               className='flex items-center justify-between p-4 border border-border rounded-lg'
                             >
                               <div className='flex-1'>
-                                <h4 className='font-medium text-foreground'>{letter.title}</h4>
+                                <h4 className='font-medium text-foreground'>{letter.positionTitle}</h4>
                                 <div className='flex items-center gap-4 mt-1 text-sm text-muted-foreground'>
                                   <span className='flex items-center gap-1'>
                                     <Calendar className='h-3 w-3' />
                                     {new Date(letter.createdAt).toLocaleDateString('tr-TR')}
                                   </span>
-                                  <Badge variant='secondary'>{letter.category}</Badge>
+                                  <Badge variant='secondary'>{letter.language}</Badge>
                                 </div>
                                 <p className='text-sm text-muted-foreground mt-1'>
                                   {letter.positionTitle} - {letter.companyName}
@@ -630,14 +627,14 @@ export default function DashboardPage() {
                                 <Button
                                   size='sm'
                                   variant='outline'
-                                  onClick={() => downloadCoverLetter(letter.content, letter.title, 'pdf')}
+                                  onClick={() => downloadBasicCoverLetterPdf(letter.id)}
                                 >
                                   <Download className='h-3 w-3' />
                                 </Button>
                                 <Button
                                   size='sm'
                                   variant='outline'
-                                  onClick={() => deleteSavedCoverLetter(letter.id)}
+                                  onClick={() => deleteBasicCoverLetter(letter.id)}
                                   className='text-destructive hover:text-destructive'
                                 >
                                   <Trash2 className='h-3 w-3' />

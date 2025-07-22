@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Mail, User, Briefcase, Send, Loader2 } from 'lucide-react'
+import { Mail, User, Briefcase, Loader2, AlertCircle, FileText } from 'lucide-react'
 
 import { Input } from '@/components/core/input'
 import { Label } from '@/components/core/label'
@@ -14,17 +14,26 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/core/card
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/core/select'
 import { useCoverLetterStore } from '@/store/coverLetterStore'
 import { useCVStore } from '@/store/cvStore'
-import { CoverLetterViewer } from './CoverLetterViewer'
-import type { CoverLetterBasic, CVUpload } from '@/types/api.types'
+import { ContentViewer } from '@/components/ui/common/ContentViewer'
+import type { CoverLetterBasic, CoverLetterBasicGenerateData, CVUpload, Language } from '@/types/api.types'
 
-// Validation schema matching API requirements
+// Validation schema matching API CoverLetterBasicGenerateData
 const basicCoverLetterSchema = z.object({
-  cvUploadId: z.string().min(1, 'CV upload ID gerekli'),
-  companyName: z.string().min(2, 'Şirket adı en az 2 karakter olmalı'),
-  positionTitle: z.string().min(2, 'Pozisyon başlığı en az 2 karakter olmalı'),
-  jobDescription: z.string().min(20, 'İş tanımı en az 20 karakter olmalı'),
-  language: z.enum(['TURKISH', 'ENGLISH']).optional(),
-})
+  cvUploadId: z.string().min(1, 'CV seçimi gereklidir'),
+  positionTitle: z
+    .string()
+    .min(2, 'Pozisyon başlığı en az 2 karakter olmalı')
+    .max(100, 'Pozisyon başlığı maksimum 100 karakter olabilir'),
+  companyName: z
+    .string()
+    .min(2, 'Şirket adı en az 2 karakter olmalı')
+    .max(100, 'Şirket adı maksimum 100 karakter olabilir'),
+  jobDescription: z
+    .string()
+    .min(20, 'İş tanımı en az 20 karakter olmalı')
+    .max(5000, 'İş tanımı maksimum 5000 karakter olabilir'),
+  language: z.enum(['TURKISH', 'ENGLISH']),
+}) satisfies z.ZodType<CoverLetterBasicGenerateData>
 
 type BasicCoverLetterForm = z.infer<typeof basicCoverLetterSchema>
 
@@ -34,11 +43,11 @@ interface BasicCoverLetterCreatorProps {
 }
 
 export function BasicCoverLetterCreator({ onCreated, className }: BasicCoverLetterCreatorProps) {
-  const [createdCoverLetter, setCreatedCoverLetter] = useState<CoverLetterBasic | null>(null)
+  const [generatedContent, setGeneratedContent] = useState<string | null>(null)
+  const [generatedCoverLetter, setGeneratedCoverLetter] = useState<CoverLetterBasic | null>(null)
 
   const { createBasicCoverLetter, isGenerating, error, clearError } = useCoverLetterStore()
-
-  const { uploadedCVs, getUploadedCVs } = useCVStore()
+  const { uploadedCVs, getUploadedCVs, selectedCV } = useCVStore()
 
   const {
     register,
@@ -46,12 +55,13 @@ export function BasicCoverLetterCreator({ onCreated, className }: BasicCoverLett
     formState: { errors },
     control,
     reset,
+    watch,
   } = useForm<BasicCoverLetterForm>({
     resolver: zodResolver(basicCoverLetterSchema),
     defaultValues: {
       cvUploadId: '',
-      companyName: '',
       positionTitle: '',
+      companyName: '',
       jobDescription: '',
       language: 'TURKISH',
     },
@@ -65,43 +75,40 @@ export function BasicCoverLetterCreator({ onCreated, className }: BasicCoverLett
     try {
       clearError()
 
-      const coverLetterData = {
+      const coverLetterData: CoverLetterBasicGenerateData = {
         cvUploadId: data.cvUploadId,
-        companyName: data.companyName,
         positionTitle: data.positionTitle,
+        companyName: data.companyName,
         jobDescription: data.jobDescription,
-        language: data.language || 'TURKISH',
+        language: data.language as Language,
       }
 
       const createdLetter = await createBasicCoverLetter(coverLetterData)
-      setCreatedCoverLetter(createdLetter)
+      setGeneratedCoverLetter(createdLetter)
+      setGeneratedContent(createdLetter.content)
       onCreated?.(createdLetter)
-      reset()
     } catch (error) {
       console.error('Basic cover letter creation error:', error)
     }
   }
 
-  // If cover letter is created, show the viewer
-  if (createdCoverLetter) {
-    return (
-      <div className={className}>
-        <CoverLetterViewer
-          coverLetter={createdCoverLetter}
-          type='basic'
-          onUpdate={() => {
-            // Refresh or handle update
-          }}
-        />
-
-        <div className='mt-4 flex justify-center'>
-          <Button variant='outline' onClick={() => setCreatedCoverLetter(null)}>
-            Yeni Ön Yazı Oluştur
-          </Button>
-        </div>
-      </div>
-    )
+  const handleReset = () => {
+    reset()
+    clearError()
+    setGeneratedContent(null)
+    setGeneratedCoverLetter(null)
   }
+
+  const formatDate = (dateString: string): string => {
+    return new Date(dateString).toLocaleDateString('tr-TR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    })
+  }
+
+  // If generated content exists, show it alongside the form
+  const shouldShowContent = generatedContent && generatedCoverLetter
 
   return (
     <div className={className}>
@@ -121,131 +128,199 @@ export function BasicCoverLetterCreator({ onCreated, className }: BasicCoverLett
         </CardHeader>
 
         <CardContent>
-          {error && (
-            <div className='mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-lg'>
-              <p className='text-sm text-destructive'>{error}</p>
-            </div>
-          )}
-
           <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
             {/* CV Selection */}
-            <Card>
-              <CardHeader className='pb-4'>
-                <div className='flex items-center gap-3'>
-                  <div className='w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center'>
-                    <User className='w-4 h-4 text-primary' />
+            <div className='space-y-2'>
+              <Label htmlFor='cvUploadId'>CV Dosyası Seçimi *</Label>
+              {selectedCV ? (
+                <div className='p-3 border rounded-lg bg-muted/50'>
+                  <div className='flex items-center gap-2'>
+                    <FileText className='h-4 w-4 text-muted-foreground' />
+                    <span className='font-medium text-sm'>{selectedCV.originalName}</span>
                   </div>
-                  <CardTitle className='text-lg'>CV Seçimi</CardTitle>
+                  <p className='text-xs text-muted-foreground mt-1'>
+                    Yükleme tarihi: {formatDate(selectedCV.uploadedAt)}
+                  </p>
                 </div>
-              </CardHeader>
-              <CardContent className='space-y-4'>
-                <div className='space-y-2'>
-                  <Label htmlFor='cvUploadId'>Kullanılacak CV *</Label>
-                  <Controller
-                    name='cvUploadId'
-                    control={control}
-                    render={({ field }) => (
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger>
-                          <SelectValue placeholder='CV seçiniz' />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {uploadedCVs.map((upload: CVUpload) => (
-                            <SelectItem key={upload.id} value={upload.id}>
-                              {upload.originalName} ({new Date(upload.uploadedAt).toLocaleDateString('tr-TR')})
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                  {errors.cvUploadId && <p className='text-sm text-destructive'>{errors.cvUploadId.message}</p>}
+              ) : uploadedCVs && uploadedCVs.length > 0 ? (
+                <Controller
+                  name='cvUploadId'
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger>
+                        <SelectValue placeholder='Yüklenmiş CV dosyalarınızdan birini seçiniz' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {uploadedCVs.map((upload: CVUpload) => (
+                          <SelectItem key={upload.id} value={upload.id}>
+                            <div className='flex items-center gap-2'>
+                              <FileText className='h-4 w-4' />
+                              <span>
+                                {upload.originalName} ({formatDate(upload.uploadedAt)})
+                              </span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              ) : (
+                <div className='bg-orange-50 border border-orange-200 rounded-lg p-4'>
+                  <div className='flex items-center gap-2'>
+                    <AlertCircle className='h-4 w-4 text-orange-600' />
+                    <p className='text-sm text-orange-800'>
+                      Ön yazı oluşturmak için önce bir CV dosyası yüklemeniz gerekiyor. Lütfen &quot;CV Yükle&quot;
+                      sekmesinden bir dosya yükleyiniz.
+                    </p>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
+              )}
+              {errors.cvUploadId && <p className='text-sm text-destructive'>{errors.cvUploadId.message}</p>}
+            </div>
 
-            {/* Job Information */}
-            <Card>
-              <CardHeader className='pb-4'>
-                <div className='flex items-center gap-3'>
-                  <div className='w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center'>
-                    <Briefcase className='w-4 h-4 text-primary' />
-                  </div>
-                  <CardTitle className='text-lg'>İş Bilgileri</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className='space-y-4'>
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                  <div className='space-y-2'>
-                    <Label htmlFor='companyName'>Şirket Adı *</Label>
-                    <Input id='companyName' {...register('companyName')} placeholder='Tech Şirket A.Ş.' />
-                    {errors.companyName && <p className='text-sm text-destructive'>{errors.companyName.message}</p>}
-                  </div>
+            {/* Company Name */}
+            <div className='space-y-2'>
+              <Label htmlFor='companyName'>Şirket Adı *</Label>
+              <div className='relative'>
+                <Briefcase className='absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4' />
+                <Input
+                  id='companyName'
+                  placeholder='ör. ABC Teknoloji, XYZ Holding'
+                  className='pl-10'
+                  {...register('companyName')}
+                  disabled={isGenerating || (!selectedCV && (!uploadedCVs || uploadedCVs.length === 0))}
+                />
+              </div>
+              {errors.companyName && <p className='text-sm text-destructive'>{errors.companyName.message}</p>}
+            </div>
 
-                  <div className='space-y-2'>
-                    <Label htmlFor='positionTitle'>Pozisyon *</Label>
-                    <Input id='positionTitle' {...register('positionTitle')} placeholder='Yazılım Geliştirici' />
-                    {errors.positionTitle && <p className='text-sm text-destructive'>{errors.positionTitle.message}</p>}
-                  </div>
-                </div>
+            {/* Position Title */}
+            <div className='space-y-2'>
+              <Label htmlFor='positionTitle'>İş Pozisyonu *</Label>
+              <div className='relative'>
+                <User className='absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4' />
+                <Input
+                  id='positionTitle'
+                  placeholder='ör. Frontend Developer, Pazarlama Uzmanı'
+                  className='pl-10'
+                  {...register('positionTitle')}
+                  disabled={isGenerating || (!selectedCV && (!uploadedCVs || uploadedCVs.length === 0))}
+                />
+              </div>
+              {errors.positionTitle && <p className='text-sm text-destructive'>{errors.positionTitle.message}</p>}
+            </div>
 
-                <div className='space-y-2'>
-                  <Label htmlFor='jobDescription'>İş Tanımı *</Label>
-                  <Textarea
-                    id='jobDescription'
-                    {...register('jobDescription')}
-                    rows={6}
-                    placeholder='İş ilanında belirtilen görev ve sorumluluklarınızı buraya yazın...'
-                  />
-                  {errors.jobDescription && <p className='text-sm text-destructive'>{errors.jobDescription.message}</p>}
-                </div>
-              </CardContent>
-            </Card>
+            {/* Job Description */}
+            <div className='space-y-2'>
+              <Label htmlFor='jobDescription'>İş Tanımı *</Label>
+              <Textarea
+                id='jobDescription'
+                placeholder='İş ilanından iş tanımını ve gereksinimlerini buraya kopyalayınız. Bu bilgiler ön yazınızın pozisyona uygun şekilde optimize edilmesi için kullanılacaktır.'
+                rows={6}
+                {...register('jobDescription')}
+                disabled={isGenerating || (!selectedCV && (!uploadedCVs || uploadedCVs.length === 0))}
+              />
+              <p className='text-xs text-muted-foreground'>{watch('jobDescription')?.length || 0} / 5000 karakter</p>
+              {errors.jobDescription && <p className='text-sm text-destructive'>{errors.jobDescription.message}</p>}
+            </div>
 
             {/* Language Selection */}
-            <Card>
-              <CardHeader className='pb-4'>
-                <CardTitle className='text-lg'>Dil Seçimi</CardTitle>
-              </CardHeader>
-              <CardContent className='space-y-4'>
-                <div className='space-y-2'>
-                  <Label htmlFor='language'>Ön Yazı Dili</Label>
-                  <Controller
-                    name='language'
-                    control={control}
-                    render={({ field }) => (
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value='TURKISH'>Türkçe</SelectItem>
-                          <SelectItem value='ENGLISH'>İngilizce</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                </div>
-              </CardContent>
-            </Card>
+            <div className='space-y-2'>
+              <Label htmlFor='language'>Ön Yazı Dili</Label>
+              <Controller
+                name='language'
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    disabled={isGenerating || (!selectedCV && (!uploadedCVs || uploadedCVs.length === 0))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value='TURKISH'>Türkçe</SelectItem>
+                      <SelectItem value='ENGLISH'>İngilizce</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.language && <p className='text-sm text-destructive'>{errors.language.message}</p>}
+            </div>
 
-            {/* Submit Button */}
-            <Button type='submit' disabled={isGenerating} className='w-full py-4 text-base font-semibold' size='lg'>
-              {isGenerating ? (
-                <>
-                  <Loader2 className='w-5 h-5 mr-2 animate-spin' />
-                  Oluşturuluyor...
-                </>
-              ) : (
-                <>
-                  <Send className='w-5 h-5 mr-2' />
-                  Temel Ön Yazı Oluştur
-                </>
-              )}
-            </Button>
+            {/* Error Message */}
+            {error && (
+              <div className='bg-destructive/10 border border-destructive/20 rounded-lg p-4'>
+                <div className='flex items-center gap-2'>
+                  <AlertCircle className='h-4 w-4 text-destructive' />
+                  <p className='text-sm text-destructive'>{error}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className='flex gap-3'>
+              <Button
+                type='submit'
+                disabled={isGenerating || (!selectedCV && (!uploadedCVs || uploadedCVs.length === 0))}
+                className='flex-1'
+              >
+                {isGenerating && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
+                {isGenerating ? 'Ön Yazı Oluşturuluyor...' : 'Ön Yazı Oluştur'}
+              </Button>
+
+              <Button type='button' variant='outline' onClick={handleReset} disabled={isGenerating}>
+                Formu Temizle
+              </Button>
+            </div>
+
+            {!selectedCV && (!uploadedCVs || uploadedCVs.length === 0) && (
+              <div className='bg-muted/50 border border-muted rounded-lg p-4'>
+                <div className='flex items-center gap-2'>
+                  <AlertCircle className='h-4 w-4 text-muted-foreground' />
+                  <p className='text-sm text-muted-foreground'>
+                    Ön yazı oluşturmak için önce &quot;CV Yükle&quot; sekmesinden bir CV dosyası yüklemeniz
+                    gerekmektedir.
+                  </p>
+                </div>
+              </div>
+            )}
           </form>
         </CardContent>
       </Card>
+
+      {/* Generated Cover Letter Content */}
+      {shouldShowContent && (
+        <>
+          <div className='border-t border-border mt-6' />
+          <Card className='mt-6'>
+            <CardContent className='pt-6'>
+              <ContentViewer
+                content={generatedContent}
+                title={`${watch('positionTitle')} - ${watch('companyName')}`}
+                type='cover-letter'
+                metadata={{
+                  createdAt: generatedCoverLetter.createdAt,
+                  wordCount: generatedContent.split(' ').length,
+                  characterCount: generatedContent.length,
+                  estimatedReadTime: Math.ceil(generatedContent.split(' ').length / 200),
+                }}
+                onSave={async ({ title, content }) => {
+                  // Save cover letter functionality can be implemented here
+                  console.log('Save Cover Letter:', { title, content })
+                }}
+                onDownload={async (format) => {
+                  // Download functionality can be implemented here
+                  console.log('Download Cover Letter as:', format)
+                }}
+              />
+            </CardContent>
+          </Card>
+        </>
+      )}
     </div>
   )
 }

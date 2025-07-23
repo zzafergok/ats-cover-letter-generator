@@ -91,7 +91,7 @@ export interface UserProfile {
   skills: Skill[]
 }
 
-export type EducationType = 'LISE' | 'ONLISANS' | 'LISANS' | 'MASTER'
+export type EducationType = 'LISE' | 'ONLISANS' | 'LISANS' | 'YUKSEKLISANS'
 
 export interface Education {
   id: string

@@ -64,7 +64,7 @@ export function EducationModal({ isOpen, onClose, onSave, education, isLoading =
       degree: 'Lisans',
     },
     {
-      type: 'MASTER' as EducationType,
+      type: 'YUKSEKLISANS' as EducationType,
       label: 'Yüksek Lisans',
       icon: Award,
       gradeSystem: 'GPA_4' as const,

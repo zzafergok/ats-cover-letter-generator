@@ -70,6 +70,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               inputVariants({ variant: effectiveVariant, inputSize }),
               startIcon && 'pl-10',
               endIcon && 'pr-10',
+              type === 'number' && '[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]',
               className,
             )}
             ref={ref}
@@ -89,7 +90,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       <div>
         <input
           type={type}
-          className={cn(inputVariants({ variant: effectiveVariant, inputSize, className }))}
+          className={cn(
+            inputVariants({ variant: effectiveVariant, inputSize }),
+            type === 'number' && '[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]',
+            className
+          )}
           ref={ref}
           {...props}
         />

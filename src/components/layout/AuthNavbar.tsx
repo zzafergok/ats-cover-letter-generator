@@ -140,8 +140,11 @@ export function AuthHeader() {
 
   // Get avatar style based on hex color
   const getAvatarStyle = (hexColor?: string) => {
+    const fallbackColor = '#3B82F6'
+    const color = hexColor && hexColor !== '' ? hexColor : fallbackColor
+
     return {
-      backgroundColor: hexColor || '#3b82f6',
+      backgroundColor: color,
       color: '#ffffff',
     }
   }

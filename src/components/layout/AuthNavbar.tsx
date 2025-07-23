@@ -32,6 +32,7 @@ import { Button } from '@/components/core/button'
 // import { Logo } from '@/components/ui/brand/logo'
 
 import { useAuth } from '@/providers/AuthProvider'
+import { useUserProfileStore } from '@/store/userProfileStore'
 
 import { cn } from '@/lib/utils'
 
@@ -53,9 +54,17 @@ export function AuthHeader() {
   const { t } = useTranslation()
   const pathname = usePathname()
   const { user, logout } = useAuth()
+  const { profile, getProfile } = useUserProfileStore()
 
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
+  // Load profile data on component mount
+  useEffect(() => {
+    if (user && !profile) {
+      getProfile()
+    }
+  }, [user, profile, getProfile])
 
   const navigation: NavigationItem[] = [
     {
@@ -127,6 +136,14 @@ export function AuthHeader() {
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen)
+  }
+
+  // Get avatar style based on hex color
+  const getAvatarStyle = (hexColor?: string) => {
+    return {
+      backgroundColor: hexColor || '#3b82f6',
+      color: '#ffffff',
+    }
   }
 
   return (
@@ -219,8 +236,14 @@ export function AuthHeader() {
                 <DropdownMenuTrigger asChild>
                   <Button variant='ghost' className='flex items-center space-x-2 h-10 px-2'>
                     <Avatar className='h-8 w-8'>
-                      <div className='w-full h-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-primary-foreground text-sm font-semibold'>
-                        {user?.name ? user.name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase() || 'U'}
+                      <div
+                        className='w-full h-full flex items-center justify-center text-sm font-semibold'
+                        style={getAvatarStyle(profile?.avatarColor)}
+                      >
+                        {profile?.firstName?.charAt(0)?.toUpperCase() ||
+                          user?.name?.charAt(0)?.toUpperCase() ||
+                          user?.email?.charAt(0)?.toUpperCase() ||
+                          'U'}
                       </div>
                     </Avatar>
                     <div className='hidden sm:block text-left'>
@@ -233,8 +256,14 @@ export function AuthHeader() {
                 <DropdownMenuContent align='end' className='w-56'>
                   <div className='flex items-center space-x-2 p-2'>
                     <Avatar className='h-10 w-10'>
-                      <div className='w-full h-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-primary-foreground font-semibold'>
-                        {user?.name ? user.name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase() || 'U'}
+                      <div
+                        className='w-full h-full flex items-center justify-center font-semibold'
+                        style={getAvatarStyle(profile?.avatarColor)}
+                      >
+                        {profile?.firstName?.charAt(0)?.toUpperCase() ||
+                          user?.name?.charAt(0)?.toUpperCase() ||
+                          user?.email?.charAt(0)?.toUpperCase() ||
+                          'U'}
                       </div>
                     </Avatar>
                     <div className='flex-1'>
@@ -362,8 +391,14 @@ export function AuthHeader() {
               <div className='mt-8 pt-6 border-t border-border'>
                 <div className='flex items-center space-x-3 mb-4'>
                   <Avatar className='h-10 w-10'>
-                    <div className='w-full h-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-primary-foreground font-semibold'>
-                      {user?.name ? user.name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase() || 'U'}
+                    <div
+                      className='w-full h-full flex items-center justify-center font-semibold'
+                      style={getAvatarStyle(profile?.avatarColor)}
+                    >
+                      {profile?.firstName?.charAt(0)?.toUpperCase() ||
+                        user?.name?.charAt(0)?.toUpperCase() ||
+                        user?.email?.charAt(0)?.toUpperCase() ||
+                        'U'}
                     </div>
                   </Avatar>
                   <div>

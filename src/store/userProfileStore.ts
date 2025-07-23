@@ -68,6 +68,7 @@ export const useUserProfileStore = create<UserProfileStore>()(
         set({ isLoading: true, error: null })
         try {
           const response = await userProfileApi.getProfile()
+          console.log('Store: Profile loaded:', response.data)
           set({ profile: response.data, isLoading: false })
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || 'Profil yüklenirken hata oluştu'
@@ -78,7 +79,9 @@ export const useUserProfileStore = create<UserProfileStore>()(
       updateProfile: async (data) => {
         set({ isLoading: true, error: null })
         try {
+          console.log('Store: Updating profile with data:', data)
           const response = await userProfileApi.updateProfile(data)
+          console.log('Store: Profile update response:', response.data)
           set({ profile: response.data, isLoading: false })
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || 'Profil güncellenirken hata oluştu'
@@ -96,7 +99,7 @@ export const useUserProfileStore = create<UserProfileStore>()(
             profile: state.profile
               ? {
                   ...state.profile,
-                  education: [...(state.profile.education || []), response.data],
+                  educations: [...(state.profile.educations || []), response.data],
                 }
               : null,
             isLoading: false,
@@ -117,7 +120,7 @@ export const useUserProfileStore = create<UserProfileStore>()(
             profile: state.profile
               ? {
                   ...state.profile,
-                  education: (state.profile.education || []).map((edu: Education) =>
+                  educations: (state.profile.educations || []).map((edu: Education) =>
                     edu.id === id ? response.data : edu,
                   ),
                 }
@@ -140,7 +143,7 @@ export const useUserProfileStore = create<UserProfileStore>()(
             profile: state.profile
               ? {
                   ...state.profile,
-                  education: (state.profile.education || []).filter((edu: Education) => edu.id !== id),
+                  educations: (state.profile.educations || []).filter((edu: Education) => edu.id !== id),
                 }
               : null,
             isLoading: false,
@@ -160,7 +163,7 @@ export const useUserProfileStore = create<UserProfileStore>()(
             profile: state.profile
               ? {
                   ...state.profile,
-                  experience: [...(state.profile.experience || []), response.data],
+                  experiences: [...(state.profile.experiences || []), response.data],
                 }
               : null,
             isLoading: false,
@@ -181,7 +184,7 @@ export const useUserProfileStore = create<UserProfileStore>()(
             profile: state.profile
               ? {
                   ...state.profile,
-                  experience: (state.profile.experience || []).map((exp: WorkExperience) =>
+                  experiences: (state.profile.experiences || []).map((exp: WorkExperience) =>
                     exp.id === id ? response.data : exp,
                   ),
                 }
@@ -204,7 +207,7 @@ export const useUserProfileStore = create<UserProfileStore>()(
             profile: state.profile
               ? {
                   ...state.profile,
-                  experience: (state.profile.experience || []).filter((exp: WorkExperience) => exp.id !== id),
+                  experiences: (state.profile.experiences || []).filter((exp: WorkExperience) => exp.id !== id),
                 }
               : null,
             isLoading: false,

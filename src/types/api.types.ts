@@ -69,23 +69,29 @@ export interface ContactResponse {
 // User Profile API Servisleri - API dokumentasyonuna göre genişletilmiş
 export interface UserProfile {
   id: string
+  email: string
   firstName?: string
   lastName?: string
   phone?: string
   address?: string
   city?: string
+  country?: string
   github?: string
   linkedin?: string
   portfolioWebsite?: string
   portfolioTitle?: string
   aboutMe?: string
-  education: Education[]
-  experience: WorkExperience[]
+  profilePictureUrl?: string
+  avatarColor?: string
+  educations: Education[]
+  experiences: WorkExperience[]
   courses: Course[]
   certificates: Certificate[]
   hobbies: Hobby[]
   skills: Skill[]
 }
+
+export type EducationType = 'LISE' | 'ONLISANS' | 'LISANS' | 'MASTER'
 
 export interface Education {
   id: string
@@ -94,6 +100,7 @@ export interface Education {
   fieldOfStudy?: string
   grade?: number
   gradeSystem: 'PERCENTAGE' | 'GPA_4'
+  educationType?: EducationType
   startYear: number
   endYear?: number
   isCurrent: boolean
@@ -316,4 +323,67 @@ export interface CoverLetterBasicsResponse {
 export interface CoverLetterDetailedsResponse {
   success: boolean
   data: CoverLetterDetailed[]
+}
+
+//  Location Services - API format
+export interface Province {
+  id: string
+  code: string
+  name: string
+  districts: District[]
+}
+
+export interface District {
+  id: string
+  name: string
+  provinceCode: string
+}
+
+export interface ProvincesResponse {
+  success: boolean
+  data: Province[]
+  message?: string
+}
+
+export interface DistrictsResponse {
+  success: boolean
+  data: District[]
+  message?: string
+}
+
+// High School Services - API format
+export interface HighSchool {
+  id: string
+  name: string
+  city?: string
+  district?: string
+  type?: string
+}
+
+export interface HighSchoolsResponse {
+  success: boolean
+  data: HighSchool[]
+  message?: string
+}
+
+// University Services - API format
+export interface University {
+  id: string
+  name: string
+  city?: string
+  type: 'STATE' | 'PRIVATE' | 'FOUNDATION'
+  website?: string
+}
+
+export interface UniversitiesResponse {
+  success: boolean
+  data: University[]
+  message?: string
+}
+
+// User Profile API responses
+export interface UserProfileResponse {
+  success: boolean
+  data: UserProfile
+  message?: string
 }

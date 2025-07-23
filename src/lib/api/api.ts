@@ -36,6 +36,13 @@ import {
   CoverLetterDetailedsResponse,
   CoverLetterDetailedUpdateData,
   CoverLetterDetailedGenerateData,
+  Province,
+  HighSchool,
+  University,
+  ProvincesResponse,
+  DistrictsResponse,
+  HighSchoolsResponse,
+  UniversitiesResponse,
 } from '@/types/api.types'
 
 // Cover Letter API Servisleri - API dokumentasyonuna göre güncellenmiş
@@ -292,4 +299,107 @@ export const cvApi = {
 
   downloadDetailedPdf: (id: string): Promise<Blob> =>
     apiRequest.get(`/cv/detailed/${id}/download/pdf`, { responseType: 'blob' }),
+}
+
+// Location API Servisleri - Güncel API format
+export const locationApi = {
+  // İl servisleri
+  getProvinces: (): Promise<ProvincesResponse> => apiRequest.get('/locations/provinces', { skipAuth: true }),
+
+  // İl arama
+  searchProvinces: (query: string): Promise<ProvincesResponse> =>
+    apiRequest.get(`/locations/provinces/search?q=${encodeURIComponent(query)}`, { skipAuth: true }),
+
+  // İl kodu ile il
+  getProvinceByCode: (code: string): Promise<{ success: boolean; data: Province }> =>
+    apiRequest.get(`/locations/provinces/code/${code}`, { skipAuth: true }),
+
+  // İl ismi ile il
+  getProvinceByName: (name: string): Promise<{ success: boolean; data: Province }> =>
+    apiRequest.get(`/locations/provinces/name/${encodeURIComponent(name)}`, { skipAuth: true }),
+
+  // İl koduna göre ilçeler
+  getDistrictsByProvinceCode: (code: string): Promise<DistrictsResponse> =>
+    apiRequest.get(`/locations/districts/province-code/${code}`, { skipAuth: true }),
+
+  // İl ismine göre ilçeler
+  getDistrictsByProvinceName: (name: string): Promise<DistrictsResponse> =>
+    apiRequest.get(`/locations/districts/province-name/${encodeURIComponent(name)}`, { skipAuth: true }),
+
+  // İlçe arama
+  searchDistricts: (query: string, provinceCode?: string): Promise<DistrictsResponse> => {
+    const url = new URL('/locations/districts/search', 'https://api.example.com')
+    url.searchParams.append('q', query)
+    if (provinceCode) url.searchParams.append('provinceCode', provinceCode)
+    return apiRequest.get(url.pathname + url.search, { skipAuth: true })
+  },
+
+  // Lokasyon istatistikleri
+  getStats: (): Promise<{
+    success: boolean
+    data: { totalProvinces: number; totalDistricts: number; isLoaded: boolean }
+  }> => apiRequest.get('/locations/stats', { skipAuth: true }),
+}
+
+// School API Servisleri - Güncel API format
+export const schoolApi = {
+  // Lise servisleri
+  getAllHighSchools: (): Promise<HighSchoolsResponse> => apiRequest.get('/high-schools', { skipAuth: true }),
+
+  // Lise arama
+  searchHighSchools: (query: string): Promise<HighSchoolsResponse> =>
+    apiRequest.get(`/high-schools/search?q=${encodeURIComponent(query)}`, { skipAuth: true }),
+
+  // Şehre göre liseler
+  getHighSchoolsByCity: (city: string): Promise<HighSchoolsResponse> =>
+    apiRequest.get(`/high-schools/city/${encodeURIComponent(city)}`, { skipAuth: true }),
+
+  // Lise detayı
+  getHighSchoolById: (id: string): Promise<{ success: boolean; data: HighSchool }> =>
+    apiRequest.get(`/high-schools/${id}`, { skipAuth: true }),
+
+  // Lise istatistikleri
+  getHighSchoolStats: (): Promise<{ success: boolean; data: { total: number; cities: number; isLoaded: boolean } }> =>
+    apiRequest.get('/high-schools/stats', { skipAuth: true }),
+
+  // Lise verilerini yenile
+  reloadHighSchools: (): Promise<{ success: boolean; message: string }> =>
+    apiRequest.post('/high-schools/reload', {}, { skipAuth: true }),
+
+  // Üniversite servisleri
+  getAllUniversities: (): Promise<UniversitiesResponse> => apiRequest.get('/universities', { skipAuth: true }),
+
+  // Üniversite arama
+  searchUniversities: (query: string): Promise<UniversitiesResponse> =>
+    apiRequest.get(`/universities/search?q=${encodeURIComponent(query)}`, { skipAuth: true }),
+
+  // Şehre göre üniversiteler
+  getUniversitiesByCity: (city: string): Promise<UniversitiesResponse> =>
+    apiRequest.get(`/universities/city/${encodeURIComponent(city)}`, { skipAuth: true }),
+
+  // Türe göre üniversiteler
+  getUniversitiesByType: (type: 'STATE' | 'FOUNDATION' | 'PRIVATE'): Promise<UniversitiesResponse> =>
+    apiRequest.get(`/universities/type/${type}`, { skipAuth: true }),
+
+  // Üniversite detayı
+  getUniversityById: (id: string): Promise<{ success: boolean; data: University }> =>
+    apiRequest.get(`/universities/${id}`, { skipAuth: true }),
+
+  // Üniversite istatistikleri
+  getUniversityStats: (): Promise<{
+    success: boolean
+    data: {
+      total: number
+      state: number
+      foundation: number
+      private: number
+      cities: number
+      isLoaded: boolean
+      lastUpdated: string
+    }
+  }> => apiRequest.get('/universities/stats', { skipAuth: true }),
+
+  // Üniversite verilerini yenile
+  refreshUniversities: (): Promise<{ success: boolean; message: string }> =>
+    apiRequest.post('/universities/refresh', {}, { skipAuth: true }),
 }

@@ -92,14 +92,26 @@ export const useUserProfileStore = create<UserProfileStore>()(
           const response = await userProfileApi.updateProfile(data)
           console.log('Store: Profile update response:', response.data)
 
-          // Ensure avatar color is preserved in the updated profile
-          const updatedProfile = {
-            ...response.data,
-            avatarColor: response.data.avatarColor || data.avatarColor || '#3B82F6',
-          }
+          set((state) => {
+            if (!state.profile) return { isLoading: false }
 
-          console.log('Store: Final profile with avatar color:', updatedProfile.avatarColor)
-          set({ profile: updatedProfile, isLoading: false })
+            // Mevcut profil verisini koru ve sadece güncellenen alanları değiştir
+            const updatedProfile = {
+              ...state.profile, // Mevcut tüm profil verisini koru (deneyimler, eğitimler vb.)
+              ...response.data, // API'den gelen yeni veriyi üzerine yaz
+              avatarColor: response.data.avatarColor || data.avatarColor || state.profile.avatarColor || '#3B82F6',
+              // Alt objeleri korumak için ayrıca kontrol et
+              experiences: response.data.experiences || state.profile.experiences || [],
+              educations: response.data.educations || state.profile.educations || [],
+              skills: response.data.skills || state.profile.skills || [],
+              courses: response.data.courses || state.profile.courses || [],
+              certificates: response.data.certificates || state.profile.certificates || [],
+              hobbies: response.data.hobbies || state.profile.hobbies || [],
+            }
+
+            console.log('Store: Final profile with preserved data:', updatedProfile)
+            return { profile: updatedProfile, isLoading: false }
+          })
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || 'Profil güncellenirken hata oluştu'
           set({ isLoading: false, error: errorMessage })

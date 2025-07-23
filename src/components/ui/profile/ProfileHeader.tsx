@@ -1,17 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import {
-  Mail,
-  Phone,
-  MapPin,
-  Globe,
-  Edit3,
-  User,
-  Palette,
-  Save,
-  X,
-} from 'lucide-react'
+import { Mail, Phone, MapPin, Globe, Edit3, User, Palette, Save, X } from 'lucide-react'
 
 import { locationApi } from '@/lib/api/api'
 import { avatarColors } from '@/constants/profile'
@@ -86,7 +76,7 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
   const loadDistricts = async (provinceCode: string) => {
     setIsLoadingDistricts(true)
     try {
-      const response = await locationApi.getDistricts(provinceCode)
+      const response = await locationApi.getDistrictsByProvinceCode(provinceCode)
       setDistricts(response.data)
     } catch (error) {
       console.error('İlçeler yüklenemedi:', error)
@@ -315,9 +305,8 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
                       <div>
                         <p className='text-sm font-medium'>Seçili Renk</p>
                         <p className='text-xs text-muted-foreground'>
-                          {avatarColors.find(
-                            (c) => c.color.toLowerCase() === profileForm.avatarColor?.toLowerCase(),
-                          )?.name || 'Varsayılan'}
+                          {avatarColors.find((c) => c.color.toLowerCase() === profileForm.avatarColor?.toLowerCase())
+                            ?.name || 'Varsayılan'}
                         </p>
                       </div>
                     </div>
@@ -349,9 +338,7 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
                         </option>
                       ))}
                     </select>
-                    {isLoadingProvinces && (
-                      <p className='text-xs text-muted-foreground mt-1'>Şehirler yükleniyor...</p>
-                    )}
+                    {isLoadingProvinces && <p className='text-xs text-muted-foreground mt-1'>Şehirler yükleniyor...</p>}
                   </div>
                   <div>
                     <Label>İlçe</Label>
@@ -368,12 +355,8 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
                         </option>
                       ))}
                     </select>
-                    {isLoadingDistricts && (
-                      <p className='text-xs text-muted-foreground mt-1'>İlçeler yükleniyor...</p>
-                    )}
-                    {!selectedProvinceCode && (
-                      <p className='text-xs text-muted-foreground mt-1'>Önce şehir seçin</p>
-                    )}
+                    {isLoadingDistricts && <p className='text-xs text-muted-foreground mt-1'>İlçeler yükleniyor...</p>}
+                    {!selectedProvinceCode && <p className='text-xs text-muted-foreground mt-1'>Önce şehir seçin</p>}
                   </div>
                 </div>
 

@@ -352,7 +352,7 @@ export function WorkExperienceModal({
               )}
             </div>
 
-            <div className='grid grid-cols-2 gap-4'>
+            <div className={`grid gap-4 ${formData.isCurrent ? 'grid-cols-1' : 'grid-cols-2'}`}>
               <div>
                 <Label>Başlangıç Tarihi *</Label>
                 <div className='grid grid-cols-2 gap-2'>
@@ -389,41 +389,41 @@ export function WorkExperienceModal({
                   />
                 </div>
               </div>
-              <div>
-                <Label>Bitiş Tarihi</Label>
-                <div className='grid grid-cols-2 gap-2'>
-                  <Select
-                    value={!isNaN(formData.endMonth) ? formData.endMonth.toString() : '1'}
-                    onValueChange={(value) => {
-                      const numValue = parseInt(value)
-                      if (!isNaN(numValue)) {
-                        setFormData((prev) => ({ ...prev, endMonth: numValue }))
-                      }
-                    }}
-                    disabled={formData.isCurrent}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder='Ay' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {months.map((month) => (
-                        <SelectItem key={month.value} value={month.value.toString()}>
-                          {month.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Input
-                    type='number'
-                    min='1980'
-                    max='2030'
-                    value={formData.endYear}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, endYear: parseInt(e.target.value) }))}
-                    placeholder='Yıl'
-                    disabled={formData.isCurrent}
-                  />
+              {!formData.isCurrent && (
+                <div>
+                  <Label>Bitiş Tarihi</Label>
+                  <div className='grid grid-cols-2 gap-2'>
+                    <Select
+                      value={!isNaN(formData.endMonth) ? formData.endMonth.toString() : '1'}
+                      onValueChange={(value) => {
+                        const numValue = parseInt(value)
+                        if (!isNaN(numValue)) {
+                          setFormData((prev) => ({ ...prev, endMonth: numValue }))
+                        }
+                      }}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder='Ay' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {months.map((month) => (
+                          <SelectItem key={month.value} value={month.value.toString()}>
+                            {month.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      type='number'
+                      min='1980'
+                      max='2030'
+                      value={formData.endYear}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, endYear: parseInt(e.target.value) }))}
+                      placeholder='Yıl'
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             <div className='flex items-center space-x-2'>

@@ -296,7 +296,7 @@ export function EducationModal({ isOpen, onClose, onSave, education, isLoading =
                 />
               </div>
 
-              <div className='grid grid-cols-2 gap-4'>
+              <div className={`grid gap-4 ${formData.isCurrent ? 'grid-cols-1' : 'grid-cols-2'}`}>
                 <div>
                   <Label htmlFor='startYear'>Başlangıç Yılı *</Label>
                   <Input
@@ -310,19 +310,20 @@ export function EducationModal({ isOpen, onClose, onSave, education, isLoading =
                     required
                   />
                 </div>
-                <div>
-                  <Label htmlFor='endYear'>Bitiş Yılı</Label>
-                  <Input
-                    id='endYear'
-                    type='number'
-                    min='1980'
-                    max='2030'
-                    value={formData.endYear}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, endYear: e.target.value }))}
-                    placeholder='2021'
-                    disabled={formData.isCurrent}
-                  />
-                </div>
+                {!formData.isCurrent && (
+                  <div>
+                    <Label htmlFor='endYear'>Bitiş Yılı</Label>
+                    <Input
+                      id='endYear'
+                      type='number'
+                      min='1980'
+                      max='2030'
+                      value={formData.endYear}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, endYear: e.target.value }))}
+                      placeholder='2021'
+                    />
+                  </div>
+                )}
               </div>
 
               <div className='flex items-center space-x-2'>
@@ -351,7 +352,7 @@ export function EducationModal({ isOpen, onClose, onSave, education, isLoading =
                     step='0.01'
                     value={formData.grade}
                     onChange={(e) => setFormData((prev) => ({ ...prev, grade: e.target.value }))}
-                    placeholder='3.09'
+                    placeholder={selectedType === 'LISE' ? '85' : '2.75'}
                   />
                 </div>
                 <div>

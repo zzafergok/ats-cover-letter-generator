@@ -100,14 +100,6 @@ export default function ProfilePage() {
     }
   }
 
-  const handleDeleteEducation = async (id: string) => {
-    try {
-      await deleteEducation(id)
-    } catch (error) {
-      console.error('Eğitim silinirken hata:', error)
-    }
-  }
-
   // İş deneyimi işlemleri
   const handleSaveWorkExperience = async (data: Omit<WorkExperience, 'id'>) => {
     try {
@@ -257,7 +249,7 @@ export default function ProfilePage() {
               profile={profile}
               onOpenModal={() => openModal('education')}
               onOpenEditModal={(id, data) => openEditModal('education', id, data)}
-              onDeleteEducation={handleDeleteEducation}
+              onDeleteEducation={(id, name) => openDeleteConfirmModal('education', id, name)}
             />
           </TabsContent>
 
@@ -267,7 +259,7 @@ export default function ProfilePage() {
               profile={profile}
               onOpenModal={() => openModal('experience')}
               onOpenEditModal={(id, data) => openEditModal('experience', id, data)}
-              onDeleteExperience={deleteWorkExperience}
+              onDeleteExperience={(id, name) => openDeleteConfirmModal('experience', id, name)}
             />
           </TabsContent>
 

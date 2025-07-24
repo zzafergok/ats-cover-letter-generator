@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { Plus, GraduationCap, Edit3, X } from 'lucide-react'
+import { Plus, GraduationCap, Edit3, Trash2 } from 'lucide-react'
 
 import { Button } from '@/components/core/button'
 import { Card, CardContent } from '@/components/core/card'
@@ -13,7 +13,7 @@ interface EducationTabProps {
   profile: UserProfile | null
   onOpenModal: () => void
   onOpenEditModal: (id: string, data: Education) => void
-  onDeleteEducation: (id: string) => void
+  onDeleteEducation: (id: string, name: string) => void
 }
 
 export function EducationTab({ 
@@ -78,10 +78,11 @@ export function EducationTab({
                     <Button
                       variant='ghost'
                       size='sm'
-                      onClick={() => onDeleteEducation(edu.id)}
+                      onClick={() => onDeleteEducation(edu.id, edu.schoolName)}
                       className='text-destructive hover:text-destructive'
+                      title='Eğitimi Sil'
                     >
-                      <X className='h-4 w-4' />
+                      <Trash2 className='h-4 w-4' />
                     </Button>
                   </div>
                 </div>

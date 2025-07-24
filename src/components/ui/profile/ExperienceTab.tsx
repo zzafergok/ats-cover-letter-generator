@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { Plus, Briefcase, Edit3, MapPin } from 'lucide-react'
+import { Plus, Briefcase, Edit3, MapPin, Trash2 } from 'lucide-react'
 
 import { Button } from '@/components/core/button'
 import { Card, CardContent } from '@/components/core/card'
@@ -14,7 +14,7 @@ interface ExperienceTabProps {
   profile: UserProfile | null
   onOpenModal: () => void
   onOpenEditModal: (id: string, data: WorkExperience) => void
-  onDeleteExperience?: (id: string) => Promise<void>
+  onDeleteExperience?: (id: string, name: string) => void
 }
 
 export function ExperienceTab({ 
@@ -100,9 +100,22 @@ export function ExperienceTab({
                       </div>
                     )}
                   </div>
-                  <Button variant='ghost' size='sm' onClick={() => onOpenEditModal(exp.id, exp)}>
-                    <Edit3 className='h-4 w-4' />
-                  </Button>
+                  <div className='flex gap-2'>
+                    <Button variant='ghost' size='sm' onClick={() => onOpenEditModal(exp.id, exp)}>
+                      <Edit3 className='h-4 w-4' />
+                    </Button>
+                    {onDeleteExperience && (
+                      <Button
+                        variant='ghost'
+                        size='sm'
+                        onClick={() => onDeleteExperience(exp.id, exp.position)}
+                        className='text-destructive hover:text-destructive'
+                        title='Deneyimi Sil'
+                      >
+                        <Trash2 className='h-4 w-4' />
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>

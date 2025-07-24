@@ -7,6 +7,7 @@ import { Input } from '@/components/core/input'
 import { Label } from '@/components/core/label'
 import { Textarea } from '@/components/core/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/core/card'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/core/select'
 import type { Certificate } from '@/types/api.types'
 
 interface CertificateModalProps {
@@ -124,70 +125,78 @@ export function CertificateModal({ isOpen, onClose, onSave, certificate, isLoadi
 
               <div>
                 <Label htmlFor='issueMonth'>Verilme Ayı</Label>
-                <select
-                  id='issueMonth'
-                  value={formData.issueMonth || ''}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, issueMonth: e.target.value ? parseInt(e.target.value) : undefined }))}
-                  className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+                <Select
+                  value={formData.issueMonth?.toString() || ''}
+                  onValueChange={(value) => setFormData((prev) => ({ ...prev, issueMonth: value ? parseInt(value) : undefined }))}
                 >
-                  <option value=''>Ay seçin</option>
-                  {months.map((month) => (
-                    <option key={month.value} value={month.value}>
-                      {month.label}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger>
+                    <SelectValue placeholder='Ay seçin' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {months.map((month) => (
+                      <SelectItem key={month.value} value={month.value.toString()}>
+                        {month.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
                 <Label htmlFor='issueYear'>Verilme Yılı</Label>
-                <select
-                  id='issueYear'
-                  value={formData.issueYear || ''}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, issueYear: e.target.value ? parseInt(e.target.value) : undefined }))}
-                  className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+                <Select
+                  value={formData.issueYear?.toString() || ''}
+                  onValueChange={(value) => setFormData((prev) => ({ ...prev, issueYear: value ? parseInt(value) : undefined }))}
                 >
-                  <option value=''>Yıl seçin</option>
-                  {years.map((year) => (
-                    <option key={year} value={year}>
-                      {year}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger>
+                    <SelectValue placeholder='Yıl seçin' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {years.map((year) => (
+                      <SelectItem key={year} value={year.toString()}>
+                        {year}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
                 <Label htmlFor='expiryMonth'>Geçerlilik Bitiş Ayı</Label>
-                <select
-                  id='expiryMonth'
-                  value={formData.expiryMonth || ''}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, expiryMonth: e.target.value ? parseInt(e.target.value) : undefined }))}
-                  className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+                <Select
+                  value={formData.expiryMonth?.toString() || ''}
+                  onValueChange={(value) => setFormData((prev) => ({ ...prev, expiryMonth: value ? parseInt(value) : undefined }))}
                 >
-                  <option value=''>Ay seçin</option>
-                  {months.map((month) => (
-                    <option key={month.value} value={month.value}>
-                      {month.label}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger>
+                    <SelectValue placeholder='Ay seçin' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {months.map((month) => (
+                      <SelectItem key={month.value} value={month.value.toString()}>
+                        {month.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
                 <Label htmlFor='expiryYear'>Geçerlilik Bitiş Yılı</Label>
-                <select
-                  id='expiryYear'
-                  value={formData.expiryYear || ''}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, expiryYear: e.target.value ? parseInt(e.target.value) : undefined }))}
-                  className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+                <Select
+                  value={formData.expiryYear?.toString() || ''}
+                  onValueChange={(value) => setFormData((prev) => ({ ...prev, expiryYear: value ? parseInt(value) : undefined }))}
                 >
-                  <option value=''>Yıl seçin</option>
-                  {years.map((year) => (
-                    <option key={year} value={year}>
-                      {year}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger>
+                    <SelectValue placeholder='Yıl seçin' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {years.map((year) => (
+                      <SelectItem key={year} value={year.toString()}>
+                        {year}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>

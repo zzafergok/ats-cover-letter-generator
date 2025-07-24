@@ -6,6 +6,7 @@ import { Button } from '@/components/core/button'
 import { Input } from '@/components/core/input'
 import { Label } from '@/components/core/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/core/card'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/core/select'
 import type { Skill } from '@/types/api.types'
 
 interface SkillModalProps {
@@ -100,36 +101,42 @@ export function SkillModal({ isOpen, onClose, onSave, skill, isLoading = false }
 
             <div>
               <Label htmlFor='category'>Kategori</Label>
-              <select
-                id='category'
+              <Select
                 value={formData.category}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, category: e.target.value as typeof formData.category }))
+                onValueChange={(value) =>
+                  setFormData((prev) => ({ ...prev, category: value as typeof formData.category }))
                 }
-                className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
               >
-                {skillCategories.map((category) => (
-                  <option key={category} value={category}>
-                    {getCategoryLabel(category)}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder='Kategori seçin' />
+                </SelectTrigger>
+                <SelectContent>
+                  {skillCategories.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {getCategoryLabel(category)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
               <Label htmlFor='level'>Seviye</Label>
-              <select
-                id='level'
+              <Select
                 value={formData.level}
-                onChange={(e) => setFormData((prev) => ({ ...prev, level: e.target.value as typeof formData.level }))}
-                className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+                onValueChange={(value) => setFormData((prev) => ({ ...prev, level: value as typeof formData.level }))}
               >
-                {skillLevels.map((level) => (
-                  <option key={level.value} value={level.value}>
-                    {level.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder='Seviye seçin' />
+                </SelectTrigger>
+                <SelectContent>
+                  {skillLevels.map((level) => (
+                    <SelectItem key={level.value} value={level.value}>
+                      {level.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>

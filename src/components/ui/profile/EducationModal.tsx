@@ -7,6 +7,7 @@ import { Input } from '@/components/core/input'
 import { Label } from '@/components/core/label'
 import { Textarea } from '@/components/core/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/core/card'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/core/select'
 import { schoolApi } from '@/lib/api/api'
 import type { Education, EducationType, HighSchool, University } from '@/types/api.types'
 
@@ -355,18 +356,21 @@ export function EducationModal({ isOpen, onClose, onSave, education, isLoading =
                 </div>
                 <div>
                   <Label htmlFor='gradeSystem'>Not Sistemi</Label>
-                  <select
-                    id='gradeSystem'
+                  <Select
                     value={formData.gradeSystem}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, gradeSystem: e.target.value as 'PERCENTAGE' | 'GPA_4' }))
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({ ...prev, gradeSystem: value as 'PERCENTAGE' | 'GPA_4' }))
                     }
                     disabled
-                    className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
                   >
-                    <option value='GPA_4'>4.0 Sistemi</option>
-                    <option value='PERCENTAGE'>Yüzdelik Sistem</option>
-                  </select>
+                    <SelectTrigger>
+                      <SelectValue placeholder='Not sistemi seçin' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value='GPA_4'>4.0 Sistemi</SelectItem>
+                      <SelectItem value='PERCENTAGE'>Yüzdelik Sistem</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 

@@ -7,6 +7,7 @@ import { Input } from '@/components/core/input'
 import { Label } from '@/components/core/label'
 import { Textarea } from '@/components/core/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/core/card'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/core/select'
 import type { Course } from '@/types/api.types'
 
 interface CourseModalProps {
@@ -121,70 +122,78 @@ export function CourseModal({ isOpen, onClose, onSave, course, isLoading = false
 
               <div>
                 <Label htmlFor='startMonth'>Başlangıç Ayı</Label>
-                <select
-                  id='startMonth'
-                  value={formData.startMonth || ''}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, startMonth: e.target.value ? parseInt(e.target.value) : undefined }))}
-                  className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+                <Select
+                  value={formData.startMonth?.toString() || ''}
+                  onValueChange={(value) => setFormData((prev) => ({ ...prev, startMonth: value ? parseInt(value) : undefined }))}
                 >
-                  <option value=''>Ay seçin</option>
-                  {months.map((month) => (
-                    <option key={month.value} value={month.value}>
-                      {month.label}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger>
+                    <SelectValue placeholder='Ay seçin' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {months.map((month) => (
+                      <SelectItem key={month.value} value={month.value.toString()}>
+                        {month.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
                 <Label htmlFor='startYear'>Başlangıç Yılı</Label>
-                <select
-                  id='startYear'
-                  value={formData.startYear || ''}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, startYear: e.target.value ? parseInt(e.target.value) : undefined }))}
-                  className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+                <Select
+                  value={formData.startYear?.toString() || ''}
+                  onValueChange={(value) => setFormData((prev) => ({ ...prev, startYear: value ? parseInt(value) : undefined }))}
                 >
-                  <option value=''>Yıl seçin</option>
-                  {years.map((year) => (
-                    <option key={year} value={year}>
-                      {year}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger>
+                    <SelectValue placeholder='Yıl seçin' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {years.map((year) => (
+                      <SelectItem key={year} value={year.toString()}>
+                        {year}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
                 <Label htmlFor='endMonth'>Bitiş Ayı</Label>
-                <select
-                  id='endMonth'
-                  value={formData.endMonth || ''}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, endMonth: e.target.value ? parseInt(e.target.value) : undefined }))}
-                  className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+                <Select
+                  value={formData.endMonth?.toString() || ''}
+                  onValueChange={(value) => setFormData((prev) => ({ ...prev, endMonth: value ? parseInt(value) : undefined }))}
                 >
-                  <option value=''>Ay seçin</option>
-                  {months.map((month) => (
-                    <option key={month.value} value={month.value}>
-                      {month.label}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger>
+                    <SelectValue placeholder='Ay seçin' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {months.map((month) => (
+                      <SelectItem key={month.value} value={month.value.toString()}>
+                        {month.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
                 <Label htmlFor='endYear'>Bitiş Yılı</Label>
-                <select
-                  id='endYear'
-                  value={formData.endYear || ''}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, endYear: e.target.value ? parseInt(e.target.value) : undefined }))}
-                  className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
+                <Select
+                  value={formData.endYear?.toString() || ''}
+                  onValueChange={(value) => setFormData((prev) => ({ ...prev, endYear: value ? parseInt(value) : undefined }))}
                 >
-                  <option value=''>Yıl seçin</option>
-                  {years.map((year) => (
-                    <option key={year} value={year}>
-                      {year}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger>
+                    <SelectValue placeholder='Yıl seçin' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {years.map((year) => (
+                      <SelectItem key={year} value={year.toString()}>
+                        {year}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className='col-span-2'>

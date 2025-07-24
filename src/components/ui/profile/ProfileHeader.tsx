@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback } from '@/components/core/avatar'
 import { Input } from '@/components/core/input'
 import { Textarea } from '@/components/core/textarea'
 import { Label } from '@/components/core/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/core/select'
 
 import type { UserProfile, Province, District } from '@/types/api.types'
 
@@ -316,10 +317,10 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
                 <div className='grid grid-cols-2 gap-4'>
                   <div>
                     <Label>Şehir *</Label>
-                    <select
+                    <Select
                       value={selectedProvinceCode}
-                      onChange={(e) => {
-                        const selectedProvince = provinces.find((p) => p.code === e.target.value)
+                      onValueChange={(value) => {
+                        const selectedProvince = provinces.find((p) => p.code === value)
                         if (selectedProvince) {
                           handleProvinceChange(selectedProvince.code, selectedProvince.name)
                         } else {
@@ -329,32 +330,38 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
                         }
                       }}
                       disabled={isLoadingProvinces}
-                      className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
                     >
-                      <option value=''>Şehir seçin...</option>
-                      {provinces.map((province) => (
-                        <option key={province.code} value={province.code}>
-                          {province.name}
-                        </option>
-                      ))}
-                    </select>
+                      <SelectTrigger>
+                        <SelectValue placeholder='Şehir seçin...' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {provinces.map((province) => (
+                          <SelectItem key={province.code} value={province.code}>
+                            {province.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     {isLoadingProvinces && <p className='text-xs text-muted-foreground mt-1'>Şehirler yükleniyor...</p>}
                   </div>
                   <div>
                     <Label>İlçe</Label>
-                    <select
+                    <Select
                       value={profileForm.address}
-                      onChange={(e) => setProfileForm((prev) => ({ ...prev, address: e.target.value }))}
+                      onValueChange={(value) => setProfileForm((prev) => ({ ...prev, address: value }))}
                       disabled={!selectedProvinceCode || isLoadingDistricts || districts.length === 0}
-                      className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
                     >
-                      <option value=''>İlçe seçin...</option>
-                      {districts.map((district) => (
-                        <option key={district.id} value={district.name}>
-                          {district.name}
-                        </option>
-                      ))}
-                    </select>
+                      <SelectTrigger>
+                        <SelectValue placeholder='İlçe seçin...' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {districts.map((district) => (
+                          <SelectItem key={district.id} value={district.name}>
+                            {district.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     {isLoadingDistricts && <p className='text-xs text-muted-foreground mt-1'>İlçeler yükleniyor...</p>}
                     {!selectedProvinceCode && <p className='text-xs text-muted-foreground mt-1'>Önce şehir seçin</p>}
                   </div>

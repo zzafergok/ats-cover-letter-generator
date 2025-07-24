@@ -88,12 +88,12 @@ export default function CoverLetterPage() {
           </CardContent>
         </Card>
 
-        {/* Detailed Cover Letter Card - Coming Soon */}
-        <Card className='hover:shadow-lg transition-shadow duration-300 opacity-60'>
+        {/* Detailed Cover Letter Card */}
+        <Card className='hover:shadow-lg transition-shadow duration-300 border-2 hover:border-primary/20'>
           <CardHeader>
             <div className='flex items-center gap-3'>
-              <div className='w-12 h-12 bg-muted rounded-xl flex items-center justify-center'>
-                <Settings className='w-6 h-6 text-muted-foreground' />
+              <div className='w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center'>
+                <Settings className='w-6 h-6 text-primary' />
               </div>
               <div>
                 <CardTitle className='text-xl'>Detaylı Ön Yazı</CardTitle>
@@ -109,16 +109,16 @@ export default function CoverLetterPage() {
               </div>
               <div className='flex items-center gap-2'>
                 <Mail className='w-4 h-4' />
-                <span>Şirket araştırması dahil</span>
+                <span>Şirket ve pozisyon motivasyonu</span>
               </div>
               <div className='flex items-center gap-2'>
                 <Settings className='w-4 h-4' />
-                <span>Gelişmiş AI analizi</span>
+                <span>Kapsamlı form alanları</span>
               </div>
             </div>
-            <Button className='w-full' variant='outline' disabled>
-              Yakında Gelecek
-            </Button>
+            <Link href='/cover-letter/detailed' className='block'>
+              <Button className='w-full'>Detaylı Ön Yazı Oluştur</Button>
+            </Link>
           </CardContent>
         </Card>
       </div>

@@ -1,32 +1,32 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Mail, Briefcase, Target, Send, Loader2 } from 'lucide-react'
-
-import { Input } from '@/components/core/input'
-import { Label } from '@/components/core/label'
 import { Button } from '@/components/core/button'
-import { Textarea } from '@/components/core/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/core/card'
+import { Form } from '@/components/form/Form'
+import { Loader2, FileText, Send } from 'lucide-react'
+import { ContentViewer } from '@/components/ui/common/ContentViewer'
+import { useUserProfileStore } from '@/store/userProfileStore'
 import { useCoverLetterStore } from '@/store/coverLetterStore'
-import { CoverLetterViewer } from './CoverLetterViewer'
-import type { CoverLetterDetailed } from '@/types/api.types'
+import { BasicInfoSection } from './sections/BasicInfoSection'
+import { MotivationSection } from './sections/MotivationSection'
+import { AdditionalInfoSection } from './sections/AdditionalInfoSection'
+import type { CoverLetterDetailed, Language } from '@/types/api.types'
 
-// Validation schema matching API requirements
 const detailedCoverLetterSchema = z.object({
-  companyName: z.string().min(2, 'Şirket adı en az 2 karakter olmalı'),
-  positionTitle: z.string().min(2, 'Pozisyon başlığı en az 2 karakter olmalı'),
-  jobDescription: z.string().min(20, 'İş tanımı en az 20 karakter olmalı'),
-  whyPosition: z.string().min(50, 'Pozisyon tercihi açıklaması en az 50 karakter olmalı'),
-  whyCompany: z.string().min(50, 'Şirket tercihi açıklaması en az 50 karakter olmalı'),
-  workMotivation: z.string().min(50, 'İş motivasyonu en az 50 karakter olmalı'),
-  language: z.enum(['TURKISH', 'ENGLISH']).optional(),
+  positionTitle: z.string().min(1, 'Pozisyon başlığı zorunludur'),
+  companyName: z.string().min(1, 'Şirket adı zorunludur'),
+  language: z.enum(['TURKISH', 'ENGLISH'] as const),
+  jobDescription: z.string().min(10, 'İş tanımı en az 10 karakter olmalıdır'),
+  whyPosition: z.string().min(10, 'Pozisyon motivasyonu en az 10 karakter olmalıdır'),
+  whyCompany: z.string().min(10, 'Şirket motivasyonu en az 10 karakter olmalıdır'),
+  workMotivation: z.string().min(10, 'Çalışma motivasyonu en az 10 karakter olmalıdır'),
 })
 
-type DetailedCoverLetterForm = z.infer<typeof detailedCoverLetterSchema>
+type DetailedCoverLetterFormData = z.infer<typeof detailedCoverLetterSchema>
 
 interface DetailedCoverLetterCreatorProps {
   onCreated?: (coverLetter: CoverLetterDetailed) => void
@@ -34,198 +34,196 @@ interface DetailedCoverLetterCreatorProps {
 }
 
 export function DetailedCoverLetterCreator({ onCreated, className }: DetailedCoverLetterCreatorProps) {
-  const [createdCoverLetter, setCreatedCoverLetter] = useState<CoverLetterDetailed | null>(null)
+  const [generatedContent, setGeneratedContent] = useState<string>('')
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [activeSection, setActiveSection] = useState<'basic' | 'motivation' | 'additional'>('basic')
 
-  const { createDetailedCoverLetter, isGenerating, error, clearError } = useCoverLetterStore()
+  const { profile } = useUserProfileStore()
+  const { createDetailedCoverLetter, isGenerating: storeIsGenerating } = useCoverLetterStore()
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<DetailedCoverLetterForm>({
+  const form = useForm<DetailedCoverLetterFormData>({
     resolver: zodResolver(detailedCoverLetterSchema),
     defaultValues: {
-      companyName: '',
       positionTitle: '',
+      companyName: '',
+      language: 'TURKISH' as Language,
       jobDescription: '',
       whyPosition: '',
       whyCompany: '',
       workMotivation: '',
-      language: 'TURKISH',
     },
   })
 
-  const onSubmit = async (data: DetailedCoverLetterForm) => {
-    try {
-      clearError()
+  // Auto-populate form when profile changes
+  useEffect(() => {
+    if (profile) {
+      // Profile data will be used by the cover letter generation API
+      // No need to pre-populate form fields as they are manually entered
+    }
+  }, [profile])
 
-      const coverLetterData = {
-        companyName: data.companyName,
-        positionTitle: data.positionTitle,
-        jobDescription: data.jobDescription,
-        language: data.language || 'TURKISH',
-        whyPosition: data.whyPosition,
-        whyCompany: data.whyCompany,
-        workMotivation: data.workMotivation,
+  const onSubmit = useCallback(
+    async (data: DetailedCoverLetterFormData) => {
+      try {
+        setIsGenerating(true)
+        setGeneratedContent('') // Reset previous content
+
+        const result = await createDetailedCoverLetter({
+          positionTitle: data.positionTitle,
+          companyName: data.companyName,
+          jobDescription: data.jobDescription,
+          language: data.language,
+          whyPosition: data.whyPosition,
+          whyCompany: data.whyCompany,
+          workMotivation: data.workMotivation,
+        })
+
+        if (result) {
+          setGeneratedContent(result.content)
+          onCreated?.(result)
+        }
+      } catch (error) {
+        console.error('Detailed cover letter generation failed:', error)
+      } finally {
+        setIsGenerating(false)
       }
+    },
+    [createDetailedCoverLetter, onCreated],
+  )
 
-      const createdLetter = await createDetailedCoverLetter(coverLetterData)
-      setCreatedCoverLetter(createdLetter)
-      onCreated?.(createdLetter)
-      reset()
-    } catch (error) {
-      console.error('Detailed cover letter creation error:', error)
+  const renderSectionContent = () => {
+    switch (activeSection) {
+      case 'basic':
+        return <BasicInfoSection form={form} />
+      case 'motivation':
+        return <MotivationSection form={form} />
+      case 'additional':
+        return <AdditionalInfoSection form={form} />
+      default:
+        return <BasicInfoSection form={form} />
     }
   }
 
-  // If cover letter is created, show the viewer
-  if (createdCoverLetter) {
-    return (
-      <div className={className}>
-        <CoverLetterViewer
-          coverLetter={createdCoverLetter}
-          type='detailed'
-          onUpdate={() => {
-            // Refresh or handle update
-          }}
-        />
+  const getSectionProgress = () => {
+    const values = form.getValues()
+    const basicComplete = !!(values.positionTitle && values.companyName && values.language)
+    const motivationComplete = !!(values.whyPosition && values.whyCompany)
+    const additionalComplete = !!(values.jobDescription && values.workMotivation)
 
-        <div className='mt-4 flex justify-center'>
-          <Button variant='outline' onClick={() => setCreatedCoverLetter(null)}>
-            Yeni Ön Yazı Oluştur
-          </Button>
-        </div>
-      </div>
-    )
+    return { basicComplete, motivationComplete, additionalComplete }
   }
 
+  const { basicComplete, motivationComplete, additionalComplete } = getSectionProgress()
+  const allSectionsComplete = basicComplete && motivationComplete && additionalComplete
+
   return (
-    <div className={className}>
-      <Card>
-        <CardHeader>
-          <div className='flex items-center gap-4'>
-            <div className='flex-shrink-0'>
-              <div className='w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center'>
-                <Mail className='w-6 h-6 text-primary' />
+    <div className={`space-y-6 ${className}`}>
+      {/* Profile Info */}
+      {profile ? (
+        <Card className='bg-blue-50 border-blue-200'>
+          <CardContent className='p-4'>
+            <div className='flex items-center gap-3'>
+              <FileText className='h-5 w-5 text-blue-600' />
+              <div>
+                <p className='font-medium text-blue-800'>Profil Bilgileri Kullanılacak</p>
+                <p className='text-sm text-blue-600'>
+                  {profile.educations?.length || 0} Eğitim, {profile.experiences?.length || 0} Deneyim bilgisi mevcut
+                </p>
               </div>
             </div>
-            <div>
-              <CardTitle className='text-2xl'>Detaylı Ön Yazı Oluştur</CardTitle>
-              <p className='text-muted-foreground mt-1'>Kapsamlı başvuru için profesyonel ön yazı oluşturun</p>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card className='bg-yellow-50 border-yellow-200'>
+          <CardContent className='p-4'>
+            <div className='flex items-center gap-3'>
+              <FileText className='h-5 w-5 text-yellow-600' />
+              <div>
+                <p className='font-medium text-yellow-800'>Profil Bilgileri Yükleniyor</p>
+                <p className='text-sm text-yellow-600'>Lütfen bekleyin...</p>
+              </div>
             </div>
-          </div>
-        </CardHeader>
+          </CardContent>
+        </Card>
+      )}
 
-        <CardContent>
-          {error && (
-            <div className='mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-lg'>
-              <p className='text-sm text-destructive'>{error}</p>
-            </div>
-          )}
+      <Form.Root form={form} onSubmit={onSubmit}>
+        <div className='space-y-6'>
+          {/* Section Navigation */}
+          <Card>
+            <CardHeader>
+              <CardTitle className='text-lg'>Detaylı Ön Yazı Formu</CardTitle>
+              <div className='flex flex-wrap gap-2'>
+                <Button
+                  type='button'
+                  variant={activeSection === 'basic' ? 'default' : 'outline'}
+                  size='sm'
+                  onClick={() => setActiveSection('basic')}
+                  className='flex items-center gap-2'
+                >
+                  Temel Bilgiler
+                  {basicComplete && <span className='h-2 w-2 bg-green-500 rounded-full' />}
+                </Button>
+                <Button
+                  type='button'
+                  variant={activeSection === 'motivation' ? 'default' : 'outline'}
+                  size='sm'
+                  onClick={() => setActiveSection('motivation')}
+                  className='flex items-center gap-2'
+                >
+                  Motivasyon
+                  {motivationComplete && <span className='h-2 w-2 bg-green-500 rounded-full' />}
+                </Button>
+                <Button
+                  type='button'
+                  variant={activeSection === 'additional' ? 'default' : 'outline'}
+                  size='sm'
+                  onClick={() => setActiveSection('additional')}
+                  className='flex items-center gap-2'
+                >
+                  Ek Bilgiler
+                  {additionalComplete && <span className='h-2 w-2 bg-green-500 rounded-full' />}
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>{renderSectionContent()}</CardContent>
+          </Card>
 
-          <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
-            {/* Job Information */}
-            <Card>
-              <CardHeader className='pb-4'>
-                <div className='flex items-center gap-3'>
-                  <div className='w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center'>
-                    <Briefcase className='w-4 h-4 text-primary' />
-                  </div>
-                  <CardTitle className='text-lg'>İş Bilgileri</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className='space-y-4'>
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                  <div className='space-y-2'>
-                    <Label htmlFor='companyName'>Şirket Adı *</Label>
-                    <Input id='companyName' {...register('companyName')} placeholder='Tech Şirket A.Ş.' />
-                    {errors.companyName && <p className='text-sm text-destructive'>{errors.companyName.message}</p>}
-                  </div>
-
-                  <div className='space-y-2'>
-                    <Label htmlFor='positionTitle'>Pozisyon *</Label>
-                    <Input id='positionTitle' {...register('positionTitle')} placeholder='Senior Yazılım Geliştirici' />
-                    {errors.positionTitle && <p className='text-sm text-destructive'>{errors.positionTitle.message}</p>}
-                  </div>
-                </div>
-
-                <div className='space-y-2'>
-                  <Label htmlFor='jobDescription'>İş Tanımı *</Label>
-                  <Textarea
-                    id='jobDescription'
-                    {...register('jobDescription')}
-                    rows={4}
-                    placeholder='İş ilanında belirtilen görev ve sorumluluklarınızı buraya yazın...'
-                  />
-                  {errors.jobDescription && <p className='text-sm text-destructive'>{errors.jobDescription.message}</p>}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Motivations */}
-            <Card>
-              <CardHeader className='pb-4'>
-                <div className='flex items-center gap-3'>
-                  <div className='w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center'>
-                    <Target className='w-4 h-4 text-primary' />
-                  </div>
-                  <CardTitle className='text-lg'>Motivasyon & Gerekçeler</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className='space-y-4'>
-                <div className='space-y-2'>
-                  <Label htmlFor='whyPosition'>Bu Pozisyonu Neden Seçtiniz? *</Label>
-                  <Textarea
-                    id='whyPosition'
-                    {...register('whyPosition')}
-                    rows={4}
-                    placeholder='Bu pozisyonun sizin için neden uygun olduğunu, hangi yeteneklerinizin bu rolle uyumlu olduğunu açıklayın...'
-                  />
-                  {errors.whyPosition && <p className='text-sm text-destructive'>{errors.whyPosition.message}</p>}
-                </div>
-
-                <div className='space-y-2'>
-                  <Label htmlFor='whyCompany'>Bu Şirketi Neden Seçtiniz? *</Label>
-                  <Textarea
-                    id='whyCompany'
-                    {...register('whyCompany')}
-                    rows={4}
-                    placeholder='Bu şirketin size neden çekici geldiğini, şirket kültürü ve değerleri hakkındaki düşüncelerinizi açıklayın...'
-                  />
-                  {errors.whyCompany && <p className='text-sm text-destructive'>{errors.whyCompany.message}</p>}
-                </div>
-
-                <div className='space-y-2'>
-                  <Label htmlFor='workMotivation'>İş Motivasyonunuz *</Label>
-                  <Textarea
-                    id='workMotivation'
-                    {...register('workMotivation')}
-                    rows={4}
-                    placeholder='Sizi motive eden faktörler, kariyer hedefleriniz ve bu pozisyonda nasıl başarılı olacağınızı açıklayın...'
-                  />
-                  {errors.workMotivation && <p className='text-sm text-destructive'>{errors.workMotivation.message}</p>}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Submit Button */}
-            <Button type='submit' disabled={isGenerating} className='w-full py-4 text-base font-semibold' size='lg'>
-              {isGenerating ? (
+          {/* Generate Button */}
+          <div className='flex justify-center'>
+            <Button
+              type='button'
+              onClick={() => form.handleSubmit(onSubmit)()}
+              disabled={isGenerating || storeIsGenerating || !allSectionsComplete}
+              className='w-full sm:w-auto min-w-[200px]'
+            >
+              {isGenerating || storeIsGenerating ? (
                 <>
-                  <Loader2 className='w-5 h-5 mr-2 animate-spin' />
-                  Oluşturuluyor...
+                  <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                  Ön Yazı Oluşturuluyor...
                 </>
               ) : (
                 <>
-                  <Send className='w-5 h-5 mr-2' />
+                  <Send className='mr-2 h-4 w-4' />
                   Detaylı Ön Yazı Oluştur
                 </>
               )}
             </Button>
-          </form>
-        </CardContent>
-      </Card>
+          </div>
+        </div>
+      </Form.Root>
+
+      {/* Generated Content Display */}
+      {generatedContent && (
+        <div className='space-y-4'>
+          <h3 className='text-lg font-semibold'>Oluşturulan Ön Yazı</h3>
+          <ContentViewer
+            content={generatedContent}
+            title={`${form.watch('companyName')} - ${form.watch('positionTitle')} Ön Yazısı`}
+            type='cover-letter'
+          />
+        </div>
+      )}
     </div>
   )
 }

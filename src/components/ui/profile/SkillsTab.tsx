@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { Plus, Star } from 'lucide-react'
+import { Plus, Star, Edit3, Trash2 } from 'lucide-react'
 
 import { Button } from '@/components/core/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/core/card'
@@ -13,9 +13,11 @@ import type { Skill, UserProfile } from '@/types/api.types'
 interface SkillsTabProps {
   profile: UserProfile | null
   onOpenModal: () => void
+  onOpenEditModal?: (id: string, data: Skill) => void
+  onDeleteSkill?: (id: string, name: string) => void
 }
 
-export function SkillsTab({ profile, onOpenModal }: SkillsTabProps) {
+export function SkillsTab({ profile, onOpenModal, onOpenEditModal, onDeleteSkill }: SkillsTabProps) {
   return (
     <div className='space-y-6'>
       <div className='flex justify-between items-center'>
@@ -50,14 +52,41 @@ export function SkillsTab({ profile, onOpenModal }: SkillsTabProps) {
                     if (!skill) return null
                     const levelInfo = skillLevels.find((l) => l.value === skill.level)
                     return (
-                      <div key={skill.id} className='flex items-center justify-between p-3 border rounded-lg'>
-                        <div>
+                      <div key={skill.id} className='flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors'>
+                        <div className='flex-1'>
                           <p className='font-medium'>{skill.name}</p>
                           {skill.yearsOfExperience && (
                             <p className='text-xs text-muted-foreground'>{skill.yearsOfExperience} yıl deneyim</p>
                           )}
                         </div>
-                        <Badge className={levelInfo?.color}>{levelInfo?.label}</Badge>
+                        <div className='flex items-center space-x-2'>
+                          <Badge className={levelInfo?.color}>{levelInfo?.label}</Badge>
+                          {(onOpenEditModal || onDeleteSkill) && (
+                            <div className='flex space-x-1'>
+                              {onOpenEditModal && (
+                                <Button 
+                                  variant='ghost' 
+                                  size='sm' 
+                                  onClick={() => onOpenEditModal(skill.id, skill)}
+                                  className='h-8 w-8 p-0'
+                                >
+                                  <Edit3 className='h-3 w-3' />
+                                </Button>
+                              )}
+                              {onDeleteSkill && (
+                                <Button 
+                                  variant='ghost' 
+                                  size='sm' 
+                                  onClick={() => onDeleteSkill(skill.id, skill.name)}
+                                  className='h-8 w-8 p-0 text-destructive hover:text-destructive'
+                                  title='Yeteneği Sil'
+                                >
+                                  <Trash2 className='h-3 w-3' />
+                                </Button>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )
                   })}

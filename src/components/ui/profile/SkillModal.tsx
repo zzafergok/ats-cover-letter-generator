@@ -28,7 +28,7 @@ const skillCategories = ['TECHNICAL', 'SOFT_SKILL', 'LANGUAGE', 'TOOL', 'FRAMEWO
 export function SkillModal({ isOpen, onClose, onSave, skill, isLoading = false }: SkillModalProps) {
   const [formData, setFormData] = useState({
     name: '',
-    category: 'TECHNICAL' as string,
+    category: 'TECHNICAL' as 'TECHNICAL' | 'SOFT_SKILL' | 'LANGUAGE' | 'TOOL' | 'FRAMEWORK' | 'OTHER',
     level: 'INTERMEDIATE' as 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT',
     yearsOfExperience: 0,
   })
@@ -54,11 +54,7 @@ export function SkillModal({ isOpen, onClose, onSave, skill, isLoading = false }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      await onSave({
-        ...formData,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      })
+      await onSave(formData)
       onClose()
     } catch (error) {
       console.error('Yetenek kaydedilirken hata:', error)
@@ -107,8 +103,10 @@ export function SkillModal({ isOpen, onClose, onSave, skill, isLoading = false }
               <select
                 id='category'
                 value={formData.category}
-                onChange={(e) => setFormData((prev) => ({ ...prev, category: e.target.value }))}
-                className='w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, category: e.target.value as typeof formData.category }))
+                }
+                className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
               >
                 {skillCategories.map((category) => (
                   <option key={category} value={category}>
@@ -124,7 +122,7 @@ export function SkillModal({ isOpen, onClose, onSave, skill, isLoading = false }
                 id='level'
                 value={formData.level}
                 onChange={(e) => setFormData((prev) => ({ ...prev, level: e.target.value as typeof formData.level }))}
-                className='w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50'
               >
                 {skillLevels.map((level) => (
                   <option key={level.value} value={level.value}>

@@ -20,6 +20,7 @@ import { ExperienceTab } from '@/components/ui/profile/ExperienceTab'
 import { SkillsTab } from '@/components/ui/profile/SkillsTab'
 import { CoursesTab } from '@/components/ui/profile/CoursesTab'
 import { CertificatesTab } from '@/components/ui/profile/CertificatesTab'
+import { ConfirmDeleteModal } from '@/components/ui/profile/ConfirmDeleteModal'
 
 import type { Education, WorkExperience, Skill } from '@/types/api.types'
 
@@ -40,6 +41,8 @@ export default function ProfilePage() {
     updateWorkExperience,
     updateSkill,
     deleteEducation,
+    deleteWorkExperience,
+    deleteSkill,
   } = useUserProfileStore()
 
   const [activeTab, setActiveTab] = useState('overview')
@@ -48,6 +51,18 @@ export default function ProfilePage() {
     education: false,
     experience: false,
     skill: false,
+  })
+
+  const [deleteConfirmModal, setDeleteConfirmModal] = useState<{
+    isOpen: boolean
+    type: 'skill' | 'education' | 'experience' | null
+    id: string
+    name: string
+  }>({
+    isOpen: false,
+    type: null,
+    id: '',
+    name: '',
   })
 
   useEffect(() => {
@@ -120,6 +135,45 @@ export default function ProfilePage() {
     } catch (error) {
       console.error('Yetenek kaydedilirken hata:', error)
       throw error
+    }
+  }
+
+  const openDeleteConfirmModal = (type: 'skill' | 'education' | 'experience', id: string, name: string) => {
+    setDeleteConfirmModal({
+      isOpen: true,
+      type,
+      id,
+      name,
+    })
+  }
+
+  const closeDeleteConfirmModal = () => {
+    setDeleteConfirmModal({
+      isOpen: false,
+      type: null,
+      id: '',
+      name: '',
+    })
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!deleteConfirmModal.type || !deleteConfirmModal.id) return
+
+    try {
+      switch (deleteConfirmModal.type) {
+        case 'skill':
+          await deleteSkill(deleteConfirmModal.id)
+          break
+        case 'education':
+          await deleteEducation(deleteConfirmModal.id)
+          break
+        case 'experience':
+          await deleteWorkExperience(deleteConfirmModal.id)
+          break
+      }
+      closeDeleteConfirmModal()
+    } catch (error) {
+      console.error('Silme işlemi sırasında hata:', error)
     }
   }
 
@@ -213,12 +267,18 @@ export default function ProfilePage() {
               profile={profile}
               onOpenModal={() => openModal('experience')}
               onOpenEditModal={(id, data) => openEditModal('experience', id, data)}
+              onDeleteExperience={deleteWorkExperience}
             />
           </TabsContent>
 
           {/* Skills Tab */}
           <TabsContent value='skills' className='space-y-6'>
-            <SkillsTab profile={profile} onOpenModal={() => openModal('skill')} />
+            <SkillsTab
+              profile={profile}
+              onOpenModal={() => openModal('skill')}
+              onOpenEditModal={(id, data) => openEditModal('skill', id, data)}
+              onDeleteSkill={(id, name) => openDeleteConfirmModal('skill', id, name)}
+            />
           </TabsContent>
 
           {/* Courses Tab */}
@@ -258,6 +318,17 @@ export default function ProfilePage() {
         onClose={() => closeModal('skill')}
         onSave={handleSaveSkill}
         skill={editingItem?.type === 'skill' ? (editingItem.data as Skill) : null}
+        isLoading={isLoading}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmDeleteModal
+        isOpen={deleteConfirmModal.isOpen}
+        onClose={closeDeleteConfirmModal}
+        onConfirm={handleConfirmDelete}
+        title='Silme Onayı'
+        message={`Bu ${deleteConfirmModal.type === 'skill' ? 'yeteneği' : deleteConfirmModal.type === 'education' ? 'eğitimi' : 'deneyimi'} silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`}
+        itemName={deleteConfirmModal.name}
         isLoading={isLoading}
       />
     </div>

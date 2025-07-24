@@ -14,12 +14,14 @@ interface ExperienceTabProps {
   profile: UserProfile | null
   onOpenModal: () => void
   onOpenEditModal: (id: string, data: WorkExperience) => void
+  onDeleteExperience?: (id: string) => Promise<void>
 }
 
 export function ExperienceTab({ 
   profile, 
   onOpenModal, 
-  onOpenEditModal 
+  onOpenEditModal,
+  onDeleteExperience
 }: ExperienceTabProps) {
   return (
     <div className='space-y-6'>

@@ -1,7 +1,10 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { X, Save } from 'lucide-react'
+import { useForm, Controller } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { Button } from '@/components/core/button'
 import { Input } from '@/components/core/input'
 import { Label } from '@/components/core/label'
@@ -33,21 +36,43 @@ const months = [
   { value: 12, label: 'Aralık' },
 ] as const
 
+// Zod schema for form validation
+const courseSchema = z.object({
+  courseName: z.string().min(1, 'Kurs adı zorunludur'),
+  provider: z.string().optional(),
+  startMonth: z.number().min(1).max(12).optional(),
+  startYear: z.number().min(1980).max(2030).optional(),
+  endMonth: z.number().min(1).max(12).optional(),
+  endYear: z.number().min(1980).max(2030).optional(),
+  duration: z.string().optional(),
+  description: z.string().optional(),
+})
+
+type CourseFormData = z.infer<typeof courseSchema>
+
 export function CourseModal({ isOpen, onClose, onSave, course, isLoading = false }: CourseModalProps) {
-  const [formData, setFormData] = useState({
-    courseName: '',
-    provider: '',
-    startMonth: undefined as number | undefined,
-    startYear: undefined as number | undefined,
-    endMonth: undefined as number | undefined,
-    endYear: undefined as number | undefined,
-    duration: '',
-    description: '',
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<CourseFormData>({
+    resolver: zodResolver(courseSchema),
+    defaultValues: {
+      courseName: '',
+      provider: '',
+      startMonth: undefined,
+      startYear: undefined,
+      endMonth: undefined,
+      endYear: undefined,
+      duration: '',
+      description: '',
+    },
   })
 
   useEffect(() => {
     if (course) {
-      setFormData({
+      reset({
         courseName: course.courseName || '',
         provider: course.provider || '',
         startMonth: course.startMonth,
@@ -58,7 +83,7 @@ export function CourseModal({ isOpen, onClose, onSave, course, isLoading = false
         description: course.description || '',
       })
     } else {
-      setFormData({
+      reset({
         courseName: '',
         provider: '',
         startMonth: undefined,
@@ -69,12 +94,11 @@ export function CourseModal({ isOpen, onClose, onSave, course, isLoading = false
         description: '',
       })
     }
-  }, [course])
+  }, [course, isOpen, reset])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const onSubmit = async (data: CourseFormData) => {
     try {
-      await onSave(formData)
+      await onSave(data)
       onClose()
     } catch (error) {
       console.error('Kurs kaydedilirken hata:', error)
@@ -97,124 +121,175 @@ export function CourseModal({ isOpen, onClose, onSave, course, isLoading = false
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleSubmit} className='space-y-4'>
+          <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
             <div className='grid grid-cols-2 gap-4'>
               <div className='col-span-2'>
                 <Label htmlFor='courseName'>Kurs Adı *</Label>
-                <Input
-                  id='courseName'
-                  value={formData.courseName}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, courseName: e.target.value }))}
-                  placeholder='React Advanced Patterns, AWS Solutions Architect, vb.'
-                  required
+                <Controller
+                  name='courseName'
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      id='courseName'
+                      placeholder='React Advanced Patterns, AWS Solutions Architect, vb.'
+                    />
+                  )}
                 />
+                {errors.courseName && <p className='text-sm text-red-500 mt-1'>{errors.courseName.message}</p>}
               </div>
 
               <div className='col-span-2'>
                 <Label htmlFor='provider'>Kurs Sağlayıcısı</Label>
-                <Input
-                  id='provider'
-                  value={formData.provider}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, provider: e.target.value }))}
-                  placeholder='Udemy, Coursera, BTK Akademi, vb.'
+                <Controller
+                  name='provider'
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      id='provider'
+                      placeholder='Udemy, Coursera, BTK Akademi, vb.'
+                    />
+                  )}
                 />
+                {errors.provider && <p className='text-sm text-red-500 mt-1'>{errors.provider.message}</p>}
               </div>
 
               <div>
                 <Label htmlFor='startMonth'>Başlangıç Ayı</Label>
-                <Select
-                  value={formData.startMonth?.toString() || ''}
-                  onValueChange={(value) => setFormData((prev) => ({ ...prev, startMonth: value ? parseInt(value) : undefined }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder='Ay seçin' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {months.map((month) => (
-                      <SelectItem key={month.value} value={month.value.toString()}>
-                        {month.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Controller
+                  name='startMonth'
+                  control={control}
+                  render={({ field }) => (
+                    <Select 
+                      onValueChange={(value) => field.onChange(value ? parseInt(value) : undefined)} 
+                      value={field.value?.toString() || ''}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder='Ay seçin' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {months.map((month) => (
+                          <SelectItem key={month.value} value={month.value.toString()}>
+                            {month.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.startMonth && <p className='text-sm text-red-500 mt-1'>{errors.startMonth.message}</p>}
               </div>
 
               <div>
                 <Label htmlFor='startYear'>Başlangıç Yılı</Label>
-                <Select
-                  value={formData.startYear?.toString() || ''}
-                  onValueChange={(value) => setFormData((prev) => ({ ...prev, startYear: value ? parseInt(value) : undefined }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder='Yıl seçin' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {years.map((year) => (
-                      <SelectItem key={year} value={year.toString()}>
-                        {year}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Controller
+                  name='startYear'
+                  control={control}
+                  render={({ field }) => (
+                    <Select 
+                      onValueChange={(value) => field.onChange(value ? parseInt(value) : undefined)} 
+                      value={field.value?.toString() || ''}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder='Yıl seçin' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {years.map((year) => (
+                          <SelectItem key={year} value={year.toString()}>
+                            {year}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.startYear && <p className='text-sm text-red-500 mt-1'>{errors.startYear.message}</p>}
               </div>
 
               <div>
                 <Label htmlFor='endMonth'>Bitiş Ayı</Label>
-                <Select
-                  value={formData.endMonth?.toString() || ''}
-                  onValueChange={(value) => setFormData((prev) => ({ ...prev, endMonth: value ? parseInt(value) : undefined }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder='Ay seçin' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {months.map((month) => (
-                      <SelectItem key={month.value} value={month.value.toString()}>
-                        {month.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Controller
+                  name='endMonth'
+                  control={control}
+                  render={({ field }) => (
+                    <Select 
+                      onValueChange={(value) => field.onChange(value ? parseInt(value) : undefined)} 
+                      value={field.value?.toString() || ''}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder='Ay seçin' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {months.map((month) => (
+                          <SelectItem key={month.value} value={month.value.toString()}>
+                            {month.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.endMonth && <p className='text-sm text-red-500 mt-1'>{errors.endMonth.message}</p>}
               </div>
 
               <div>
                 <Label htmlFor='endYear'>Bitiş Yılı</Label>
-                <Select
-                  value={formData.endYear?.toString() || ''}
-                  onValueChange={(value) => setFormData((prev) => ({ ...prev, endYear: value ? parseInt(value) : undefined }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder='Yıl seçin' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {years.map((year) => (
-                      <SelectItem key={year} value={year.toString()}>
-                        {year}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Controller
+                  name='endYear'
+                  control={control}
+                  render={({ field }) => (
+                    <Select 
+                      onValueChange={(value) => field.onChange(value ? parseInt(value) : undefined)} 
+                      value={field.value?.toString() || ''}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder='Yıl seçin' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {years.map((year) => (
+                          <SelectItem key={year} value={year.toString()}>
+                            {year}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.endYear && <p className='text-sm text-red-500 mt-1'>{errors.endYear.message}</p>}
               </div>
 
               <div className='col-span-2'>
                 <Label htmlFor='duration'>Kurs Süresi</Label>
-                <Input
-                  id='duration'
-                  value={formData.duration}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, duration: e.target.value }))}
-                  placeholder='20 saat, 8 hafta, 3 ay, vb.'
+                <Controller
+                  name='duration'
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      id='duration'
+                      placeholder='20 saat, 8 hafta, 3 ay, vb.'
+                    />
+                  )}
                 />
+                {errors.duration && <p className='text-sm text-red-500 mt-1'>{errors.duration.message}</p>}
               </div>
 
               <div className='col-span-2'>
                 <Label htmlFor='description'>Açıklama</Label>
-                <Textarea
-                  id='description'
-                  value={formData.description}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
-                  placeholder='Kurs hakkında detaylar, öğrendikleriniz, sertifika bilgisi vb.'
-                  rows={3}
+                <Controller
+                  name='description'
+                  control={control}
+                  render={({ field }) => (
+                    <Textarea
+                      {...field}
+                      id='description'
+                      placeholder='Kurs hakkında detaylar, öğrendikleriniz, sertifika bilgisi vb.'
+                      rows={3}
+                    />
+                  )}
                 />
+                {errors.description && <p className='text-sm text-red-500 mt-1'>{errors.description.message}</p>}
               </div>
             </div>
 
@@ -222,8 +297,10 @@ export function CourseModal({ isOpen, onClose, onSave, course, isLoading = false
               <Button type='button' variant='outline' onClick={onClose}>
                 İptal
               </Button>
-              <Button type='submit' disabled={isLoading}>
-                {isLoading && <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2' />}
+              <Button type='submit' disabled={isLoading || isSubmitting}>
+                {(isLoading || isSubmitting) && (
+                  <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2' />
+                )}
                 <Save className='h-4 w-4 mr-2' />
                 Kaydet
               </Button>

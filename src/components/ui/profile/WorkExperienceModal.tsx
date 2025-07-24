@@ -2,6 +2,9 @@
 
 import React, { useState, useEffect } from 'react'
 import { X, Save, Search } from 'lucide-react'
+import { useForm, Controller } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { Button } from '@/components/core/button'
 import { Input } from '@/components/core/input'
 import { Label } from '@/components/core/label'
@@ -49,6 +52,24 @@ const months = [
   { value: 12, label: 'Aralık' },
 ]
 
+// Zod schema for form validation
+const workExperienceSchema = z.object({
+  companyName: z.string().min(1, 'Şirket adı zorunludur'),
+  position: z.string().min(1, 'Pozisyon zorunludur'),
+  employmentType: z.enum(['FULL_TIME', 'PART_TIME', 'CONTRACT', 'FREELANCE', 'INTERNSHIP', 'TEMPORARY']),
+  workMode: z.enum(['ONSITE', 'REMOTE', 'HYBRID']),
+  location: z.string().optional(),
+  startMonth: z.number().min(1).max(12),
+  startYear: z.number().min(1980).max(2030),
+  endMonth: z.number().min(1).max(12).optional(),
+  endYear: z.number().min(1980).max(2030).optional(),
+  isCurrent: z.boolean(),
+  description: z.string().optional(),
+  achievements: z.string().optional(),
+})
+
+type WorkExperienceFormData = z.infer<typeof workExperienceSchema>
+
 export function WorkExperienceModal({
   isOpen,
   onClose,
@@ -56,20 +77,32 @@ export function WorkExperienceModal({
   experience,
   isLoading = false,
 }: WorkExperienceModalProps) {
-  const [formData, setFormData] = useState({
-    companyName: '',
-    position: '',
-    employmentType: 'FULL_TIME' as (typeof employmentTypes)[number]['value'],
-    workMode: 'ONSITE' as 'ONSITE' | 'REMOTE' | 'HYBRID',
-    location: '',
-    startMonth: 1,
-    startYear: new Date().getFullYear(),
-    endMonth: 1,
-    endYear: new Date().getFullYear(),
-    isCurrent: false,
-    description: '',
-    achievements: '',
+  const {
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm<WorkExperienceFormData>({
+    resolver: zodResolver(workExperienceSchema),
+    defaultValues: {
+      companyName: '',
+      position: '',
+      employmentType: 'FULL_TIME',
+      workMode: 'ONSITE',
+      location: '',
+      startMonth: 1,
+      startYear: new Date().getFullYear(),
+      endMonth: 1,
+      endYear: new Date().getFullYear(),
+      isCurrent: false,
+      description: '',
+      achievements: '',
+    },
   })
+
+  const watchIsCurrent = watch('isCurrent')
 
   // Province search for location
   const [locationSearch, setLocationSearch] = useState('')
@@ -83,16 +116,7 @@ export function WorkExperienceModal({
 
   useEffect(() => {
     if (experience) {
-      console.log('WorkExperience modal - received experience:', experience)
-      console.log('Start month:', experience.startMonth, typeof experience.startMonth)
-      console.log('End month:', experience.endMonth, typeof experience.endMonth)
-      console.log('Start year:', experience.startYear, typeof experience.startYear)
-      console.log('End year:', experience.endYear, typeof experience.endYear)
-      console.log('Number conversion test:')
-      console.log('Number(startMonth):', Number(experience.startMonth))
-      console.log('Number(startYear):', Number(experience.startYear))
-
-      setFormData({
+      const formData = {
         companyName: experience.companyName || '',
         position: experience.position || '',
         employmentType: experience.employmentType || 'FULL_TIME',
@@ -107,16 +131,9 @@ export function WorkExperienceModal({
         isCurrent: experience.isCurrent || false,
         description: experience.description || '',
         achievements: experience.achievements || '',
-      })
+      }
 
-      console.log('FormData set with:', {
-        startMonth: experience.startMonth ? Number(experience.startMonth) || 1 : 1,
-        startYear: experience.startYear
-          ? Number(experience.startYear) || new Date().getFullYear()
-          : new Date().getFullYear(),
-        endMonth: experience.endMonth ? Number(experience.endMonth) || 1 : 1,
-        endYear: experience.endYear ? Number(experience.endYear) || new Date().getFullYear() : new Date().getFullYear(),
-      })
+      reset(formData)
       setLocationSearch(experience.location || '')
 
       // Parse achievements string to array for display
@@ -129,7 +146,7 @@ export function WorkExperienceModal({
         )
       }
     } else {
-      setFormData({
+      reset({
         companyName: '',
         position: '',
         employmentType: 'FULL_TIME',
@@ -149,7 +166,7 @@ export function WorkExperienceModal({
       setShowLocationDropdown(false)
       setProvinces([])
     }
-  }, [experience, isOpen])
+  }, [experience, isOpen, reset])
 
   // Province search functionality
   useEffect(() => {
@@ -178,7 +195,7 @@ export function WorkExperienceModal({
   }, [locationSearch, userIsTyping])
 
   const handleLocationSelect = (province: Province) => {
-    setFormData((prev) => ({ ...prev, location: province.name }))
+    setValue('location', province.name)
     setLocationSearch(province.name)
     setShowLocationDropdown(false)
     setProvinces([])
@@ -189,7 +206,7 @@ export function WorkExperienceModal({
     if (newAchievement.trim() && !achievementsList.includes(newAchievement.trim())) {
       const newList = [...achievementsList, newAchievement.trim()]
       setAchievementsList(newList)
-      setFormData((prev) => ({ ...prev, achievements: newList.join(', ') }))
+      setValue('achievements', newList.join(', '))
       setNewAchievement('')
     }
   }
@@ -197,25 +214,24 @@ export function WorkExperienceModal({
   const removeAchievement = (achievement: string) => {
     const newList = achievementsList.filter((a) => a !== achievement)
     setAchievementsList(newList)
-    setFormData((prev) => ({ ...prev, achievements: newList.join(', ') }))
+    setValue('achievements', newList.join(', '))
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const onSubmit = async (data: WorkExperienceFormData) => {
     try {
       const submitData = {
-        companyName: formData.companyName,
-        position: formData.position,
-        employmentType: formData.employmentType,
-        workMode: formData.workMode,
-        location: formData.location || undefined,
-        startMonth: formData.startMonth,
-        startYear: formData.startYear,
-        endMonth: formData.isCurrent ? undefined : formData.endMonth,
-        endYear: formData.isCurrent ? undefined : formData.endYear,
-        isCurrent: formData.isCurrent,
-        description: formData.description,
-        achievements: formData.achievements || undefined,
+        companyName: data.companyName,
+        position: data.position,
+        employmentType: data.employmentType,
+        workMode: data.workMode,
+        location: data.location || undefined,
+        startMonth: data.startMonth,
+        startYear: data.startYear,
+        endMonth: data.isCurrent ? undefined : data.endMonth,
+        endYear: data.isCurrent ? undefined : data.endYear,
+        isCurrent: data.isCurrent,
+        description: data.description || undefined,
+        achievements: data.achievements || undefined,
       }
       await onSave(submitData)
       onClose()
@@ -225,13 +241,6 @@ export function WorkExperienceModal({
   }
 
   if (!isOpen) return null
-
-  console.log('Modal rendering with formData:', {
-    startMonth: formData.startMonth,
-    startYear: formData.startYear,
-    endMonth: formData.endMonth,
-    endYear: formData.endYear,
-  })
 
   return (
     <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'>
@@ -244,90 +253,99 @@ export function WorkExperienceModal({
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleSubmit} className='space-y-4'>
+          <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
             <div className='grid grid-cols-2 gap-4'>
               <div>
                 <Label htmlFor='companyName'>Şirket Adı *</Label>
-                <Input
-                  id='companyName'
-                  value={formData.companyName}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, companyName: e.target.value }))}
-                  placeholder='Şirket adı'
-                  required
+                <Controller
+                  name='companyName'
+                  control={control}
+                  render={({ field }) => <Input {...field} id='companyName' placeholder='Şirket adı' />}
                 />
+                {errors.companyName && <p className='text-sm text-red-500 mt-1'>{errors.companyName.message}</p>}
               </div>
               <div>
                 <Label htmlFor='position'>Pozisyon *</Label>
-                <Input
-                  id='position'
-                  value={formData.position}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, position: e.target.value }))}
-                  placeholder='İş pozisyonunuz'
-                  required
+                <Controller
+                  name='position'
+                  control={control}
+                  render={({ field }) => <Input {...field} id='position' placeholder='İş pozisyonunuz' />}
                 />
+                {errors.position && <p className='text-sm text-red-500 mt-1'>{errors.position.message}</p>}
               </div>
             </div>
 
             <div className='grid grid-cols-2 gap-4'>
               <div>
                 <Label htmlFor='employmentType'>İstihdam Türü *</Label>
-                <Select
-                  value={formData.employmentType}
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, employmentType: value as typeof formData.employmentType }))
-                  }
-                >
-                  <SelectTrigger id='employmentType'>
-                    <SelectValue placeholder='İstihdam türü seçin' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {employmentTypes.map((type) => (
-                      <SelectItem key={type.value} value={type.value}>
-                        {type.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Controller
+                  name='employmentType'
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger id='employmentType'>
+                        <SelectValue placeholder='İstihdam türü seçin' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {employmentTypes.map((type) => (
+                          <SelectItem key={type.value} value={type.value}>
+                            {type.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.employmentType && <p className='text-sm text-red-500 mt-1'>{errors.employmentType.message}</p>}
               </div>
               <div>
                 <Label htmlFor='workMode'>Çalışma Şekli *</Label>
-                <Select
-                  value={formData.workMode}
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({ ...prev, workMode: value as typeof formData.workMode }))
-                  }
-                >
-                  <SelectTrigger id='workMode'>
-                    <SelectValue placeholder='Çalışma şekli seçin' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {workModes.map((mode) => (
-                      <SelectItem key={mode.value} value={mode.value}>
-                        {mode.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Controller
+                  name='workMode'
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger id='workMode'>
+                        <SelectValue placeholder='Çalışma şekli seçin' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {workModes.map((mode) => (
+                          <SelectItem key={mode.value} value={mode.value}>
+                            {mode.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.workMode && <p className='text-sm text-red-500 mt-1'>{errors.workMode.message}</p>}
               </div>
             </div>
 
             <div className='relative'>
               <Label htmlFor='location'>Konum</Label>
-              <Input
-                id='location'
-                value={locationSearch}
-                onChange={(e) => {
-                  setLocationSearch(e.target.value)
-                  setFormData((prev) => ({ ...prev, location: e.target.value }))
-                  setUserIsTyping(true)
-                }}
-                onFocus={() => {
-                  if (locationSearch.length >= 2) {
-                    setUserIsTyping(true)
-                  }
-                }}
-                placeholder='Şehir ara...'
-                endIcon={<Search className='h-4 w-4' />}
+              <Controller
+                name='location'
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    id='location'
+                    value={locationSearch}
+                    onChange={(e) => {
+                      setLocationSearch(e.target.value)
+                      field.onChange(e.target.value)
+                      setUserIsTyping(true)
+                    }}
+                    onFocus={() => {
+                      if (locationSearch.length >= 2) {
+                        setUserIsTyping(true)
+                      }
+                    }}
+                    placeholder='Şehir ara...'
+                    endIcon={<Search className='h-4 w-4' />}
+                  />
+                )}
               />
 
               {/* Location dropdown */}
@@ -350,103 +368,124 @@ export function WorkExperienceModal({
                   Şehirler aranıyor...
                 </div>
               )}
+              {errors.location && <p className='text-sm text-red-500 mt-1'>{errors.location.message}</p>}
             </div>
 
-            <div className={`grid gap-4 ${formData.isCurrent ? 'grid-cols-1' : 'grid-cols-2'}`}>
+            <div className={`grid gap-4 ${watchIsCurrent ? 'grid-cols-1' : 'grid-cols-2'}`}>
               <div>
                 <Label>Başlangıç Tarihi *</Label>
                 <div className='grid grid-cols-2 gap-2'>
-                  <Select
-                    value={!isNaN(formData.startMonth) ? formData.startMonth.toString() : '1'}
-                    onValueChange={(value) => {
-                      console.log('Start month changed to:', value, typeof value)
-                      const numValue = parseInt(value)
-                      console.log('Parsed value:', numValue)
-                      if (!isNaN(numValue)) {
-                        setFormData((prev) => ({ ...prev, startMonth: numValue }))
-                      }
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder='Ay' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {months.map((month) => (
-                        <SelectItem key={month.value} value={month.value.toString()}>
-                          {month.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Input
-                    type='number'
-                    min='1980'
-                    max='2030'
-                    value={formData.startYear}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, startYear: parseInt(e.target.value) }))}
-                    placeholder='Yıl'
-                    required
+                  <Controller
+                    name='startMonth'
+                    control={control}
+                    render={({ field }) => (
+                      <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value.toString()}>
+                        <SelectTrigger>
+                          <SelectValue placeholder='Ay' />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {months.map((month) => (
+                            <SelectItem key={month.value} value={month.value.toString()}>
+                              {month.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  <Controller
+                    name='startYear'
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        type='number'
+                        min='1980'
+                        max='2030'
+                        placeholder='Yıl'
+                        {...field}
+                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                      />
+                    )}
                   />
                 </div>
+                {(errors.startMonth || errors.startYear) && (
+                  <p className='text-sm text-red-500 mt-1'>{errors.startMonth?.message || errors.startYear?.message}</p>
+                )}
               </div>
-              {!formData.isCurrent && (
+              {!watchIsCurrent && (
                 <div>
                   <Label>Bitiş Tarihi</Label>
                   <div className='grid grid-cols-2 gap-2'>
-                    <Select
-                      value={!isNaN(formData.endMonth) ? formData.endMonth.toString() : '1'}
-                      onValueChange={(value) => {
-                        const numValue = parseInt(value)
-                        if (!isNaN(numValue)) {
-                          setFormData((prev) => ({ ...prev, endMonth: numValue }))
-                        }
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder='Ay' />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {months.map((month) => (
-                          <SelectItem key={month.value} value={month.value.toString()}>
-                            {month.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Input
-                      type='number'
-                      min='1980'
-                      max='2030'
-                      value={formData.endYear}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, endYear: parseInt(e.target.value) }))}
-                      placeholder='Yıl'
+                    <Controller
+                      name='endMonth'
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          onValueChange={(value) => field.onChange(parseInt(value))}
+                          value={field.value?.toString() || '1'}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder='Ay' />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {months.map((month) => (
+                              <SelectItem key={month.value} value={month.value.toString()}>
+                                {month.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                    <Controller
+                      name='endYear'
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          type='number'
+                          min='1980'
+                          max='2030'
+                          placeholder='Yıl'
+                          value={field.value || ''}
+                          onChange={(e) => field.onChange(parseInt(e.target.value))}
+                        />
+                      )}
                     />
                   </div>
+                  {(errors.endMonth || errors.endYear) && (
+                    <p className='text-sm text-red-500 mt-1'>{errors.endMonth?.message || errors.endYear?.message}</p>
+                  )}
                 </div>
               )}
             </div>
 
             <div className='flex items-center space-x-2'>
-              <input
-                type='checkbox'
-                id='isCurrent'
-                checked={formData.isCurrent}
-                onChange={(e) => setFormData((prev) => ({ ...prev, isCurrent: e.target.checked }))}
-                className='rounded'
+              <Controller
+                name='isCurrent'
+                control={control}
+                render={({ field }) => (
+                  <input
+                    type='checkbox'
+                    id='isCurrent'
+                    checked={field.value}
+                    onChange={field.onChange}
+                    className='rounded'
+                  />
+                )}
               />
               <Label htmlFor='isCurrent'>Halen çalışıyorum</Label>
             </div>
 
             <div>
-              <Label htmlFor='description'>İş Tanımı *</Label>
-              <Textarea
-                id='description'
-                value={formData.description}
-                onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
-                placeholder='İş tanımınız ve sorumluluklarınız'
-                rows={3}
-                required
+              <Label htmlFor='description'>İş Tanımı</Label>
+              <Controller
+                name='description'
+                control={control}
+                render={({ field }) => (
+                  <Textarea {...field} id='description' placeholder='İş tanımınız ve sorumluluklarınız' rows={3} />
+                )}
               />
+              {errors.description && <p className='text-sm text-red-500 mt-1'>{errors.description.message}</p>}
             </div>
 
             <div>
@@ -479,14 +518,17 @@ export function WorkExperienceModal({
                   </div>
                 ))}
               </div>
+              {errors.achievements && <p className='text-sm text-red-500 mt-1'>{errors.achievements.message}</p>}
             </div>
 
             <div className='flex justify-end space-x-2 pt-4'>
               <Button type='button' variant='outline' onClick={onClose}>
                 İptal
               </Button>
-              <Button type='submit' disabled={isLoading}>
-                {isLoading && <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2' />}
+              <Button type='submit' disabled={isLoading || isSubmitting}>
+                {(isLoading || isSubmitting) && (
+                  <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2' />
+                )}
                 <Save className='h-4 w-4 mr-2' />
                 Kaydet
               </Button>

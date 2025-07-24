@@ -2,6 +2,9 @@
 
 import React, { useState, useEffect } from 'react'
 import { X, Save, GraduationCap, BookOpen, Award, Search } from 'lucide-react'
+import { useForm, Controller } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { Button } from '@/components/core/button'
 import { Input } from '@/components/core/input'
 import { Label } from '@/components/core/label'
@@ -19,59 +22,87 @@ interface EducationModalProps {
   isLoading?: boolean
 }
 
+const educationTypes = [
+  {
+    type: 'LISE' as EducationType,
+    label: 'Lise',
+    icon: BookOpen,
+    gradeSystem: 'PERCENTAGE' as const,
+    degree: 'Lise Diploması',
+  },
+  {
+    type: 'ONLISANS' as EducationType,
+    label: 'Önlisans',
+    icon: GraduationCap,
+    gradeSystem: 'GPA_4' as const,
+    degree: 'Ön Lisans',
+  },
+  {
+    type: 'LISANS' as EducationType,
+    label: 'Lisans',
+    icon: GraduationCap,
+    gradeSystem: 'GPA_4' as const,
+    degree: 'Lisans',
+  },
+  {
+    type: 'YUKSEKLISANS' as EducationType,
+    label: 'Yüksek Lisans',
+    icon: Award,
+    gradeSystem: 'GPA_4' as const,
+    degree: 'Yüksek Lisans',
+  },
+]
+
+// Zod schema for form validation
+const educationSchema = z.object({
+  schoolName: z.string().min(1, 'Okul adı zorunludur'),
+  degree: z.string().min(1, 'Derece zorunludur'),
+  fieldOfStudy: z.string().min(1, 'Bölüm zorunludur'),
+  grade: z.string().optional(),
+  gradeSystem: z.enum(['PERCENTAGE', 'GPA_4']),
+  educationType: z.enum(['LISE', 'ONLISANS', 'LISANS', 'YUKSEKLISANS']),
+  startYear: z.number().min(1980).max(2030),
+  endYear: z.number().min(1980).max(2030).optional(),
+  isCurrent: z.boolean(),
+  description: z.string().optional(),
+})
+
+type EducationFormData = z.infer<typeof educationSchema>
+
 export function EducationModal({ isOpen, onClose, onSave, education, isLoading = false }: EducationModalProps) {
   const [step, setStep] = useState<'type' | 'form'>('type')
   const [selectedType, setSelectedType] = useState<EducationType | null>(null)
 
-  const [formData, setFormData] = useState({
-    schoolName: '',
-    degree: '',
-    fieldOfStudy: '',
-    grade: '',
-    gradeSystem: 'GPA_4' as 'PERCENTAGE' | 'GPA_4',
-    educationType: 'UNIVERSITE' as EducationType,
-    startYear: '',
-    endYear: '',
-    isCurrent: false,
-    description: '',
+  const {
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm<EducationFormData>({
+    resolver: zodResolver(educationSchema),
+    defaultValues: {
+      schoolName: '',
+      degree: '',
+      fieldOfStudy: '',
+      grade: '',
+      gradeSystem: 'GPA_4',
+      educationType: 'LISANS',
+      startYear: new Date().getFullYear(),
+      endYear: new Date().getFullYear(),
+      isCurrent: false,
+      description: '',
+    },
   })
+
+  const watchIsCurrent = watch('isCurrent')
 
   // School search state
   const [schoolSearch, setSchoolSearch] = useState('')
   const [schools, setSchools] = useState<(HighSchool | University)[]>([])
   const [showSchoolDropdown, setShowSchoolDropdown] = useState(false)
   const [isLoadingSchools, setIsLoadingSchools] = useState(false)
-
-  const educationTypes = [
-    {
-      type: 'LISE' as EducationType,
-      label: 'Lise',
-      icon: BookOpen,
-      gradeSystem: 'PERCENTAGE' as const,
-      degree: 'Lise Diploması',
-    },
-    {
-      type: 'ONLISANS' as EducationType,
-      label: 'Önlisans',
-      icon: GraduationCap,
-      gradeSystem: 'GPA_4' as const,
-      degree: 'Ön Lisans',
-    },
-    {
-      type: 'LISANS' as EducationType,
-      label: 'Lisans',
-      icon: GraduationCap,
-      gradeSystem: 'GPA_4' as const,
-      degree: 'Lisans',
-    },
-    {
-      type: 'YUKSEKLISANS' as EducationType,
-      label: 'Yüksek Lisans',
-      icon: Award,
-      gradeSystem: 'GPA_4' as const,
-      degree: 'Yüksek Lisans',
-    },
-  ]
 
   useEffect(() => {
     if (education) {
@@ -81,35 +112,40 @@ export function EducationModal({ isOpen, onClose, onSave, education, isLoading =
 
       setStep('form')
       setSelectedType(educationType)
-      setFormData({
+      
+      const formData = {
         schoolName: education.schoolName || '',
         degree: selectedEducationType?.degree || education.degree || '',
         fieldOfStudy: education.fieldOfStudy || '',
         grade: education.grade?.toString() || '',
         gradeSystem: education.gradeSystem || 'GPA_4',
         educationType: educationType,
-        startYear: education.startYear?.toString() || '',
-        endYear: education.endYear?.toString() || '',
+        startYear: Number(education.startYear) || new Date().getFullYear(),
+        endYear: Number(education.endYear) || new Date().getFullYear(),
         isCurrent: education.isCurrent || false,
         description: education.description || '',
-      })
+      }
+
+      reset(formData)
+      setSchoolSearch(education.schoolName || '')
     } else {
       setStep('type')
       setSelectedType(null)
-      setFormData({
+      reset({
         schoolName: '',
         degree: '',
         fieldOfStudy: '',
         grade: '',
         gradeSystem: 'GPA_4',
         educationType: 'LISANS',
-        startYear: '',
-        endYear: '',
+        startYear: new Date().getFullYear(),
+        endYear: new Date().getFullYear(),
         isCurrent: false,
         description: '',
       })
+      setSchoolSearch('')
     }
-  }, [education, isOpen])
+  }, [education, isOpen, reset])
 
   // School search functionality
   useEffect(() => {
@@ -124,11 +160,9 @@ export function EducationModal({ isOpen, onClose, onSave, education, isLoading =
       try {
         if (selectedType === 'LISE') {
           const response = await schoolApi.searchHighSchools(schoolSearch)
-          // İlk 10 sonucu al
           setSchools(response.data.slice(0, 10))
         } else {
           const response = await schoolApi.searchUniversities(schoolSearch)
-          // İlk 10 sonucu al
           setSchools(response.data.slice(0, 10))
         }
         setShowSchoolDropdown(true)
@@ -145,7 +179,7 @@ export function EducationModal({ isOpen, onClose, onSave, education, isLoading =
   }, [schoolSearch, selectedType])
 
   const handleSchoolSelect = (school: HighSchool | University) => {
-    setFormData((prev) => ({ ...prev, schoolName: school.name }))
+    setValue('schoolName', school.name)
     setSchoolSearch(school.name)
     setShowSchoolDropdown(false)
     setSchools([])
@@ -154,29 +188,25 @@ export function EducationModal({ isOpen, onClose, onSave, education, isLoading =
   const handleTypeSelect = (type: EducationType) => {
     const selectedEducationType = educationTypes.find((t) => t.type === type)
     setSelectedType(type)
-    setFormData((prev) => ({
-      ...prev,
-      educationType: type,
-      gradeSystem: selectedEducationType?.gradeSystem || 'GPA_4',
-      degree: selectedEducationType?.degree || '',
-    }))
+    setValue('educationType', type)
+    setValue('gradeSystem', selectedEducationType?.gradeSystem || 'GPA_4')
+    setValue('degree', selectedEducationType?.degree || '')
     setStep('form')
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const onSubmit = async (data: EducationFormData) => {
     try {
       const submitData = {
-        schoolName: formData.schoolName,
-        degree: formData.degree,
-        fieldOfStudy: formData.fieldOfStudy,
-        grade: formData.grade ? parseFloat(formData.grade) : undefined,
-        gradeSystem: formData.gradeSystem,
-        educationType: formData.educationType || 'LISANS',
-        startYear: parseInt(formData.startYear),
-        endYear: formData.endYear ? parseInt(formData.endYear) : undefined,
-        isCurrent: formData.isCurrent,
-        description: formData.description || undefined,
+        schoolName: data.schoolName,
+        degree: data.degree,
+        fieldOfStudy: data.fieldOfStudy,
+        grade: data.grade ? parseFloat(data.grade) : undefined,
+        gradeSystem: data.gradeSystem,
+        educationType: data.educationType || 'LISANS',
+        startYear: data.startYear,
+        endYear: data.isCurrent ? undefined : data.endYear,
+        isCurrent: data.isCurrent,
+        description: data.description || undefined,
       }
       await onSave(submitData)
       onClose()
@@ -227,20 +257,26 @@ export function EducationModal({ isOpen, onClose, onSave, education, isLoading =
               </div>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className='space-y-4'>
+            <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
               <div className='grid grid-cols-2 gap-4'>
                 <div className='relative'>
                   <Label htmlFor='schoolName'>Okul Adı *</Label>
                   <div className='relative'>
-                    <Input
-                      id='schoolName'
-                      value={schoolSearch || formData.schoolName}
-                      onChange={(e) => {
-                        setSchoolSearch(e.target.value)
-                        setFormData((prev) => ({ ...prev, schoolName: e.target.value }))
-                      }}
-                      placeholder={selectedType === 'LISE' ? 'Lise adı ara...' : 'Üniversite adı ara...'}
-                      required
+                    <Controller
+                      name='schoolName'
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          id='schoolName'
+                          value={schoolSearch}
+                          onChange={(e) => {
+                            setSchoolSearch(e.target.value)
+                            field.onChange(e.target.value)
+                          }}
+                          placeholder={selectedType === 'LISE' ? 'Lise adı ara...' : 'Üniversite adı ara...'}
+                        />
+                      )}
                     />
                     <Search className='absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
                   </div>
@@ -271,74 +307,98 @@ export function EducationModal({ isOpen, onClose, onSave, education, isLoading =
                       Aranıyor...
                     </div>
                   )}
+                  {errors.schoolName && <p className='text-sm text-red-500 mt-1'>{errors.schoolName.message}</p>}
                 </div>
                 <div>
                   <Label htmlFor='degree'>Derece *</Label>
-                  <Input
-                    id='degree'
-                    value={formData.degree}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, degree: e.target.value }))}
-                    placeholder='Ön Lisans, Lisans, Yüksek Lisans, vb.'
-                    disabled
-                    required
+                  <Controller
+                    name='degree'
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        id='degree'
+                        placeholder='Ön Lisans, Lisans, Yüksek Lisans, vb.'
+                        disabled
+                      />
+                    )}
                   />
+                  {errors.degree && <p className='text-sm text-red-500 mt-1'>{errors.degree.message}</p>}
                 </div>
               </div>
 
               <div>
                 <Label htmlFor='fieldOfStudy'>Bölüm *</Label>
-                <Input
-                  id='fieldOfStudy'
-                  value={formData.fieldOfStudy}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, fieldOfStudy: e.target.value }))}
-                  placeholder='Bilgisayar Programcılığı'
-                  required
+                <Controller
+                  name='fieldOfStudy'
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      {...field}
+                      id='fieldOfStudy'
+                      placeholder='Bilgisayar Programcılığı'
+                    />
+                  )}
                 />
+                {errors.fieldOfStudy && <p className='text-sm text-red-500 mt-1'>{errors.fieldOfStudy.message}</p>}
               </div>
 
-              <div className={`grid gap-4 ${formData.isCurrent ? 'grid-cols-1' : 'grid-cols-2'}`}>
+              <div className={`grid gap-4 ${watchIsCurrent ? 'grid-cols-1' : 'grid-cols-2'}`}>
                 <div>
                   <Label htmlFor='startYear'>Başlangıç Yılı *</Label>
-                  <Input
-                    id='startYear'
-                    type='number'
-                    min='1980'
-                    max='2030'
-                    value={formData.startYear}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, startYear: e.target.value }))}
-                    placeholder='2019'
-                    required
+                  <Controller
+                    name='startYear'
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        id='startYear'
+                        type='number'
+                        min='1980'
+                        max='2030'
+                        placeholder='2019'
+                        {...field}
+                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                      />
+                    )}
                   />
+                  {errors.startYear && <p className='text-sm text-red-500 mt-1'>{errors.startYear.message}</p>}
                 </div>
-                {!formData.isCurrent && (
+                {!watchIsCurrent && (
                   <div>
                     <Label htmlFor='endYear'>Bitiş Yılı</Label>
-                    <Input
-                      id='endYear'
-                      type='number'
-                      min='1980'
-                      max='2030'
-                      value={formData.endYear}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, endYear: e.target.value }))}
-                      placeholder='2021'
+                    <Controller
+                      name='endYear'
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          id='endYear'
+                          type='number'
+                          min='1980'
+                          max='2030'
+                          placeholder='2021'
+                          value={field.value || ''}
+                          onChange={(e) => field.onChange(parseInt(e.target.value))}
+                        />
+                      )}
                     />
+                    {errors.endYear && <p className='text-sm text-red-500 mt-1'>{errors.endYear.message}</p>}
                   </div>
                 )}
               </div>
 
               <div className='flex items-center space-x-2'>
-                <input
-                  type='checkbox'
-                  id='isCurrent'
-                  checked={formData.isCurrent}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      isCurrent: e.target.checked,
-                      endYear: e.target.checked ? '' : prev.endYear,
-                    }))
-                  }
-                  className='rounded'
+                <Controller
+                  name='isCurrent'
+                  control={control}
+                  render={({ field }) => (
+                    <input
+                      type='checkbox'
+                      id='isCurrent'
+                      checked={field.value}
+                      onChange={field.onChange}
+                      className='rounded'
+                    />
+                  )}
                 />
                 <Label htmlFor='isCurrent'>Halen devam ediyorum</Label>
               </div>
@@ -346,52 +406,67 @@ export function EducationModal({ isOpen, onClose, onSave, education, isLoading =
               <div className='grid grid-cols-2 gap-4'>
                 <div>
                   <Label htmlFor='grade'>Not</Label>
-                  <Input
-                    id='grade'
-                    type='number'
-                    step='0.01'
-                    value={formData.grade}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, grade: e.target.value }))}
-                    placeholder={selectedType === 'LISE' ? '85' : '2.75'}
+                  <Controller
+                    name='grade'
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        id='grade'
+                        type='number'
+                        step='0.01'
+                        placeholder={selectedType === 'LISE' ? '85' : '2.75'}
+                      />
+                    )}
                   />
+                  {errors.grade && <p className='text-sm text-red-500 mt-1'>{errors.grade.message}</p>}
                 </div>
                 <div>
                   <Label htmlFor='gradeSystem'>Not Sistemi</Label>
-                  <Select
-                    value={formData.gradeSystem}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({ ...prev, gradeSystem: value as 'PERCENTAGE' | 'GPA_4' }))
-                    }
-                    disabled
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder='Not sistemi seçin' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value='GPA_4'>4.0 Sistemi</SelectItem>
-                      <SelectItem value='PERCENTAGE'>Yüzdelik Sistem</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Controller
+                    name='gradeSystem'
+                    control={control}
+                    render={({ field }) => (
+                      <Select onValueChange={field.onChange} value={field.value} disabled>
+                        <SelectTrigger>
+                          <SelectValue placeholder='Not sistemi seçin' />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value='GPA_4'>4.0 Sistemi</SelectItem>
+                          <SelectItem value='PERCENTAGE'>Yüzdelik Sistem</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  {errors.gradeSystem && <p className='text-sm text-red-500 mt-1'>{errors.gradeSystem.message}</p>}
                 </div>
               </div>
 
               <div>
                 <Label htmlFor='description'>Açıklama</Label>
-                <Textarea
-                  id='description'
-                  value={formData.description}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
-                  placeholder='Başarılar, önemli projeler, vb.'
-                  rows={3}
+                <Controller
+                  name='description'
+                  control={control}
+                  render={({ field }) => (
+                    <Textarea
+                      {...field}
+                      id='description'
+                      placeholder='Başarılar, önemli projeler, vb.'
+                      rows={3}
+                    />
+                  )}
                 />
+                {errors.description && <p className='text-sm text-red-500 mt-1'>{errors.description.message}</p>}
               </div>
 
               <div className='flex justify-end space-x-2 pt-4'>
                 <Button type='button' variant='outline' onClick={onClose}>
                   İptal
                 </Button>
-                <Button type='submit' disabled={isLoading}>
-                  {isLoading && <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2' />}
+                <Button type='submit' disabled={isLoading || isSubmitting}>
+                  {(isLoading || isSubmitting) && (
+                    <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2' />
+                  )}
                   <Save className='h-4 w-4 mr-2' />
                   Kaydet
                 </Button>

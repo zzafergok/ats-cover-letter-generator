@@ -2,6 +2,9 @@
 
 import React, { useState, useEffect } from 'react'
 import { Mail, Phone, MapPin, Globe, Edit3, User, Palette, Save, X } from 'lucide-react'
+import { useForm, Controller } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 
 import { locationApi } from '@/lib/api/api'
 import { avatarColors } from '@/constants/profile'
@@ -22,6 +25,22 @@ interface ProfileHeaderProps {
   onUpdateProfile: (data: Partial<UserProfile>) => Promise<void>
 }
 
+// Zod schema for profile validation
+const profileSchema = z.object({
+  firstName: z.string().min(1, 'Ad zorunludur'),
+  lastName: z.string().min(1, 'Soyad zorunludur'),
+  phone: z.string().optional(),
+  address: z.string().optional(),
+  city: z.string().optional(),
+  github: z.string().url('Geçerli bir GitHub URL giriniz').optional().or(z.literal('')),
+  linkedin: z.string().url('Geçerli bir LinkedIn URL giriniz').optional().or(z.literal('')),
+  portfolioWebsite: z.string().url('Geçerli bir website URL giriniz').optional().or(z.literal('')),
+  aboutMe: z.string().optional(),
+  avatarColor: z.string().optional(),
+})
+
+type ProfileFormData = z.infer<typeof profileSchema>
+
 export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHeaderProps) {
   const [isEditingProfile, setIsEditingProfile] = useState(false)
   const [showColorPicker, setShowColorPicker] = useState(false)
@@ -33,19 +52,32 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
   const [isLoadingProvinces, setIsLoadingProvinces] = useState(false)
   const [isLoadingDistricts, setIsLoadingDistricts] = useState(false)
 
-  // Basic profile edit state
-  const [profileForm, setProfileForm] = useState({
-    firstName: '',
-    lastName: '',
-    phone: '',
-    address: '',
-    city: '',
-    github: '',
-    linkedin: '',
-    portfolioWebsite: '',
-    aboutMe: '',
-    avatarColor: '',
+  const {
+    control,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm<ProfileFormData>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      phone: '',
+      address: '',
+      city: '',
+      github: '',
+      linkedin: '',
+      portfolioWebsite: '',
+      aboutMe: '',
+      avatarColor: '#3B82F6',
+    },
   })
+
+  const watchFirstName = watch('firstName')
+  const watchLastName = watch('lastName')
+  const watchAvatarColor = watch('avatarColor')
 
   // Get avatar style based on hex color
   const getAvatarStyle = (hexColor: string) => {
@@ -89,14 +121,60 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
   // Handle province selection
   const handleProvinceChange = (provinceCode: string, provinceName: string) => {
     setSelectedProvinceCode(provinceCode)
-    setProfileForm((prev) => ({ ...prev, city: provinceName, address: '' }))
+    setValue('city', provinceName)
+    setValue('address', '')
     loadDistricts(provinceCode)
   }
 
   // Update form when profile changes
   useEffect(() => {
     if (profile) {
-      setProfileForm({
+      const formData = {
+        firstName: profile.firstName || '',
+        lastName: profile.lastName || '',
+        phone: profile.phone || '',
+        address: profile.address || '',
+        city: profile.city || '',
+        github: profile.github || '',
+        linkedin: profile.linkedin || '',
+        portfolioWebsite: profile.portfolioWebsite || '',
+        aboutMe: profile.aboutMe || '',
+        avatarColor: profile.avatarColor || '#3B82F6',
+      }
+
+      reset(formData)
+
+      // Find and set the province code if city exists
+      if (profile.city && provinces.length > 0) {
+        const province = provinces.find((p) => p.name === profile.city)
+        if (province) {
+          setSelectedProvinceCode(province.code)
+          loadDistricts(province.code)
+        }
+      }
+    }
+  }, [profile, provinces, reset])
+
+  useEffect(() => {
+    loadProvinces()
+  }, [])
+
+  const onSubmit = async (data: ProfileFormData) => {
+    try {
+      await onUpdateProfile(data)
+      setIsEditingProfile(false)
+      setShowColorPicker(false)
+    } catch (error) {
+      console.error('Profil güncellenirken hata:', error)
+    }
+  }
+
+  const handleCancel = () => {
+    setIsEditingProfile(false)
+    setShowColorPicker(false)
+    // Reset form to original profile data
+    if (profile) {
+      reset({
         firstName: profile.firstName || '',
         lastName: profile.lastName || '',
         phone: profile.phone || '',
@@ -108,29 +186,6 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
         aboutMe: profile.aboutMe || '',
         avatarColor: profile.avatarColor || '#3B82F6',
       })
-
-      // Find and set the province code if city exists
-      if (profile.city && provinces.length > 0) {
-        const province = provinces.find((p) => p.name === profile.city)
-        if (province) {
-          setSelectedProvinceCode(province.code)
-          loadDistricts(province.code)
-        }
-      }
-    }
-  }, [profile, provinces])
-
-  useEffect(() => {
-    loadProvinces()
-  }, [])
-
-  const handleProfileUpdate = async () => {
-    try {
-      await onUpdateProfile(profileForm)
-      setIsEditingProfile(false)
-      setShowColorPicker(false)
-    } catch (error) {
-      console.error('Profil güncellenirken hata:', error)
     }
   }
 
@@ -170,13 +225,13 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
                           key={color.color}
                           type='button'
                           className={`w-8 h-8 rounded-full border-2 ${
-                            profileForm.avatarColor?.toLowerCase() === color.color.toLowerCase()
+                            watchAvatarColor?.toLowerCase() === color.color.toLowerCase()
                               ? 'border-foreground'
                               : 'border-border'
                           } hover:scale-110 transition-transform`}
                           style={{ backgroundColor: color.color }}
                           onClick={() => {
-                            setProfileForm((prev) => ({ ...prev, avatarColor: color.color }))
+                            setValue('avatarColor', color.color)
                             setShowColorPicker(false)
                           }}
                           title={color.name}
@@ -258,63 +313,79 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
                 </div>
               </div>
             ) : (
-              <div className='space-y-4'>
+              <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
                 <div className='grid grid-cols-2 gap-4'>
                   <div>
-                    <Label>Ad</Label>
-                    <Input
-                      value={profileForm.firstName}
-                      onChange={(e) => setProfileForm((prev) => ({ ...prev, firstName: e.target.value }))}
-                      placeholder='Adınız'
+                    <Label>Ad *</Label>
+                    <Controller
+                      name='firstName'
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          placeholder='Adınız'
+                        />
+                      )}
                     />
+                    {errors.firstName && <p className='text-sm text-red-500 mt-1'>{errors.firstName.message}</p>}
                   </div>
                   <div>
-                    <Label>Soyad</Label>
-                    <Input
-                      value={profileForm.lastName}
-                      onChange={(e) => setProfileForm((prev) => ({ ...prev, lastName: e.target.value }))}
-                      placeholder='Soyadınız'
+                    <Label>Soyad *</Label>
+                    <Controller
+                      name='lastName'
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          placeholder='Soyadınız'
+                        />
+                      )}
                     />
+                    {errors.lastName && <p className='text-sm text-red-500 mt-1'>{errors.lastName.message}</p>}
                   </div>
                 </div>
 
                 <div>
                   <Label>Telefon</Label>
-                  <Input
-                    value={profileForm.phone}
-                    onChange={(e) => setProfileForm((prev) => ({ ...prev, phone: e.target.value }))}
-                    placeholder='Telefon numaranız'
+                  <Controller
+                    name='phone'
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        placeholder='Telefon numaranız'
+                      />
+                    )}
                   />
+                  {errors.phone && <p className='text-sm text-red-500 mt-1'>{errors.phone.message}</p>}
                 </div>
 
                 {/* Avatar Color Preview in Edit Mode */}
-                {isEditingProfile && (
-                  <div className='mb-4'>
-                    <Label>Avatar Önizleme</Label>
-                    <div className='flex items-center space-x-3 mt-2'>
-                      <Avatar className='h-16 w-16 border-2 border-border'>
-                        <AvatarFallback
-                          className='text-lg font-semibold'
-                          style={getAvatarStyle(profileForm.avatarColor || '#3B82F6')}
-                        >
-                          {profileForm.firstName?.charAt(0) || 'A'}
-                          {profileForm.lastName?.charAt(0) || 'B'}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className='text-sm font-medium'>Seçili Renk</p>
-                        <p className='text-xs text-muted-foreground'>
-                          {avatarColors.find((c) => c.color.toLowerCase() === profileForm.avatarColor?.toLowerCase())
-                            ?.name || 'Varsayılan'}
-                        </p>
-                      </div>
+                <div className='mb-4'>
+                  <Label>Avatar Önizleme</Label>
+                  <div className='flex items-center space-x-3 mt-2'>
+                    <Avatar className='h-16 w-16 border-2 border-border'>
+                      <AvatarFallback
+                        className='text-lg font-semibold'
+                        style={getAvatarStyle(watchAvatarColor || '#3B82F6')}
+                      >
+                        {watchFirstName?.charAt(0) || 'A'}
+                        {watchLastName?.charAt(0) || 'B'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className='text-sm font-medium'>Seçili Renk</p>
+                      <p className='text-xs text-muted-foreground'>
+                        {avatarColors.find((c) => c.color.toLowerCase() === watchAvatarColor?.toLowerCase())
+                          ?.name || 'Varsayılan'}
+                      </p>
                     </div>
                   </div>
-                )}
+                </div>
 
                 <div className='grid grid-cols-2 gap-4'>
                   <div>
-                    <Label>Şehir *</Label>
+                    <Label>Şehir</Label>
                     <Select
                       value={selectedProvinceCode}
                       onValueChange={(value) => {
@@ -323,7 +394,8 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
                           handleProvinceChange(selectedProvince.code, selectedProvince.name)
                         } else {
                           setSelectedProvinceCode('')
-                          setProfileForm((prev) => ({ ...prev, city: '', address: '' }))
+                          setValue('city', '')
+                          setValue('address', '')
                           setDistricts([])
                         }
                       }}
@@ -341,81 +413,114 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
                       </SelectContent>
                     </Select>
                     {isLoadingProvinces && <p className='text-xs text-muted-foreground mt-1'>Şehirler yükleniyor...</p>}
+                    {errors.city && <p className='text-sm text-red-500 mt-1'>{errors.city.message}</p>}
                   </div>
                   <div>
                     <Label>İlçe</Label>
-                    <Select
-                      value={profileForm.address}
-                      onValueChange={(value) => setProfileForm((prev) => ({ ...prev, address: value }))}
-                      disabled={!selectedProvinceCode || isLoadingDistricts || districts.length === 0}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder='İlçe seçin...' />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {districts.map((district) => (
-                          <SelectItem key={district.id} value={district.name}>
-                            {district.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Controller
+                      name='address'
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          disabled={!selectedProvinceCode || isLoadingDistricts || districts.length === 0}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder='İlçe seçin...' />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {districts.map((district) => (
+                              <SelectItem key={district.id} value={district.name}>
+                                {district.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
                     {isLoadingDistricts && <p className='text-xs text-muted-foreground mt-1'>İlçeler yükleniyor...</p>}
                     {!selectedProvinceCode && <p className='text-xs text-muted-foreground mt-1'>Önce şehir seçin</p>}
+                    {errors.address && <p className='text-sm text-red-500 mt-1'>{errors.address.message}</p>}
                   </div>
                 </div>
 
                 <div className='grid grid-cols-2 gap-4'>
                   <div>
                     <Label>LinkedIn</Label>
-                    <Input
-                      value={profileForm.linkedin}
-                      onChange={(e) => setProfileForm((prev) => ({ ...prev, linkedin: e.target.value }))}
-                      placeholder='LinkedIn profil URLsi'
+                    <Controller
+                      name='linkedin'
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          placeholder='LinkedIn profil URLsi'
+                        />
+                      )}
                     />
+                    {errors.linkedin && <p className='text-sm text-red-500 mt-1'>{errors.linkedin.message}</p>}
                   </div>
                   <div>
                     <Label>GitHub</Label>
-                    <Input
-                      value={profileForm.github}
-                      onChange={(e) => setProfileForm((prev) => ({ ...prev, github: e.target.value }))}
-                      placeholder='GitHub profil URLsi'
+                    <Controller
+                      name='github'
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          placeholder='GitHub profil URLsi'
+                        />
+                      )}
                     />
-                  </div>
-                </div>
-
-                <div className='grid grid-cols-2 gap-4'>
-                  <div>
-                    <Label>Portfolyo Website</Label>
-                    <Input
-                      value={profileForm.portfolioWebsite}
-                      onChange={(e) => setProfileForm((prev) => ({ ...prev, portfolioWebsite: e.target.value }))}
-                      placeholder='Portfolyo website URLsi'
-                    />
+                    {errors.github && <p className='text-sm text-red-500 mt-1'>{errors.github.message}</p>}
                   </div>
                 </div>
 
                 <div>
-                  <Label>Hakkımda</Label>
-                  <Textarea
-                    value={profileForm.aboutMe}
-                    onChange={(e) => setProfileForm((prev) => ({ ...prev, aboutMe: e.target.value }))}
-                    placeholder='Kendiniz hakkında detaylı bir açıklama...'
-                    rows={4}
+                  <Label>Portfolyo Website</Label>
+                  <Controller
+                    name='portfolioWebsite'
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        placeholder='Portfolyo website URLsi'
+                      />
+                    )}
                   />
+                  {errors.portfolioWebsite && <p className='text-sm text-red-500 mt-1'>{errors.portfolioWebsite.message}</p>}
+                </div>
+
+                <div>
+                  <Label>Hakkımda</Label>
+                  <Controller
+                    name='aboutMe'
+                    control={control}
+                    render={({ field }) => (
+                      <Textarea
+                        {...field}
+                        placeholder='Kendiniz hakkında detaylı bir açıklama...'
+                        rows={4}
+                      />
+                    )}
+                  />
+                  {errors.aboutMe && <p className='text-sm text-red-500 mt-1'>{errors.aboutMe.message}</p>}
                 </div>
 
                 <div className='flex space-x-3'>
-                  <Button onClick={handleProfileUpdate} disabled={isLoading}>
+                  <Button type='submit' disabled={isLoading || isSubmitting}>
+                    {(isLoading || isSubmitting) && (
+                      <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2' />
+                    )}
                     <Save className='h-4 w-4 mr-2' />
                     Kaydet
                   </Button>
-                  <Button variant='outline' onClick={() => setIsEditingProfile(false)}>
+                  <Button type='button' variant='outline' onClick={handleCancel}>
                     <X className='h-4 w-4 mr-2' />
                     İptal
                   </Button>
                 </div>
-              </div>
+              </form>
             )}
           </div>
         </div>

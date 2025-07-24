@@ -154,8 +154,8 @@ const setupResponseInterceptor = (instance: AxiosInstance): void => {
         globalToast.error(errorMessage)
       }
 
-      if (status === 401 && !originalRequest._retry && SessionTokenManager.getRefreshToken()) {
-        console.log('🔄 Attempting token refresh for 401 error')
+      if (status === 401 && !originalRequest._retry) {
+        console.log('🔄 401 error detected - attempting token refresh to keep user logged in')
 
         if (isRefreshing) {
           console.log('⏳ Token refresh already in progress, queuing request')
@@ -182,7 +182,7 @@ const setupResponseInterceptor = (instance: AxiosInstance): void => {
           console.log('🔄 Retrying original request with new token')
           return instance(originalRequest)
         } catch (refreshError) {
-          console.error('❌ Token refresh failed:', refreshError)
+          console.error('❌ Token refresh failed - redirecting to login')
           processRequestQueue(refreshError, null)
           handleAuthFailure()
           return Promise.reject(refreshError)

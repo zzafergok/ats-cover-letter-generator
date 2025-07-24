@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { Plus, BookOpen, Edit3, CheckCircle2 } from 'lucide-react'
+import { Plus, BookOpen, Edit3, CheckCircle2, Trash2 } from 'lucide-react'
 
 import { Button } from '@/components/core/button'
 import { Card, CardContent } from '@/components/core/card'
@@ -12,9 +12,11 @@ import type { Course, UserProfile } from '@/types/api.types'
 interface CoursesTabProps {
   profile: UserProfile | null
   onOpenModal: () => void
+  onOpenEditModal?: (id: string, data: Course) => void
+  onDeleteCourse?: (id: string, name: string) => void
 }
 
-export function CoursesTab({ profile, onOpenModal }: CoursesTabProps) {
+export function CoursesTab({ profile, onOpenModal, onOpenEditModal, onDeleteCourse }: CoursesTabProps) {
   return (
     <div className='space-y-6'>
       <div className='flex justify-between items-center'>
@@ -50,11 +52,31 @@ export function CoursesTab({ profile, onOpenModal }: CoursesTabProps) {
                       <p className='text-sm text-muted-foreground mt-2'>{course.description}</p>
                     )}
                   </div>
-                  <div className='flex space-x-2'>
-                    <Button variant='ghost' size='sm'>
-                      <Edit3 className='h-4 w-4' />
-                    </Button>
-                  </div>
+                  {(onOpenEditModal || onDeleteCourse) && (
+                    <div className='flex space-x-2'>
+                      {onOpenEditModal && (
+                        <Button 
+                          variant='ghost' 
+                          size='sm' 
+                          onClick={() => onOpenEditModal(course.id, course)}
+                          title='Kursu Düzenle'
+                        >
+                          <Edit3 className='h-4 w-4' />
+                        </Button>
+                      )}
+                      {onDeleteCourse && (
+                        <Button 
+                          variant='ghost' 
+                          size='sm' 
+                          onClick={() => onDeleteCourse(course.id, course.courseName)}
+                          className='text-destructive hover:text-destructive'
+                          title='Kursu Sil'
+                        >
+                          <Trash2 className='h-4 w-4' />
+                        </Button>
+                      )}
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

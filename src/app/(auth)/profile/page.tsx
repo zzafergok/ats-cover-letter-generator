@@ -21,8 +21,9 @@ import { SkillsTab } from '@/components/ui/profile/SkillsTab'
 import { CoursesTab } from '@/components/ui/profile/CoursesTab'
 import { CertificatesTab } from '@/components/ui/profile/CertificatesTab'
 import { ConfirmDeleteModal } from '@/components/ui/profile/ConfirmDeleteModal'
+import { CourseModal } from '@/components/ui/profile/CourseModal'
 
-import type { Education, WorkExperience, Skill } from '@/types/api.types'
+import type { Education, WorkExperience, Skill, Course } from '@/types/api.types'
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -43,6 +44,9 @@ export default function ProfilePage() {
     deleteEducation,
     deleteWorkExperience,
     deleteSkill,
+    addCourse,
+    updateCourse,
+    deleteCourse,
   } = useUserProfileStore()
 
   const [activeTab, setActiveTab] = useState('overview')
@@ -51,11 +55,12 @@ export default function ProfilePage() {
     education: false,
     experience: false,
     skill: false,
+    course: false,
   })
 
   const [deleteConfirmModal, setDeleteConfirmModal] = useState<{
     isOpen: boolean
-    type: 'skill' | 'education' | 'experience' | null
+    type: 'skill' | 'education' | 'experience' | 'course' | null
     id: string
     name: string
   }>({
@@ -130,7 +135,22 @@ export default function ProfilePage() {
     }
   }
 
-  const openDeleteConfirmModal = (type: 'skill' | 'education' | 'experience', id: string, name: string) => {
+  // Kurs işlemleri
+  const handleSaveCourse = async (data: Omit<Course, 'id'>) => {
+    try {
+      if (editingItem && editingItem.type === 'course') {
+        await updateCourse(editingItem.id, data)
+      } else {
+        await addCourse(data)
+      }
+      closeModal('course')
+    } catch (error) {
+      console.error('Kurs kaydedilirken hata:', error)
+      throw error
+    }
+  }
+
+  const openDeleteConfirmModal = (type: 'skill' | 'education' | 'experience' | 'course', id: string, name: string) => {
     setDeleteConfirmModal({
       isOpen: true,
       type,
@@ -161,6 +181,9 @@ export default function ProfilePage() {
           break
         case 'experience':
           await deleteWorkExperience(deleteConfirmModal.id)
+          break
+        case 'course':
+          await deleteCourse(deleteConfirmModal.id)
           break
       }
       closeDeleteConfirmModal()
@@ -275,7 +298,12 @@ export default function ProfilePage() {
 
           {/* Courses Tab */}
           <TabsContent value='courses' className='space-y-6'>
-            <CoursesTab profile={profile} onOpenModal={() => console.log('Course modal not implemented yet')} />
+            <CoursesTab
+              profile={profile}
+              onOpenModal={() => openModal('course')}
+              onOpenEditModal={(id, data) => openEditModal('course', id, data)}
+              onDeleteCourse={(id, name) => openDeleteConfirmModal('course', id, name)}
+            />
           </TabsContent>
 
           {/* Certificates Tab */}
@@ -313,13 +341,21 @@ export default function ProfilePage() {
         isLoading={isLoading}
       />
 
+      <CourseModal
+        isOpen={modalStates.course}
+        onClose={() => closeModal('course')}
+        onSave={handleSaveCourse}
+        course={editingItem?.type === 'course' ? (editingItem.data as Course) : null}
+        isLoading={isLoading}
+      />
+
       {/* Delete Confirmation Modal */}
       <ConfirmDeleteModal
         isOpen={deleteConfirmModal.isOpen}
         onClose={closeDeleteConfirmModal}
         onConfirm={handleConfirmDelete}
         title='Silme Onayı'
-        message={`Bu ${deleteConfirmModal.type === 'skill' ? 'yeteneği' : deleteConfirmModal.type === 'education' ? 'eğitimi' : 'deneyimi'} silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`}
+        message={`Bu ${deleteConfirmModal.type === 'skill' ? 'yeteneği' : deleteConfirmModal.type === 'education' ? 'eğitimi' : deleteConfirmModal.type === 'experience' ? 'deneyimi' : 'kursu'} silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`}
         itemName={deleteConfirmModal.name}
         isLoading={isLoading}
       />

@@ -340,17 +340,12 @@ export const useUserProfileStore = create<UserProfileStore>()(
         set({ isLoading: true, error: null })
         try {
           const response = await userProfileApi.course.update(id, data)
-          set((state) => ({
-            profile: state.profile
-              ? {
-                  ...state.profile,
-                  courses: (state.profile.courses || [])
-                    .filter(Boolean)
-                    .map((course) => (course && course.id === id ? response.data : course)),
-                }
-              : null,
-            isLoading: false,
-          }))
+          console.log('Course update response:', response)
+          
+          // Update işleminden sonra profili yeniden fetch et
+          const { getProfile } = _get()
+          await getProfile()
+          
           return response.data
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || 'Kurs bilgisi güncellenirken hata oluştu'
@@ -534,17 +529,12 @@ export const useUserProfileStore = create<UserProfileStore>()(
         set({ isLoading: true, error: null })
         try {
           const response = await userProfileApi.skill.update(id, data)
-          set((state) => ({
-            profile: state.profile
-              ? {
-                  ...state.profile,
-                  skills: (state.profile.skills || [])
-                    .filter(Boolean)
-                    .map((skill) => (skill && skill.id === id ? response.data : skill)),
-                }
-              : null,
-            isLoading: false,
-          }))
+          console.log('Skill update response:', response)
+          
+          // Update işleminden sonra profili yeniden fetch et
+          const { getProfile } = _get()
+          await getProfile()
+          
           return response.data
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || 'Yetenek bilgisi güncellenirken hata oluştu'

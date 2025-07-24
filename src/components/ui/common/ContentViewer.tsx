@@ -54,14 +54,31 @@ interface ContentViewerProps {
 
 const useContentStats = (content: string) => {
   return useMemo(() => {
-    const wordCount = content
+    if (!content || typeof content !== 'string') {
+      return {
+        wordCount: 0,
+        characterCount: 0,
+        characterCountNoSpaces: 0,
+        estimatedReadTime: 0,
+        paragraphCount: 0,
+      }
+    }
+
+    // Daha doğru kelime sayısı hesaplama
+    const cleanText = content
+      .replace(/[^\w\s\u00C0-\u017F\u0100-\u024F\u1E00-\u1EFF]/g, ' ') // Sadece harfler ve boşluklar
+      .replace(/\s+/g, ' ') // Çoklu boşlukları tek boşluk yap
       .trim()
-      .split(/\\s+/)
-      .filter((word) => word.length > 0).length
+
+    const wordCount = cleanText ? cleanText.split(' ').filter((word) => word.length > 0).length : 0
     const characterCount = content.length
-    const characterCountNoSpaces = content.replace(/\\s/g, '').length
-    const estimatedReadTime = Math.ceil(wordCount / 200) // 200 words per minute
-    const paragraphCount = content.split('\\n\\n').filter((p) => p.trim().length > 0).length
+    const characterCountNoSpaces = content.replace(/\s/g, '').length
+
+    // Daha doğru okuma süresi hesaplama (Türkçe için 180-200 kelime/dk)
+    const estimatedReadTime = wordCount > 0 ? Math.max(1, Math.ceil(wordCount / 180)) : 0
+
+    // Daha doğru paragraf sayısı hesaplama
+    const paragraphCount = content.split(/\n\s*\n/).filter((p) => p.trim().length > 10).length // En az 10 karakter olan paragrafları say
 
     return {
       wordCount,
@@ -207,23 +224,23 @@ export function ContentViewer({
   }
 
   return (
-    <Card className={className}>
-      <CardHeader className='pb-4'>
-        <div className='flex items-start justify-between'>
+    <Card className={`${className} bg-gradient-to-br from-background to-muted/30`}>
+      <CardHeader className='pb-6 space-y-4'>
+        <div className='flex items-start justify-between flex-col-reverse gap-4'>
           <div className='flex items-start gap-3'>
-            <div className='mt-1'>{typeConfig.icon}</div>
-            <div className='space-y-1'>
-              <CardTitle className='flex items-center gap-2'>
+            <div className='mt-1 p-2 rounded-lg bg-primary/10 text-primary'>{typeConfig.icon}</div>
+            <div className='space-y-2'>
+              <CardTitle className='flex items-center gap-2 text-xl'>
                 {title}
-                <Badge variant='secondary' className='text-xs'>
+                <Badge variant='secondary' className='text-xs px-2 py-1'>
                   {typeConfig.label}
                 </Badge>
               </CardTitle>
-              <CardDescription>{typeConfig.description}</CardDescription>
+              <CardDescription className='text-sm'>{typeConfig.description}</CardDescription>
 
               {/* Metadata */}
               {metadata && (
-                <div className='flex items-center gap-4 text-xs text-muted-foreground mt-2'>
+                <div className='flex items-center gap-4 text-xs text-muted-foreground'>
                   {metadata.createdAt && (
                     <span>Oluşturulma: {new Date(metadata.createdAt).toLocaleDateString('tr-TR')}</span>
                   )}
@@ -234,81 +251,104 @@ export function ContentViewer({
               )}
             </div>
           </div>
-
-          {/* Action buttons */}
-          <div className='flex items-center gap-2'>
-            {!readonly && (
-              <>
-                <Button
-                  variant='outline'
-                  size='sm'
-                  onClick={() => setViewMode(viewMode === 'edit' ? 'preview' : 'edit')}
-                >
-                  <Edit className='h-4 w-4 mr-1' />
-                  {viewMode === 'edit' ? 'Görüntüle' : 'Düzenle'}
-                </Button>
-                <Button variant='outline' size='sm' onClick={handleCopy} disabled={isCopied}>
-                  {isCopied ? <Check className='h-4 w-4 mr-1' /> : <Copy className='h-4 w-4 mr-1' />}
-                  {isCopied ? 'Kopyalandı' : 'Kopyala'}
-                </Button>
-              </>
-            )}
-          </div>
         </div>
 
-        {/* Content statistics */}
-        <div className='flex items-center gap-4 text-sm text-muted-foreground pt-2 border-t'>
-          <span>{contentStats.wordCount} kelime</span>
-          <span>{contentStats.characterCount} karakter</span>
-          <span>{contentStats.paragraphCount} paragraf</span>
-          <span>~{contentStats.estimatedReadTime} dk okuma</span>
+        {/* Content statistics - Fresh design */}
+        <div className='grid grid-cols-2 md:grid-cols-4 gap-3 p-4 bg-muted/50 rounded-lg border'>
+          <div className='text-center space-y-1'>
+            <div className='text-lg font-semibold text-primary'>{contentStats.wordCount}</div>
+            <div className='text-xs text-muted-foreground font-medium'>Kelime</div>
+          </div>
+          <div className='text-center space-y-1'>
+            <div className='text-lg font-semibold text-primary'>{contentStats.characterCount}</div>
+            <div className='text-xs text-muted-foreground font-medium'>Karakter</div>
+          </div>
+          <div className='text-center space-y-1'>
+            <div className='text-lg font-semibold text-primary'>{contentStats.paragraphCount}</div>
+            <div className='text-xs text-muted-foreground font-medium'>Paragraf</div>
+          </div>
+          <div className='text-center space-y-1'>
+            <div className='text-lg font-semibold text-primary'>{contentStats.estimatedReadTime}</div>
+            <div className='text-xs text-muted-foreground font-medium'>Dk Okuma</div>
+          </div>
         </div>
       </CardHeader>
 
-      <CardContent className='space-y-4'>
+      <CardContent className='space-y-6'>
         {/* Content tabs for different view modes */}
-        <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as ViewMode)}>
-          <TabsList className='grid w-full grid-cols-3'>
-            <TabsTrigger value='preview' className='flex items-center gap-2'>
+        <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as ViewMode)} className='w-full'>
+          <TabsList className='grid w-full grid-cols-3 h-11'>
+            <TabsTrigger
+              value='preview'
+              className='flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground'
+            >
               <Eye className='h-4 w-4' />
               Önizleme
             </TabsTrigger>
             {!readonly && (
-              <TabsTrigger value='edit' className='flex items-center gap-2'>
+              <TabsTrigger
+                value='edit'
+                className='flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground'
+              >
                 <Edit className='h-4 w-4' />
                 Düzenle
               </TabsTrigger>
             )}
-            <TabsTrigger value='raw' className='flex items-center gap-2'>
+            <TabsTrigger
+              value='raw'
+              className='flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground'
+            >
               <EyeOff className='h-4 w-4' />
               Ham Metin
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value='preview' className='mt-4'>
-            <ScrollArea className='h-[500px] w-full rounded-md border p-4'>
-              <ContentRenderer content={editedContent} type={type} />
-            </ScrollArea>
+          <TabsContent value='preview' className='mt-6'>
+            <div className='relative'>
+              <Button
+                variant='ghost'
+                size='sm'
+                onClick={handleCopy}
+                disabled={isCopied}
+                className='absolute top-3 right-5 z-10 bg-background/80 backdrop-blur-sm hover:bg-background/90 border'
+              >
+                {isCopied ? <Check className='h-4 w-4' /> : <Copy className='h-4 w-4' />}
+              </Button>
+              <ScrollArea className='h-[500px] w-full rounded-lg border bg-background p-6'>
+                <ContentRenderer content={editedContent} type={type} />
+              </ScrollArea>
+            </div>
           </TabsContent>
 
           {!readonly && (
-            <TabsContent value='edit' className='mt-4'>
+            <TabsContent value='edit' className='mt-6'>
               <Textarea
                 value={editedContent}
                 onChange={(e) => handleContentChange(e.target.value)}
                 rows={20}
-                className='font-mono text-sm'
+                className='font-mono text-sm resize-none'
                 placeholder={`${typeConfig.label} içeriğinizi buraya yazın...`}
               />
             </TabsContent>
           )}
 
-          <TabsContent value='raw' className='mt-4'>
-            <ScrollArea className='h-[500px] w-full rounded-md border'>
-              <div className='bg-muted/50 p-4'>
-                <pre className='whitespace-pre-wrap text-sm font-mono'>{editedContent}</pre>
-              </div>
-            </ScrollArea>
+          <TabsContent value='raw' className='mt-6'>
+            <div className='relative'>
+              <Button
+                variant='ghost'
+                size='sm'
+                onClick={handleCopy}
+                disabled={isCopied}
+                className='absolute top-3 right-5 z-10 bg-background/80 backdrop-blur-sm hover:bg-background/90 border'
+              >
+                {isCopied ? <Check className='h-4 w-4' /> : <Copy className='h-4 w-4' />}
+              </Button>
+              <ScrollArea className='h-[500px] w-full rounded-lg border'>
+                <div className='bg-muted/30 p-6'>
+                  <pre className='whitespace-pre-wrap text-sm font-mono leading-relaxed'>{editedContent}</pre>
+                </div>
+              </ScrollArea>
+            </div>
           </TabsContent>
         </Tabs>
 
@@ -316,14 +356,14 @@ export function ContentViewer({
         {!readonly && (
           <>
             <Separator />
-            <div className='flex items-center justify-end'>
+            <div className='flex items-center justify-end pt-2'>
               {/* Download button */}
               {onDownload && (
                 <AlertDialog open={downloadDialogOpen} onOpenChange={setDownloadDialogOpen}>
                   <AlertDialogTrigger asChild>
-                    <Button variant='outline'>
+                    <Button variant='default' size='lg' className='px-6'>
                       <Download className='h-4 w-4 mr-2' />
-                      İndir
+                      PDF İndir
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>

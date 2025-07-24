@@ -114,11 +114,19 @@ export function CVGeneratorForm({ onGenerate, className }: CVGeneratorFormProps)
   }
 
   const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleDateString('tr-TR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
+    try {
+      const date = new Date(dateString)
+      if (isNaN(date.getTime())) {
+        return 'Tarih belirtilmemiş'
+      }
+      return date.toLocaleDateString('tr-TR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })
+    } catch (error) {
+      return 'Tarih belirtilmemiş'
+    }
   }
 
   return (

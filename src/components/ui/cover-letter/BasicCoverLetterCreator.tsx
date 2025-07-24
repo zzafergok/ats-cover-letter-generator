@@ -118,11 +118,19 @@ export function BasicCoverLetterCreator({ onCreated, className }: BasicCoverLett
   }
 
   const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleDateString('tr-TR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
+    try {
+      const date = new Date(dateString)
+      if (isNaN(date.getTime())) {
+        return 'Tarih belirtilmemiş'
+      }
+      return date.toLocaleDateString('tr-TR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })
+    } catch (error) {
+      return 'Tarih belirtilmemiş'
+    }
   }
 
   // If generated content exists, show it alongside the form

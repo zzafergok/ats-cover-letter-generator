@@ -23,7 +23,7 @@ type CVGeneratorFormData = CVFromUploadFormValues
 interface CVUpload {
   id: string
   originalName: string
-  uploadedAt: string
+  uploadDate: string
 }
 
 interface UseCVStoreReturn {
@@ -150,7 +150,7 @@ export function CVGeneratorForm({ onGenerate, className }: CVGeneratorFormProps)
                   <span className='font-medium text-sm'>{selectedCV.originalName}</span>
                 </div>
                 <p className='text-xs text-muted-foreground mt-1'>
-                  Yükleme tarihi: {formatDate(selectedCV.uploadedAt)}
+                  Yükleme tarihi: {formatDate(selectedCV.uploadDate)}
                 </p>
               </div>
             ) : uploadedCVs && uploadedCVs.length > 0 ? (
@@ -164,7 +164,7 @@ export function CVGeneratorForm({ onGenerate, className }: CVGeneratorFormProps)
                       <div className='flex items-center gap-2'>
                         <FileText className='h-4 w-4' />
                         <span>
-                          {cv.originalName} ({formatDate(cv.uploadedAt)})
+                          {cv.originalName} ({formatDate(cv.uploadDate)})
                         </span>
                       </div>
                     </SelectItem>

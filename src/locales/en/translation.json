@@ -192,9 +192,9 @@
       },
       "demoAccounts": {
         "title": "Demo Accounts",
-        "ortak": "Ortak",
-        "zafer": "Zafer",
-        "akin": "Akin"
+        "ortak": "Ahmet",
+        "zafer": "Admin",
+        "akin": "Mehmet"
       }
     },
     "register": {

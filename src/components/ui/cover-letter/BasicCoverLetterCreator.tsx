@@ -57,6 +57,7 @@ export function BasicCoverLetterCreator({ onCreated, className }: BasicCoverLett
     control,
     reset,
     watch,
+    setValue,
   } = useForm<BasicCoverLetterForm>({
     resolver: zodResolver(basicCoverLetterSchema),
     defaultValues: {
@@ -71,6 +72,13 @@ export function BasicCoverLetterCreator({ onCreated, className }: BasicCoverLett
   useEffect(() => {
     getUploadedCVs()
   }, [getUploadedCVs])
+
+  // Auto-select CV when selectedCV changes
+  useEffect(() => {
+    if (selectedCV) {
+      setValue('cvUploadId', selectedCV.id)
+    }
+  }, [selectedCV, setValue])
 
   const onSubmit = async (data: BasicCoverLetterForm) => {
     try {
@@ -175,7 +183,7 @@ export function BasicCoverLetterCreator({ onCreated, className }: BasicCoverLett
                     <span className='font-medium text-sm'>{selectedCV.originalName}</span>
                   </div>
                   <p className='text-xs text-muted-foreground mt-1'>
-                    Yükleme tarihi: {formatDate(selectedCV.uploadedAt)}
+                    Yükleme tarihi: {formatDate(selectedCV.uploadDate)}
                   </p>
                 </div>
               ) : uploadedCVs && uploadedCVs.length > 0 ? (
@@ -193,7 +201,7 @@ export function BasicCoverLetterCreator({ onCreated, className }: BasicCoverLett
                             <div className='flex items-center gap-2'>
                               <FileText className='h-4 w-4' />
                               <span>
-                                {upload.originalName} ({formatDate(upload.uploadedAt)})
+                                {upload.originalName} ({formatDate(upload.uploadDate)})
                               </span>
                             </div>
                           </SelectItem>

@@ -173,7 +173,7 @@ export interface CVUpload {
   originalName: string
   fileName: string
   size: number
-  uploadedAt: string
+  uploadDate: string
   status: CVUploadStatus
   extractedText?: string
 }

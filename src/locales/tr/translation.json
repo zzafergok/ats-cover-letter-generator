@@ -196,9 +196,9 @@
       },
       "demoAccounts": {
         "title": "Demo Hesaplar",
-        "ortak": "Ortak",
-        "zafer": "Zafer",
-        "akin": "Akın"
+        "ortak": "Ahmet",
+        "zafer": "Admin",
+        "akin": "Mehmet"
       }
     },
     "register": {
@@ -460,14 +460,14 @@
     "dashboardDescription": "Ana kontrol paneli",
     "projects": "Projeler",
     "projectsDescription": "Tüm projelerinizi yönetin",
-    "coverLetter": "Mektup Üret",
-    "coverLetterDescription": "Ön yazı mektuplarını oluşturun",
-    "coverLetterGenerator": "Mektup Oluştur",
-    "coverLetterGeneratorDescription": "Yeni ön yazı mektubu oluştur",
+    "coverLetter": "Ön Yazı Üret",
+    "coverLetterDescription": "Ön yazıları oluşturun",
+    "coverLetterGenerator": "Ön Yazı Oluştur",
+    "coverLetterGeneratorDescription": "Yeni ön yazı oluştur",
     "coverLetterTemplates": "Şablonlar",
     "coverLetterTemplatesDescription": "Hazır şablonları görüntüle",
-    "coverLetterList": "Mektup Listesi",
-    "coverLetterListDescription": "Mektuplarınızı görüntüleyin ve yönetin",
+    "coverLetterList": "Ön Yazı Listesi",
+    "coverLetterListDescription": "Ön yazılarınızı görüntüleyin ve yönetin",
     "users": "Kullanıcılar",
     "usersDescription": "Kullanıcı yönetimi",
     "menu": "Menü",

@@ -3,16 +3,28 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Upload, FileText } from 'lucide-react'
+import { ArrowLeft, Upload, FileText, Trash2 } from 'lucide-react'
 import { Button } from '@/components/core/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/core/tabs'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/core/alert-dialog'
 import { BasicCoverLetterCreator } from '@/components/ui/cover-letter/BasicCoverLetterCreator'
 import { CVUpload } from '@/components/ui/cv/CVUpload'
 import { useCVStore } from '@/store/cvStore'
 
 export default function BasicCoverLetterPage() {
   const [activeTab, setActiveTab] = useState<string>('create')
-  const { uploadedCVs, getUploadedCVs } = useCVStore()
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [cvToDelete, setCvToDelete] = useState<any>(null)
+  const { uploadedCVs, getUploadedCVs, selectCV, clearSelectedCV, deleteUploadedCV, isLoading } = useCVStore()
 
   useEffect(() => {
     getUploadedCVs()
@@ -24,6 +36,30 @@ export default function BasicCoverLetterPage() {
       setActiveTab('upload')
     }
   }, [uploadedCVs])
+
+  // Clear selected CV when switching to upload tab
+  useEffect(() => {
+    if (activeTab === 'upload') {
+      clearSelectedCV()
+    }
+  }, [activeTab, clearSelectedCV])
+
+  const handleDelete = (cv: any) => {
+    setCvToDelete(cv)
+    setDeleteDialogOpen(true)
+  }
+
+  const confirmDelete = async () => {
+    if (!cvToDelete) return
+
+    try {
+      await deleteUploadedCV(cvToDelete.id)
+      setDeleteDialogOpen(false)
+      setCvToDelete(null)
+    } catch (error) {
+      console.error('CV deletion failed:', error)
+    }
+  }
 
   return (
     <div className='container mx-auto p-4 md:p-6 space-y-4 md:space-y-6'>
@@ -45,8 +81,8 @@ export default function BasicCoverLetterPage() {
 
       {/* Tabbed Interface */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
-        <TabsList className='grid w-full grid-cols-2'>
-          <TabsTrigger value='upload' className='flex items-center gap-1 sm:gap-2 text-xs sm:text-sm'>
+        <TabsList className='grid w-full grid-cols-2 h-12'>
+          <TabsTrigger value='upload' className='flex items-center gap-1 sm:gap-2 text-xs sm:text-sm h-10'>
             <Upload className='w-3 h-3 sm:w-4 sm:h-4' />
             <span className='hidden xs:inline'>CV Yükle</span>
             <span className='xs:hidden'>Yükle</span>
@@ -56,7 +92,7 @@ export default function BasicCoverLetterPage() {
           </TabsTrigger>
           <TabsTrigger
             value='create'
-            className='flex items-center gap-1 sm:gap-2 text-xs sm:text-sm'
+            className='flex items-center gap-1 sm:gap-2 text-xs sm:text-sm h-10'
             disabled={uploadedCVs !== null && uploadedCVs.length === 0}
           >
             <FileText className='w-3 h-3 sm:w-4 sm:h-4' />
@@ -86,7 +122,7 @@ export default function BasicCoverLetterPage() {
                   setActiveTab('create')
                 }, 2500)
               }}
-              className='max-w-2xl'
+              className='w-full'
             />
 
             {/* Show uploaded CVs if any */}
@@ -104,19 +140,34 @@ export default function BasicCoverLetterPage() {
                         <div className='min-w-0 flex-1'>
                           <span className='font-medium text-sm block truncate'>{cv.originalName}</span>
                           <span className='text-xs text-muted-foreground block sm:inline'>
-                            ({new Date(cv.uploadedAt).toLocaleDateString('tr-TR')})
+                            ({new Date(cv.uploadDate).toLocaleDateString('tr-TR')})
                           </span>
                         </div>
                       </div>
-                      <Button
-                        onClick={() => setActiveTab('create')}
-                        size='sm'
-                        variant='outline'
-                        className='w-full sm:w-auto'
-                      >
-                        <span className='hidden sm:inline'>Bu CV ile Ön Yazı Oluştur</span>
-                        <span className='sm:hidden'>Ön Yazı Oluştur</span>
-                      </Button>
+                      <div className='flex gap-2 w-full sm:w-auto'>
+                        <Button
+                          onClick={() => {
+                            selectCV(cv)
+                            setActiveTab('create')
+                          }}
+                          size='sm'
+                          variant='outline'
+                          className='flex-1 sm:flex-none'
+                        >
+                          <span className='hidden sm:inline'>Bu CV ile Ön Yazı Oluştur</span>
+                          <span className='sm:hidden'>Ön Yazı Oluştur</span>
+                        </Button>
+                        <Button
+                          onClick={() => handleDelete(cv)}
+                          size='sm'
+                          variant='outline'
+                          className='text-destructive hover:text-destructive hover:bg-destructive/10'
+                          disabled={isLoading}
+                        >
+                          <Trash2 className='h-4 w-4' />
+                          <span className='sr-only'>CV'yi Sil</span>
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -134,6 +185,29 @@ export default function BasicCoverLetterPage() {
           />
         </TabsContent>
       </Tabs>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>CV'yi Sil</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bu işlem geri alınamaz. "{cvToDelete?.originalName}" CV dosyasını kalıcı olarak silmek istediğinizden emin
+              misiniz?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>İptal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className='bg-destructive hover:bg-destructive/90'
+              disabled={isLoading}
+            >
+              {isLoading ? 'Siliniyor...' : 'Sil'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

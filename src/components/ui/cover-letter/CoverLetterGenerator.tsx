@@ -368,7 +368,7 @@ const CoverLetterGenerator = () => {
                 <CardContent className='space-y-4'>
                   <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
                     <div className='space-y-2'>
-                      <Label htmlFor='coverLetterType'>Mektup Türü</Label>
+                      <Label htmlFor='coverLetterType'>Ön Yazı Türü</Label>
                       <Controller
                         name='coverLetterType'
                         control={control}

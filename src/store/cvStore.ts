@@ -55,6 +55,7 @@ interface CVActions {
 
   // Utility Actions
   selectCV: (cv: CVUpload) => void
+  clearSelectedCV: () => void
   clearError: () => void
   reset: () => void
 }
@@ -272,6 +273,10 @@ export const useCVStore = create<CVStore>()(
       // Utility Actions
       selectCV: (cv: CVUpload) => {
         set({ selectedCV: cv })
+      },
+
+      clearSelectedCV: () => {
+        set({ selectedCV: null })
       },
 
       clearError: () => set({ error: null }),

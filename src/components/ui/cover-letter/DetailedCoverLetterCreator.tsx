@@ -79,7 +79,7 @@ export function DetailedCoverLetterCreator({ onCreated, className }: DetailedCov
         })
 
         if (result) {
-          setGeneratedContent(result.content)
+          setGeneratedContent(result.content || '')
           onCreated?.(result)
         }
       } catch (error) {
@@ -192,8 +192,7 @@ export function DetailedCoverLetterCreator({ onCreated, className }: DetailedCov
           {/* Generate Button */}
           <div className='flex justify-center'>
             <Button
-              type='button'
-              onClick={() => form.handleSubmit(onSubmit)()}
+              type='submit'
               disabled={isGenerating || storeIsGenerating || !allSectionsComplete}
               className='w-full sm:w-auto min-w-[200px]'
             >

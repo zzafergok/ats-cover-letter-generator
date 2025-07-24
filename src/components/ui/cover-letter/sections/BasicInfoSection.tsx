@@ -36,7 +36,7 @@ export function BasicInfoSection({ form: _ }: BasicInfoSectionProps) {
 
         <Form.Field name='language' label='Dil Seçimi'>
           {(field) => (
-            <Select onValueChange={field.onChange} defaultValue={field.value || ''}>
+            <Select onValueChange={field.onChange} value={field.value}>
               <SelectTrigger>
                 <SelectValue placeholder='Dil seçin' />
               </SelectTrigger>

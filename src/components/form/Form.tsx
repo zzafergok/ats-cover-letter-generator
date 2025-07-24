@@ -3,7 +3,7 @@
 
 import React, { createContext, useContext } from 'react'
 
-import { UseFormReturn, FieldPath, FieldValues } from 'react-hook-form'
+import { UseFormReturn, FieldPath, FieldValues, Controller } from 'react-hook-form'
 
 import { cn } from '@/lib/utils'
 
@@ -73,13 +73,21 @@ function FormField<T extends FieldValues = FieldValues>({
         </label>
       )}
 
-      {form.register &&
-        children({
-          ...form.register(name),
-          error: !!error,
-          'aria-invalid': !!error,
-          'aria-describedby': error ? `${name}-error` : undefined,
-        })}
+      <Controller
+        name={name}
+        control={form.control}
+        render={({ field }) => (
+          <>
+            {children({
+              ...field,
+              value: field.value || '',
+              error: !!error,
+              'aria-invalid': !!error,
+              'aria-describedby': error ? `${name}-error` : undefined,
+            })}
+          </>
+        )}
+      />
 
       {description && <p className='text-xs text-neutral-500'>{description}</p>}
 

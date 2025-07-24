@@ -119,21 +119,7 @@ export function DetailedCoverLetterCreator({ onCreated, className }: DetailedCov
   return (
     <div className={`space-y-6 ${className}`}>
       {/* Profile Info */}
-      {profile ? (
-        <Card className='bg-blue-50 border-blue-200'>
-          <CardContent className='p-4'>
-            <div className='flex items-center gap-3'>
-              <FileText className='h-5 w-5 text-blue-600' />
-              <div>
-                <p className='font-medium text-blue-800'>Profil Bilgileri Kullanılacak</p>
-                <p className='text-sm text-blue-600'>
-                  {profile.educations?.length || 0} Eğitim, {profile.experiences?.length || 0} Deneyim bilgisi mevcut
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
+      {!profile && (
         <Card className='bg-yellow-50 border-yellow-200'>
           <CardContent className='p-4'>
             <div className='flex items-center gap-3'>

@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, User, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/core/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/core/card'
 import { DetailedCoverLetterCreator } from '@/components/ui/cover-letter/DetailedCoverLetterCreator'
 import { useUserProfileStore } from '@/store/userProfileStore'
 
@@ -16,12 +15,43 @@ export default function DetailedCoverLetterPage() {
     getProfile()
   }, [getProfile])
 
-  // Check if profile has required data (at least 1 education and 1 experience)
+  // Check if profile has required data
   useEffect(() => {
-    const hasEducation = profile?.educations && profile.educations.length > 0
-    const hasExperience = profile?.experiences && profile.experiences.length > 0
-    setIsProfileReady(!!(hasEducation && hasExperience))
+    if (!profile) {
+      setIsProfileReady(false)
+      return
+    }
+
+    const hasRequiredFields = !!(
+      profile.city &&
+      profile.email &&
+      profile.firstName &&
+      profile.lastName &&
+      profile.phone &&
+      profile.educations &&
+      profile.educations.length > 0
+    )
+
+    setIsProfileReady(hasRequiredFields)
   }, [profile])
+
+  // Get list of missing required fields
+  const getMissingFields = () => {
+    if (!profile) return []
+
+    const missingFields = []
+
+    if (!profile.firstName) missingFields.push('Ad')
+    if (!profile.lastName) missingFields.push('Soyad')
+    if (!profile.email) missingFields.push('E-posta')
+    if (!profile.phone) missingFields.push('Telefon')
+    if (!profile.city) missingFields.push('Şehir')
+    if (!profile.educations || profile.educations.length === 0) {
+      missingFields.push('En az 1 eğitim bilgisi')
+    }
+
+    return missingFields
+  }
 
   return (
     <div className='container mx-auto p-4 md:p-6 space-y-4 md:space-y-6'>
@@ -43,55 +73,61 @@ export default function DetailedCoverLetterPage() {
 
       {/* Profile Status Check */}
       {!isProfileReady ? (
-        <Card className='bg-yellow-50 border-yellow-200'>
-          <CardHeader>
-            <CardTitle className='flex items-center gap-3 text-yellow-800'>
-              <AlertCircle className='h-5 w-5' />
-              Profil Bilgileri Eksik
-            </CardTitle>
-            <CardDescription className='text-yellow-700'>
-              Detaylı ön yazı oluşturabilmek için profilinizde en az 1 eğitim ve 1 iş deneyimi bilgisi bulunmalıdır.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className='space-y-3'>
-              <div className='text-sm text-yellow-700'>
-                <strong>Eksik bilgiler:</strong>
-                <ul className='mt-2 space-y-1 ml-4'>
-                  {(!profile?.educations || profile.educations.length === 0) && (
-                    <li>• En az 1 eğitim bilgisi gereklidir</li>
-                  )}
-                  {(!profile?.experiences || profile.experiences.length === 0) && (
-                    <li>• En az 1 iş deneyimi bilgisi gereklidir</li>
-                  )}
-                </ul>
+        <div className='bg-orange-50 border border-orange-200 rounded-lg p-6'>
+          <div className='flex items-start gap-4'>
+            <div className='p-2 bg-orange-100 rounded-full'>
+              <AlertCircle className='h-5 w-5 text-orange-600' />
+            </div>
+            <div className='flex-1'>
+              <h3 className='text-lg font-semibold text-orange-800 mb-2'>Profil Tamamlanması Gerekiyor</h3>
+              <p className='text-orange-700 mb-4'>
+                Detaylı ön yazı oluşturabilmek için aşağıdaki bilgilerin tamamlanması gerekmektedir.
+              </p>
+              <div className='bg-white rounded-lg p-4 mb-4'>
+                <h4 className='font-medium text-orange-800 mb-3'>Eksik Bilgiler:</h4>
+                <div className='grid grid-cols-1 sm:grid-cols-2 gap-2'>
+                  {getMissingFields().map((field, index) => (
+                    <div key={index} className='flex items-center gap-2 text-sm text-orange-700'>
+                      <div className='w-1.5 h-1.5 bg-orange-400 rounded-full'></div>
+                      {field}
+                    </div>
+                  ))}
+                </div>
               </div>
+
               <Link href='/profile'>
-                <Button className='gap-2'>
+                <Button className='bg-orange-600 hover:bg-orange-700 text-white gap-2'>
                   <User className='w-4 h-4' />
                   Profilimi Tamamla
                 </Button>
               </Link>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       ) : (
         <div className='space-y-6'>
-          {/* Profile Ready - Show Cover Letter Creator */}
-          <Card className='bg-green-50 border-green-200'>
-            <CardContent className='p-4'>
-              <div className='flex items-center gap-3'>
+          {/* Profile Ready Status */}
+          <div className='bg-green-50 border border-green-200 rounded-lg p-6'>
+            <div className='flex items-start gap-4'>
+              <div className='p-2 bg-green-100 rounded-full'>
                 <User className='h-5 w-5 text-green-600' />
-                <div>
-                  <p className='font-medium text-green-800'>Profil Hazır</p>
-                  <p className='text-sm text-green-600'>
-                    {profile?.educations?.length || 0} Eğitim, {profile?.experiences?.length || 0} Deneyim bilgisi
-                    mevcut
-                  </p>
+              </div>
+              <div className='flex-1'>
+                <h3 className='text-lg font-semibold text-green-800 mb-2'>✓ Profil Tamamlandı</h3>
+                <p className='text-green-700 mb-3'>
+                  Tüm gerekli bilgiler mevcut. Artık detaylı ön yazı oluşturabilirsiniz.
+                </p>
+                <div className='flex flex-wrap gap-4 text-sm text-green-600'>
+                  <span>✓ Kişisel Bilgiler</span>
+                  <span>✓ İletişim Bilgileri</span>
+                  <span>✓ {profile?.educations?.length || 0} Eğitim</span>
+                  {profile?.experiences && profile.experiences.length > 0 && (
+                    <span>✓ {profile.experiences.length} İş Deneyimi</span>
+                  )}
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           <DetailedCoverLetterCreator
             onCreated={(coverLetter) => {

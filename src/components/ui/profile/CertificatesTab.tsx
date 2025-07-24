@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { Plus, Award, Edit3, Globe } from 'lucide-react'
+import { Plus, Award, Edit3, Globe, Trash2 } from 'lucide-react'
 
 import { Button } from '@/components/core/button'
 import { Card, CardContent } from '@/components/core/card'
@@ -11,9 +11,11 @@ import type { Certificate, UserProfile } from '@/types/api.types'
 interface CertificatesTabProps {
   profile: UserProfile | null
   onOpenModal: () => void
+  onOpenEditModal?: (id: string, data: Certificate) => void
+  onDeleteCertificate?: (id: string, name: string) => void
 }
 
-export function CertificatesTab({ profile, onOpenModal }: CertificatesTabProps) {
+export function CertificatesTab({ profile, onOpenModal, onOpenEditModal, onDeleteCertificate }: CertificatesTabProps) {
   return (
     <div className='space-y-6'>
       <div className='flex justify-between items-center'>
@@ -61,9 +63,31 @@ export function CertificatesTab({ profile, onOpenModal }: CertificatesTabProps) 
                         </Button>
                       </a>
                     )}
-                    <Button variant='ghost' size='sm'>
-                      <Edit3 className='h-4 w-4' />
-                    </Button>
+                    {(onOpenEditModal || onDeleteCertificate) && (
+                      <div className='flex space-x-1'>
+                        {onOpenEditModal && (
+                          <Button 
+                            variant='ghost' 
+                            size='sm' 
+                            onClick={() => onOpenEditModal(cert.id, cert)}
+                            title='Sertifikayı Düzenle'
+                          >
+                            <Edit3 className='h-4 w-4' />
+                          </Button>
+                        )}
+                        {onDeleteCertificate && (
+                          <Button 
+                            variant='ghost' 
+                            size='sm' 
+                            onClick={() => onDeleteCertificate(cert.id, cert.certificateName)}
+                            className='text-destructive hover:text-destructive'
+                            title='Sertifikayı Sil'
+                          >
+                            <Trash2 className='h-4 w-4' />
+                          </Button>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardContent>

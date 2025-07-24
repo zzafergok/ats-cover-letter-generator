@@ -22,8 +22,9 @@ import { CoursesTab } from '@/components/ui/profile/CoursesTab'
 import { CertificatesTab } from '@/components/ui/profile/CertificatesTab'
 import { ConfirmDeleteModal } from '@/components/ui/profile/ConfirmDeleteModal'
 import { CourseModal } from '@/components/ui/profile/CourseModal'
+import { CertificateModal } from '@/components/ui/profile/CertificateModal'
 
-import type { Education, WorkExperience, Skill, Course } from '@/types/api.types'
+import type { Education, WorkExperience, Skill, Course, Certificate } from '@/types/api.types'
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -47,6 +48,9 @@ export default function ProfilePage() {
     addCourse,
     updateCourse,
     deleteCourse,
+    addCertificate,
+    updateCertificate,
+    deleteCertificate,
   } = useUserProfileStore()
 
   const [activeTab, setActiveTab] = useState('overview')
@@ -56,11 +60,12 @@ export default function ProfilePage() {
     experience: false,
     skill: false,
     course: false,
+    certificate: false,
   })
 
   const [deleteConfirmModal, setDeleteConfirmModal] = useState<{
     isOpen: boolean
-    type: 'skill' | 'education' | 'experience' | 'course' | null
+    type: 'skill' | 'education' | 'experience' | 'course' | 'certificate' | null
     id: string
     name: string
   }>({
@@ -150,7 +155,26 @@ export default function ProfilePage() {
     }
   }
 
-  const openDeleteConfirmModal = (type: 'skill' | 'education' | 'experience' | 'course', id: string, name: string) => {
+  // Sertifika işlemleri
+  const handleSaveCertificate = async (data: Omit<Certificate, 'id'>) => {
+    try {
+      if (editingItem && editingItem.type === 'certificate') {
+        await updateCertificate(editingItem.id, data)
+      } else {
+        await addCertificate(data)
+      }
+      closeModal('certificate')
+    } catch (error) {
+      console.error('Sertifika kaydedilirken hata:', error)
+      throw error
+    }
+  }
+
+  const openDeleteConfirmModal = (
+    type: 'skill' | 'education' | 'experience' | 'course' | 'certificate',
+    id: string,
+    name: string,
+  ) => {
     setDeleteConfirmModal({
       isOpen: true,
       type,
@@ -184,6 +208,9 @@ export default function ProfilePage() {
           break
         case 'course':
           await deleteCourse(deleteConfirmModal.id)
+          break
+        case 'certificate':
+          await deleteCertificate(deleteConfirmModal.id)
           break
       }
       closeDeleteConfirmModal()
@@ -310,7 +337,9 @@ export default function ProfilePage() {
           <TabsContent value='certificates' className='space-y-6'>
             <CertificatesTab
               profile={profile}
-              onOpenModal={() => console.log('Certificate modal not implemented yet')}
+              onOpenModal={() => openModal('certificate')}
+              onOpenEditModal={(id, data) => openEditModal('certificate', id, data)}
+              onDeleteCertificate={(id, name) => openDeleteConfirmModal('certificate', id, name)}
             />
           </TabsContent>
         </Tabs>
@@ -349,13 +378,21 @@ export default function ProfilePage() {
         isLoading={isLoading}
       />
 
+      <CertificateModal
+        isOpen={modalStates.certificate}
+        onClose={() => closeModal('certificate')}
+        onSave={handleSaveCertificate}
+        certificate={editingItem?.type === 'certificate' ? (editingItem.data as Certificate) : null}
+        isLoading={isLoading}
+      />
+
       {/* Delete Confirmation Modal */}
       <ConfirmDeleteModal
         isOpen={deleteConfirmModal.isOpen}
         onClose={closeDeleteConfirmModal}
         onConfirm={handleConfirmDelete}
         title='Silme Onayı'
-        message={`Bu ${deleteConfirmModal.type === 'skill' ? 'yeteneği' : deleteConfirmModal.type === 'education' ? 'eğitimi' : deleteConfirmModal.type === 'experience' ? 'deneyimi' : 'kursu'} silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`}
+        message={`Bu ${deleteConfirmModal.type === 'skill' ? 'yeteneği' : deleteConfirmModal.type === 'education' ? 'eğitimi' : deleteConfirmModal.type === 'experience' ? 'deneyimi' : deleteConfirmModal.type === 'course' ? 'kursu' : 'sertifikayı'} silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`}
         itemName={deleteConfirmModal.name}
         isLoading={isLoading}
       />

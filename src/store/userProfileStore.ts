@@ -399,19 +399,12 @@ export const useUserProfileStore = create<UserProfileStore>()(
         set({ isLoading: true, error: null })
         try {
           const response = await userProfileApi.certificate.update(id, data)
-          set((state) => ({
-            profile: state.profile
-              ? {
-                  ...state.profile,
-                  certificates: (state.profile.certificates || [])
-                    .filter(Boolean)
-                    .map((cert) =>
-                      cert && cert.id === id ? response.data : cert,
-                    ),
-                }
-              : null,
-            isLoading: false,
-          }))
+          console.log('Certificate update response:', response)
+          
+          // Update işleminden sonra profili yeniden fetch et
+          const { getProfile } = _get()
+          await getProfile()
+          
           return response.data
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || 'Sertifika bilgisi güncellenirken hata oluştu'

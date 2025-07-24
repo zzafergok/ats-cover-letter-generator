@@ -23,6 +23,7 @@ import { CertificatesTab } from '@/components/ui/profile/CertificatesTab'
 import { ConfirmDeleteModal } from '@/components/ui/profile/ConfirmDeleteModal'
 import { CourseModal } from '@/components/ui/profile/CourseModal'
 import { CertificateModal } from '@/components/ui/profile/CertificateModal'
+import { ProfileCompletionBar } from '@/components/ui/profile/ProfileCompletionBar'
 
 import type { Education, WorkExperience, Skill, Course, Certificate } from '@/types/api.types'
 
@@ -258,6 +259,9 @@ export default function ProfilePage() {
         </div>
 
         <ProfileHeader profile={profile} isLoading={isLoading} onUpdateProfile={updateProfile} />
+
+        {/* Profile Completion Bar */}
+        <ProfileCompletionBar profile={profile} />
 
         {/* Profile Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className='space-y-6'>

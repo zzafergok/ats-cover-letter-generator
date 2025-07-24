@@ -220,7 +220,34 @@ export function DetailedCoverLetterCreator({ onCreated, className }: DetailedCov
           <ContentViewer
             content={generatedContent}
             title={`${form.watch('companyName')} - ${form.watch('positionTitle')} Ön Yazısı`}
-            type='cover-letter'
+            type='cover-letter-detailed'
+            metadata={{
+              companyName: form.watch('companyName'),
+              positionTitle: form.watch('positionTitle'),
+              language: form.watch('language'),
+            }}
+            onDownload={async (_format, downloadType, editedContent) => {
+              if (downloadType === 'edited' && editedContent) {
+                // This is a temporary generated content, so we use the custom PDF endpoint
+                const { downloadDetailedCoverLetterCustomPdf } = useCoverLetterStore.getState()
+                await downloadDetailedCoverLetterCustomPdf({
+                  content: editedContent,
+                  positionTitle: form.watch('positionTitle'),
+                  companyName: form.watch('companyName'),
+                  language: form.watch('language'),
+                })
+              }
+              // For original download of temporary content, we also use custom endpoint
+              else {
+                const { downloadDetailedCoverLetterCustomPdf } = useCoverLetterStore.getState()
+                await downloadDetailedCoverLetterCustomPdf({
+                  content: generatedContent,
+                  positionTitle: form.watch('positionTitle'),
+                  companyName: form.watch('companyName'),
+                  language: form.watch('language'),
+                })
+              }
+            }}
           />
         </div>
       )}

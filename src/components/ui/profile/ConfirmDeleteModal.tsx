@@ -22,7 +22,7 @@ export function ConfirmDeleteModal({
   title,
   message,
   itemName,
-  isLoading = false
+  isLoading = false,
 }: ConfirmDeleteModalProps) {
   if (!isOpen) return null
 
@@ -52,23 +52,11 @@ export function ConfirmDeleteModal({
           </div>
 
           <div className='flex justify-end space-x-2 pt-4'>
-            <Button 
-              type='button' 
-              variant='outline' 
-              onClick={onClose}
-              disabled={isLoading}
-            >
+            <Button type='button' variant='outline' onClick={onClose} disabled={isLoading}>
               İptal
             </Button>
-            <Button 
-              type='button' 
-              variant='destructive' 
-              onClick={onConfirm}
-              disabled={isLoading}
-            >
-              {isLoading && (
-                <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2' />
-              )}
+            <Button type='button' variant='destructive' onClick={onConfirm} disabled={isLoading}>
+              {isLoading && <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2' />}
               Evet, Sil
             </Button>
           </div>

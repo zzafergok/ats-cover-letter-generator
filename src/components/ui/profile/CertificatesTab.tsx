@@ -49,9 +49,7 @@ export function CertificatesTab({ profile, onOpenModal, onOpenEditModal, onDelet
                         </span>
                       )}
                     </p>
-                    {cert.credentialId && (
-                      <p className='text-xs text-muted-foreground'>Kimlik: {cert.credentialId}</p>
-                    )}
+                    {cert.credentialId && <p className='text-xs text-muted-foreground'>Kimlik: {cert.credentialId}</p>}
                     {cert.description && <p className='text-sm text-muted-foreground mt-2'>{cert.description}</p>}
                   </div>
                   <div className='flex space-x-2'>
@@ -66,9 +64,9 @@ export function CertificatesTab({ profile, onOpenModal, onOpenEditModal, onDelet
                     {(onOpenEditModal || onDeleteCertificate) && (
                       <div className='flex space-x-1'>
                         {onOpenEditModal && (
-                          <Button 
-                            variant='ghost' 
-                            size='sm' 
+                          <Button
+                            variant='ghost'
+                            size='sm'
                             onClick={() => onOpenEditModal(cert.id, cert)}
                             title='Sertifikayı Düzenle'
                           >
@@ -76,9 +74,9 @@ export function CertificatesTab({ profile, onOpenModal, onOpenEditModal, onDelet
                           </Button>
                         )}
                         {onDeleteCertificate && (
-                          <Button 
-                            variant='ghost' 
-                            size='sm' 
+                          <Button
+                            variant='ghost'
+                            size='sm'
                             onClick={() => onDeleteCertificate(cert.id, cert.certificateName)}
                             className='text-destructive hover:text-destructive'
                             title='Sertifikayı Sil'
@@ -100,7 +98,9 @@ export function CertificatesTab({ profile, onOpenModal, onOpenEditModal, onDelet
             <CardContent className='p-12 text-center'>
               <Award className='h-12 w-12 text-muted-foreground mx-auto mb-4' />
               <p className='text-muted-foreground mb-4'>Henüz sertifikanız bulunmuyor</p>
-              <Button onClick={onOpenModal} variant='outline'>İlk sertifikanızı ekleyin</Button>
+              <Button onClick={onOpenModal} variant='outline'>
+                İlk sertifikanızı ekleyin
+              </Button>
             </CardContent>
           </Card>
         )}

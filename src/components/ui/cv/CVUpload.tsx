@@ -61,15 +61,19 @@ export function CVUpload({ onUploadSuccess, maxFiles = 1, className }: CVUploadP
           if (progressInterval) clearInterval(progressInterval)
           setUploadProgress(0)
           setUploadSuccess(false)
-          
+
           // Check if it's a processing error (CV_009 or similar processing messages)
           const errorMessage = error.response?.data?.message || error.message || 'CV yüklenirken bir hata oluştu'
-          
-          if (errorMessage.includes('CV_009') || errorMessage.includes('işleniyor') || errorMessage.includes('processing')) {
+
+          if (
+            errorMessage.includes('CV_009') ||
+            errorMessage.includes('işleniyor') ||
+            errorMessage.includes('processing')
+          ) {
             // Handle processing state
             setIsProcessing(true)
             setProcessingMessage('CV dosyanız işleniyor. Bu işlem birkaç dakika sürebilir...')
-            
+
             // Poll for completion every 3 seconds
             const pollInterval = setInterval(async () => {
               try {
@@ -84,7 +88,7 @@ export function CVUpload({ onUploadSuccess, maxFiles = 1, className }: CVUploadP
                 console.log('Still processing...', pollError)
               }
             }, 3000)
-            
+
             // Stop polling after 5 minutes
             setTimeout(() => {
               clearInterval(pollInterval)
@@ -143,14 +147,10 @@ export function CVUpload({ onUploadSuccess, maxFiles = 1, className }: CVUploadP
                 <File className='mx-auto h-12 w-12 text-primary' />
               </div>
               <div className='space-y-2'>
-                <p className='text-sm font-medium'>
-                  {isProcessing ? 'CV işleniyor...' : 'CV yükleniyor...'}
-                </p>
+                <p className='text-sm font-medium'>{isProcessing ? 'CV işleniyor...' : 'CV yükleniyor...'}</p>
                 {!isProcessing && <Progress value={uploadProgress} className='w-full' />}
                 {!isProcessing && <p className='text-xs text-muted-foreground'>{uploadProgress}%</p>}
-                {isProcessing && (
-                  <p className='text-xs text-muted-foreground'>{processingMessage}</p>
-                )}
+                {isProcessing && <p className='text-xs text-muted-foreground'>{processingMessage}</p>}
               </div>
             </div>
           ) : (

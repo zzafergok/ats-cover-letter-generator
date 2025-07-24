@@ -143,6 +143,8 @@ export function CoverLetterList() {
     deleteDetailedCoverLetter,
     downloadBasicCoverLetterPdf,
     downloadDetailedCoverLetterPdf,
+    downloadBasicCoverLetterCustomPdf,
+    downloadDetailedCoverLetterCustomPdf,
     isLoading,
     error,
   } = useCoverLetterStore()
@@ -410,9 +412,34 @@ export function CoverLetterList() {
                       wordCount: content.split(' ').length || 0,
                       characterCount: content.length || 0,
                       estimatedReadTime: Math.ceil((content.split(' ').length || 0) / 200),
+                      companyName: selectedCoverLetter.companyName,
+                      positionTitle: selectedCoverLetter.positionTitle,
+                      language: selectedCoverLetter.language,
                     }}
-                    onDownload={async (_format) => {
-                      handleDownload(selectedCoverLetter)
+                    onDownload={async (_format, downloadType, editedContent) => {
+                      if (downloadType === 'edited' && editedContent) {
+                        // Download edited version using custom PDF endpoint
+                        if ('experience' in selectedCoverLetter) {
+                          // Detailed cover letter
+                          await downloadDetailedCoverLetterCustomPdf({
+                            content: editedContent,
+                            positionTitle: selectedCoverLetter.positionTitle,
+                            companyName: selectedCoverLetter.companyName,
+                            language: selectedCoverLetter.language,
+                          })
+                        } else {
+                          // Basic cover letter
+                          await downloadBasicCoverLetterCustomPdf({
+                            content: editedContent,
+                            positionTitle: selectedCoverLetter.positionTitle,
+                            companyName: selectedCoverLetter.companyName,
+                            language: selectedCoverLetter.language,
+                          })
+                        }
+                      } else {
+                        // Download original version
+                        handleDownload(selectedCoverLetter)
+                      }
                     }}
                     readonly={false}
                   />

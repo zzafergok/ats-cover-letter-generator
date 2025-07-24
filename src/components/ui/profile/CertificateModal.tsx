@@ -133,14 +133,12 @@ export function CertificateModal({ isOpen, onClose, onSave, certificate, isLoadi
                   name='certificateName'
                   control={control}
                   render={({ field }) => (
-                    <Input
-                      {...field}
-                      id='certificateName'
-                      placeholder='AWS Certified Solutions Architect, PMP, vb.'
-                    />
+                    <Input {...field} id='certificateName' placeholder='AWS Certified Solutions Architect, PMP, vb.' />
                   )}
                 />
-                {errors.certificateName && <p className='text-sm text-red-500 mt-1'>{errors.certificateName.message}</p>}
+                {errors.certificateName && (
+                  <p className='text-sm text-red-500 mt-1'>{errors.certificateName.message}</p>
+                )}
               </div>
 
               <div className='col-span-2'>
@@ -149,11 +147,7 @@ export function CertificateModal({ isOpen, onClose, onSave, certificate, isLoadi
                   name='issuer'
                   control={control}
                   render={({ field }) => (
-                    <Input
-                      {...field}
-                      id='issuer'
-                      placeholder='Amazon Web Services, PMI, Microsoft, vb.'
-                    />
+                    <Input {...field} id='issuer' placeholder='Amazon Web Services, PMI, Microsoft, vb.' />
                   )}
                 />
                 {errors.issuer && <p className='text-sm text-red-500 mt-1'>{errors.issuer.message}</p>}
@@ -165,8 +159,8 @@ export function CertificateModal({ isOpen, onClose, onSave, certificate, isLoadi
                   name='issueMonth'
                   control={control}
                   render={({ field }) => (
-                    <Select 
-                      onValueChange={(value) => field.onChange(value ? parseInt(value) : undefined)} 
+                    <Select
+                      onValueChange={(value) => field.onChange(value ? parseInt(value) : undefined)}
                       value={field.value?.toString() || ''}
                     >
                       <SelectTrigger>
@@ -191,8 +185,8 @@ export function CertificateModal({ isOpen, onClose, onSave, certificate, isLoadi
                   name='issueYear'
                   control={control}
                   render={({ field }) => (
-                    <Select 
-                      onValueChange={(value) => field.onChange(value ? parseInt(value) : undefined)} 
+                    <Select
+                      onValueChange={(value) => field.onChange(value ? parseInt(value) : undefined)}
                       value={field.value?.toString() || ''}
                     >
                       <SelectTrigger>
@@ -217,8 +211,8 @@ export function CertificateModal({ isOpen, onClose, onSave, certificate, isLoadi
                   name='expiryMonth'
                   control={control}
                   render={({ field }) => (
-                    <Select 
-                      onValueChange={(value) => field.onChange(value ? parseInt(value) : undefined)} 
+                    <Select
+                      onValueChange={(value) => field.onChange(value ? parseInt(value) : undefined)}
                       value={field.value?.toString() || ''}
                     >
                       <SelectTrigger>
@@ -243,8 +237,8 @@ export function CertificateModal({ isOpen, onClose, onSave, certificate, isLoadi
                   name='expiryYear'
                   control={control}
                   render={({ field }) => (
-                    <Select 
-                      onValueChange={(value) => field.onChange(value ? parseInt(value) : undefined)} 
+                    <Select
+                      onValueChange={(value) => field.onChange(value ? parseInt(value) : undefined)}
                       value={field.value?.toString() || ''}
                     >
                       <SelectTrigger>
@@ -268,13 +262,7 @@ export function CertificateModal({ isOpen, onClose, onSave, certificate, isLoadi
                 <Controller
                   name='credentialId'
                   control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      id='credentialId'
-                      placeholder='AWS-SA-2023-123456'
-                    />
-                  )}
+                  render={({ field }) => <Input {...field} id='credentialId' placeholder='AWS-SA-2023-123456' />}
                 />
                 {errors.credentialId && <p className='text-sm text-red-500 mt-1'>{errors.credentialId.message}</p>}
               </div>
@@ -285,12 +273,7 @@ export function CertificateModal({ isOpen, onClose, onSave, certificate, isLoadi
                   name='credentialUrl'
                   control={control}
                   render={({ field }) => (
-                    <Input
-                      {...field}
-                      id='credentialUrl'
-                      type='url'
-                      placeholder='https://aws.amazon.com/verification'
-                    />
+                    <Input {...field} id='credentialUrl' type='url' placeholder='https://aws.amazon.com/verification' />
                   )}
                 />
                 {errors.credentialUrl && <p className='text-sm text-red-500 mt-1'>{errors.credentialUrl.message}</p>}

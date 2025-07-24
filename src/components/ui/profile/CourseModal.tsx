@@ -145,11 +145,7 @@ export function CourseModal({ isOpen, onClose, onSave, course, isLoading = false
                   name='provider'
                   control={control}
                   render={({ field }) => (
-                    <Input
-                      {...field}
-                      id='provider'
-                      placeholder='Udemy, Coursera, BTK Akademi, vb.'
-                    />
+                    <Input {...field} id='provider' placeholder='Udemy, Coursera, BTK Akademi, vb.' />
                   )}
                 />
                 {errors.provider && <p className='text-sm text-red-500 mt-1'>{errors.provider.message}</p>}
@@ -161,8 +157,8 @@ export function CourseModal({ isOpen, onClose, onSave, course, isLoading = false
                   name='startMonth'
                   control={control}
                   render={({ field }) => (
-                    <Select 
-                      onValueChange={(value) => field.onChange(value ? parseInt(value) : undefined)} 
+                    <Select
+                      onValueChange={(value) => field.onChange(value ? parseInt(value) : undefined)}
                       value={field.value?.toString() || ''}
                     >
                       <SelectTrigger>
@@ -187,8 +183,8 @@ export function CourseModal({ isOpen, onClose, onSave, course, isLoading = false
                   name='startYear'
                   control={control}
                   render={({ field }) => (
-                    <Select 
-                      onValueChange={(value) => field.onChange(value ? parseInt(value) : undefined)} 
+                    <Select
+                      onValueChange={(value) => field.onChange(value ? parseInt(value) : undefined)}
                       value={field.value?.toString() || ''}
                     >
                       <SelectTrigger>
@@ -213,8 +209,8 @@ export function CourseModal({ isOpen, onClose, onSave, course, isLoading = false
                   name='endMonth'
                   control={control}
                   render={({ field }) => (
-                    <Select 
-                      onValueChange={(value) => field.onChange(value ? parseInt(value) : undefined)} 
+                    <Select
+                      onValueChange={(value) => field.onChange(value ? parseInt(value) : undefined)}
                       value={field.value?.toString() || ''}
                     >
                       <SelectTrigger>
@@ -239,8 +235,8 @@ export function CourseModal({ isOpen, onClose, onSave, course, isLoading = false
                   name='endYear'
                   control={control}
                   render={({ field }) => (
-                    <Select 
-                      onValueChange={(value) => field.onChange(value ? parseInt(value) : undefined)} 
+                    <Select
+                      onValueChange={(value) => field.onChange(value ? parseInt(value) : undefined)}
                       value={field.value?.toString() || ''}
                     >
                       <SelectTrigger>
@@ -264,13 +260,7 @@ export function CourseModal({ isOpen, onClose, onSave, course, isLoading = false
                 <Controller
                   name='duration'
                   control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      id='duration'
-                      placeholder='20 saat, 8 hafta, 3 ay, vb.'
-                    />
-                  )}
+                  render={({ field }) => <Input {...field} id='duration' placeholder='20 saat, 8 hafta, 3 ay, vb.' />}
                 />
                 {errors.duration && <p className='text-sm text-red-500 mt-1'>{errors.duration.message}</p>}
               </div>

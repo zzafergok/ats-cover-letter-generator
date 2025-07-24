@@ -112,7 +112,7 @@ export function EducationModal({ isOpen, onClose, onSave, education, isLoading =
 
       setStep('form')
       setSelectedType(educationType)
-      
+
       const formData = {
         schoolName: education.schoolName || '',
         degree: selectedEducationType?.degree || education.degree || '',
@@ -315,12 +315,7 @@ export function EducationModal({ isOpen, onClose, onSave, education, isLoading =
                     name='degree'
                     control={control}
                     render={({ field }) => (
-                      <Input
-                        {...field}
-                        id='degree'
-                        placeholder='Ön Lisans, Lisans, Yüksek Lisans, vb.'
-                        disabled
-                      />
+                      <Input {...field} id='degree' placeholder='Ön Lisans, Lisans, Yüksek Lisans, vb.' disabled />
                     )}
                   />
                   {errors.degree && <p className='text-sm text-red-500 mt-1'>{errors.degree.message}</p>}
@@ -332,13 +327,7 @@ export function EducationModal({ isOpen, onClose, onSave, education, isLoading =
                 <Controller
                   name='fieldOfStudy'
                   control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      id='fieldOfStudy'
-                      placeholder='Bilgisayar Programcılığı'
-                    />
-                  )}
+                  render={({ field }) => <Input {...field} id='fieldOfStudy' placeholder='Bilgisayar Programcılığı' />}
                 />
                 {errors.fieldOfStudy && <p className='text-sm text-red-500 mt-1'>{errors.fieldOfStudy.message}</p>}
               </div>
@@ -448,12 +437,7 @@ export function EducationModal({ isOpen, onClose, onSave, education, isLoading =
                   name='description'
                   control={control}
                   render={({ field }) => (
-                    <Textarea
-                      {...field}
-                      id='description'
-                      placeholder='Başarılar, önemli projeler, vb.'
-                      rows={3}
-                    />
+                    <Textarea {...field} id='description' placeholder='Başarılar, önemli projeler, vb.' rows={3} />
                   )}
                 />
                 {errors.description && <p className='text-sm text-red-500 mt-1'>{errors.description.message}</p>}

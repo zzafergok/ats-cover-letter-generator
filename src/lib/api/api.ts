@@ -64,6 +64,13 @@ export const coverLetterApi = {
 
     downloadPdf: (id: string): Promise<Blob> =>
       apiRequest.get(`/cover-letter-basic/${id}/download/pdf`, { responseType: 'blob' }),
+
+    downloadCustomPdf: (data: {
+      content: string
+      positionTitle: string
+      companyName: string
+      language?: 'TURKISH' | 'ENGLISH'
+    }): Promise<Blob> => apiRequest.post('/cover-letter-basic/download/custom-pdf', data, { responseType: 'blob' }),
   },
 
   // Detailed Cover Letter servisleri
@@ -83,6 +90,13 @@ export const coverLetterApi = {
 
     downloadPdf: (id: string): Promise<Blob> =>
       apiRequest.get(`/cover-letter-detailed/${id}/download/pdf`, { responseType: 'blob' }),
+
+    downloadCustomPdf: (data: {
+      content: string
+      positionTitle: string
+      companyName: string
+      language?: 'TURKISH' | 'ENGLISH'
+    }): Promise<Blob> => apiRequest.post('/cover-letter-detailed/download/custom-pdf', data, { responseType: 'blob' }),
   },
 }
 

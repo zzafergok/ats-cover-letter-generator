@@ -145,18 +145,18 @@ export const useUserProfileStore = create<UserProfileStore>()(
         set({ isLoading: true, error: null })
         try {
           const response = await userProfileApi.education.update(id, data)
-          
+
           set((state) => {
             if (!state.profile) return { isLoading: false }
-            
+
             const currentEducations = state.profile.educations || []
             const existingEducation = currentEducations.find((edu) => edu && edu.id === id)
-            
+
             if (!existingEducation) {
               console.warn('Education not found for update:', id)
               return { isLoading: false }
             }
-            
+
             // Create updated education by merging existing data with API response
             // Preserve all original fields and only update what's provided
             const updatedEducation: Education = {
@@ -170,20 +170,19 @@ export const useUserProfileStore = create<UserProfileStore>()(
               startYear: response.data.startYear || existingEducation.startYear,
               endYear: response.data.endYear !== undefined ? response.data.endYear : existingEducation.endYear,
               isCurrent: response.data.isCurrent !== undefined ? response.data.isCurrent : existingEducation.isCurrent,
-              description: response.data.description !== undefined ? response.data.description : existingEducation.description,
+              description:
+                response.data.description !== undefined ? response.data.description : existingEducation.description,
             }
-            
+
             return {
               profile: {
                 ...state.profile,
-                educations: currentEducations.map((edu) => 
-                  edu && edu.id === id ? updatedEducation : edu
-                ),
+                educations: currentEducations.map((edu) => (edu && edu.id === id ? updatedEducation : edu)),
               },
               isLoading: false,
             }
           })
-          
+
           return response.data
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || 'Eğitim bilgisi güncellenirken hata oluştu'
@@ -238,27 +237,27 @@ export const useUserProfileStore = create<UserProfileStore>()(
         try {
           const response = await userProfileApi.experience.update(id, data)
           console.log('Work experience update response:', response)
-          
+
           set((state) => {
             if (!state.profile) return { isLoading: false }
-            
+
             const currentExperiences = state.profile.experiences || []
             const existingExperience = currentExperiences.find((exp) => exp && exp.id === id)
-            
+
             if (!existingExperience) {
               console.warn('Work experience not found for update:', id)
               return { isLoading: false }
             }
-            
+
             // Eğer API response.data yoksa veya boşsa, mevcut veriyi koru
             if (!response || !response.data) {
               console.warn('Invalid API response for work experience update:', response)
               return { isLoading: false }
             }
-            
+
             // Create updated experience by merging existing data with API response
             const responseData = response.data
-            
+
             const updatedExperience: WorkExperience = {
               ...existingExperience, // Start with existing experience
               // Override only with provided values from API response
@@ -275,18 +274,16 @@ export const useUserProfileStore = create<UserProfileStore>()(
               ...(responseData.description !== undefined && { description: responseData.description }),
               ...(responseData.achievements !== undefined && { achievements: responseData.achievements }),
             }
-            
+
             return {
               profile: {
                 ...state.profile,
-                experiences: currentExperiences.map((exp) => 
-                  exp && exp.id === id ? updatedExperience : exp
-                ),
+                experiences: currentExperiences.map((exp) => (exp && exp.id === id ? updatedExperience : exp)),
               },
               isLoading: false,
             }
           })
-          
+
           return response.data
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || 'İş deneyimi güncellenirken hata oluştu'
@@ -341,11 +338,11 @@ export const useUserProfileStore = create<UserProfileStore>()(
         try {
           const response = await userProfileApi.course.update(id, data)
           console.log('Course update response:', response)
-          
+
           // Update işleminden sonra profili yeniden fetch et
           const { getProfile } = _get()
           await getProfile()
-          
+
           return response.data
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || 'Kurs bilgisi güncellenirken hata oluştu'
@@ -400,11 +397,11 @@ export const useUserProfileStore = create<UserProfileStore>()(
         try {
           const response = await userProfileApi.certificate.update(id, data)
           console.log('Certificate update response:', response)
-          
+
           // Update işleminden sonra profili yeniden fetch et
           const { getProfile } = _get()
           await getProfile()
-          
+
           return response.data
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || 'Sertifika bilgisi güncellenirken hata oluştu'
@@ -523,11 +520,11 @@ export const useUserProfileStore = create<UserProfileStore>()(
         try {
           const response = await userProfileApi.skill.update(id, data)
           console.log('Skill update response:', response)
-          
+
           // Update işleminden sonra profili yeniden fetch et
           const { getProfile } = _get()
           await getProfile()
-          
+
           return response.data
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || 'Yetenek bilgisi güncellenirken hata oluştu'

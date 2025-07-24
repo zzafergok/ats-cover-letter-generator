@@ -16,12 +16,7 @@ interface EducationTabProps {
   onDeleteEducation: (id: string, name: string) => void
 }
 
-export function EducationTab({ 
-  profile, 
-  onOpenModal, 
-  onOpenEditModal, 
-  onDeleteEducation 
-}: EducationTabProps) {
+export function EducationTab({ profile, onOpenModal, onOpenEditModal, onDeleteEducation }: EducationTabProps) {
   return (
     <div className='space-y-6'>
       <div className='flex justify-between items-center'>

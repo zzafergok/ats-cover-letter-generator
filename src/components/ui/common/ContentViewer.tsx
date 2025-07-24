@@ -2,7 +2,7 @@
 'use client'
 
 import React, { useState, useMemo, useCallback } from 'react'
-import { Download, Copy, Check, Edit, FileText, Mail, Eye } from 'lucide-react'
+import { Download, Copy, Check, Edit, FileText, Mail, Eye, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/core/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/core/card'
 import { Textarea } from '@/components/core/textarea'
@@ -22,12 +22,14 @@ import { Separator } from '@/components/core/separator'
 import { Alert, AlertDescription } from '@/components/core/alert'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/core/tabs'
 import { ScrollArea } from '@/components/core/scroll-area'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/core/dropdown'
 import { useClipboard } from '@/hooks/useClipboard'
 
 // Types
 type ContentType = 'cv' | 'cover-letter' | 'cover-letter-basic' | 'cover-letter-detailed'
 type ViewMode = 'preview' | 'edit' | 'raw'
 type DownloadFormat = 'pdf'
+type DownloadType = 'original' | 'edited'
 
 interface SaveData {
   title: string
@@ -44,9 +46,12 @@ interface ContentViewerProps {
     wordCount?: number
     characterCount?: number
     estimatedReadTime?: number
+    companyName?: string
+    positionTitle?: string
+    language?: 'TURKISH' | 'ENGLISH'
   }
   onSave?: (data: SaveData) => Promise<void>
-  onDownload?: (format: DownloadFormat) => Promise<void>
+  onDownload?: (format: DownloadFormat, downloadType?: DownloadType, editedContent?: string) => Promise<void>
   onEdit?: (content: string) => void
   className?: string
   readonly?: boolean
@@ -187,20 +192,30 @@ export function ContentViewer({
     [onEdit],
   )
 
-  const handleDownload = useCallback(async () => {
-    if (!onDownload) return
+  const handleDownload = useCallback(
+    async (downloadType: DownloadType = 'original') => {
+      if (!onDownload) return
 
-    try {
-      setIsDownloading(true)
-      await onDownload(downloadFormat)
-      setDownloadDialogOpen(false)
-    } catch (error) {
-      console.error('Download error:', error)
-      // Handle error (could add toast notification here)
-    } finally {
-      setIsDownloading(false)
-    }
-  }, [onDownload, downloadFormat])
+      try {
+        setIsDownloading(true)
+        if (downloadType === 'edited') {
+          await onDownload(downloadFormat, downloadType, editedContent)
+        } else {
+          await onDownload(downloadFormat, downloadType)
+        }
+        setDownloadDialogOpen(false)
+      } catch (error) {
+        console.error('Download error:', error)
+        // Handle error (could add toast notification here)
+      } finally {
+        setIsDownloading(false)
+      }
+    },
+    [onDownload, downloadFormat, editedContent],
+  )
+
+  const handleOriginalDownload = useCallback(() => handleDownload('original'), [handleDownload])
+  const handleEditedDownload = useCallback(() => handleDownload('edited'), [handleDownload])
 
   const handleCopy = useCallback(() => {
     copyToClipboard(editedContent)
@@ -208,6 +223,11 @@ export function ContentViewer({
 
   // Content validation
   const hasContent = content.trim().length > 0
+  const hasContentChanged = editedContent !== content
+  const canDownloadEdited =
+    hasContentChanged && (type.includes('cover-letter-detailed') || type.includes('cover-letter-basic'))
+
+  // Debug logging removed
 
   if (!hasContent) {
     return (
@@ -324,7 +344,6 @@ export function ContentViewer({
               />
             </TabsContent>
           )}
-
         </Tabs>
 
         {/* Action buttons */}
@@ -334,52 +353,76 @@ export function ContentViewer({
             <div className='flex items-center justify-end pt-2'>
               {/* Download button */}
               {onDownload && (
-                <AlertDialog open={downloadDialogOpen} onOpenChange={setDownloadDialogOpen}>
-                  <AlertDialogTrigger asChild>
-                    <Button variant='default' size='lg' className='px-6'>
-                      <Download className='h-4 w-4 mr-2' />
-                      PDF İndir
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle className='flex items-center gap-2'>
-                        <Download className='h-5 w-5 text-primary' />
-                        PDF Olarak İndir
-                      </AlertDialogTitle>
-                      <AlertDialogDescription>
-                        "{title}" dosyasını PDF olarak indirmek istediğinizden emin misiniz?
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <div className='flex items-center gap-3 p-4 bg-muted/50 rounded-lg my-4'>
-                      <div className='w-10 h-10 bg-red-100 dark:bg-red-900/20 rounded-lg flex items-center justify-center'>
-                        <FileText className='h-5 w-5 text-red-600 dark:text-red-400' />
-                      </div>
-                      <div className='flex-1'>
-                        <p className='font-medium text-sm'>PDF Formatında İndirilecek</p>
-                        <p className='text-xs text-muted-foreground'>
-                          Dosya otomatik olarak indirme klasörünüze kaydedilecektir
-                        </p>
-                      </div>
-                    </div>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>İptal</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleDownload} disabled={isDownloading}>
-                        {isDownloading ? (
-                          <>
-                            <div className='w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2' />
-                            İndiriliyor...
-                          </>
-                        ) : (
-                          <>
-                            <Download className='h-4 w-4 mr-2' />
-                            İndir
-                          </>
-                        )}
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                <>
+                  {canDownloadEdited ? (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant='default' size='lg' className='px-6'>
+                          <Download className='h-4 w-4 mr-2' />
+                          PDF İndir
+                          <ChevronDown className='h-4 w-4 ml-2' />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align='end' className='w-56'>
+                        <DropdownMenuItem onClick={() => setDownloadDialogOpen(true)}>
+                          <FileText className='h-4 w-4 mr-2' />
+                          Orijinal Ön Yazıyı İndir
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleEditedDownload}>
+                          <Edit className='h-4 w-4 mr-2' />
+                          Düzenlenmiş Ön Yazıyı İndir
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  ) : (
+                    <AlertDialog open={downloadDialogOpen} onOpenChange={setDownloadDialogOpen}>
+                      <AlertDialogTrigger asChild>
+                        <Button variant='default' size='lg' className='px-6'>
+                          <Download className='h-4 w-4 mr-2' />
+                          PDF İndir
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle className='flex items-center gap-2'>
+                            <Download className='h-5 w-5 text-primary' />
+                            PDF Olarak İndir
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            "{title}" dosyasını PDF olarak indirmek istediğinizden emin misiniz?
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <div className='flex items-center gap-3 p-4 bg-muted/50 rounded-lg my-4'>
+                          <div className='w-10 h-10 bg-red-100 dark:bg-red-900/20 rounded-lg flex items-center justify-center'>
+                            <FileText className='h-5 w-5 text-red-600 dark:text-red-400' />
+                          </div>
+                          <div className='flex-1'>
+                            <p className='font-medium text-sm'>PDF Formatında İndirilecek</p>
+                            <p className='text-xs text-muted-foreground'>
+                              Dosya otomatik olarak indirme klasörünüze kaydedilecektir
+                            </p>
+                          </div>
+                        </div>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>İptal</AlertDialogCancel>
+                          <AlertDialogAction onClick={handleOriginalDownload} disabled={isDownloading}>
+                            {isDownloading ? (
+                              <>
+                                <div className='w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2' />
+                                İndiriliyor...
+                              </>
+                            ) : (
+                              <>
+                                <Download className='h-4 w-4 mr-2' />
+                                İndir
+                              </>
+                            )}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
+                </>
               )}
             </div>
           </>

@@ -34,7 +34,10 @@ const skillSchema = z.object({
   name: z.string().min(1, 'Yetenek adı zorunludur'),
   category: z.enum(['TECHNICAL', 'SOFT_SKILL', 'LANGUAGE', 'TOOL', 'FRAMEWORK', 'OTHER']),
   level: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED', 'EXPERT']),
-  yearsOfExperience: z.number().min(0, 'Deneyim yılı 0 veya pozitif olmalıdır').max(50, 'Deneyim yılı 50\'den fazla olamaz'),
+  yearsOfExperience: z
+    .number()
+    .min(0, 'Deneyim yılı 0 veya pozitif olmalıdır')
+    .max(50, "Deneyim yılı 50'den fazla olamaz"),
 })
 
 type SkillFormData = z.infer<typeof skillSchema>
@@ -113,13 +116,7 @@ export function SkillModal({ isOpen, onClose, onSave, skill, isLoading = false }
               <Controller
                 name='name'
                 control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    id='name'
-                    placeholder='JavaScript, React, Liderlik, vb.'
-                  />
-                )}
+                render={({ field }) => <Input {...field} id='name' placeholder='JavaScript, React, Liderlik, vb.' />}
               />
               {errors.name && <p className='text-sm text-red-500 mt-1'>{errors.name.message}</p>}
             </div>
@@ -187,7 +184,9 @@ export function SkillModal({ isOpen, onClose, onSave, skill, isLoading = false }
                   />
                 )}
               />
-              {errors.yearsOfExperience && <p className='text-sm text-red-500 mt-1'>{errors.yearsOfExperience.message}</p>}
+              {errors.yearsOfExperience && (
+                <p className='text-sm text-red-500 mt-1'>{errors.yearsOfExperience.message}</p>
+              )}
             </div>
 
             <div className='flex justify-end space-x-2 pt-4'>

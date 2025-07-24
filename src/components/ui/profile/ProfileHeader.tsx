@@ -320,12 +320,7 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
                     <Controller
                       name='firstName'
                       control={control}
-                      render={({ field }) => (
-                        <Input
-                          {...field}
-                          placeholder='Adınız'
-                        />
-                      )}
+                      render={({ field }) => <Input {...field} placeholder='Adınız' />}
                     />
                     {errors.firstName && <p className='text-sm text-red-500 mt-1'>{errors.firstName.message}</p>}
                   </div>
@@ -334,12 +329,7 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
                     <Controller
                       name='lastName'
                       control={control}
-                      render={({ field }) => (
-                        <Input
-                          {...field}
-                          placeholder='Soyadınız'
-                        />
-                      )}
+                      render={({ field }) => <Input {...field} placeholder='Soyadınız' />}
                     />
                     {errors.lastName && <p className='text-sm text-red-500 mt-1'>{errors.lastName.message}</p>}
                   </div>
@@ -350,12 +340,7 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
                   <Controller
                     name='phone'
                     control={control}
-                    render={({ field }) => (
-                      <Input
-                        {...field}
-                        placeholder='Telefon numaranız'
-                      />
-                    )}
+                    render={({ field }) => <Input {...field} placeholder='Telefon numaranız' />}
                   />
                   {errors.phone && <p className='text-sm text-red-500 mt-1'>{errors.phone.message}</p>}
                 </div>
@@ -376,8 +361,8 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
                     <div>
                       <p className='text-sm font-medium'>Seçili Renk</p>
                       <p className='text-xs text-muted-foreground'>
-                        {avatarColors.find((c) => c.color.toLowerCase() === watchAvatarColor?.toLowerCase())
-                          ?.name || 'Varsayılan'}
+                        {avatarColors.find((c) => c.color.toLowerCase() === watchAvatarColor?.toLowerCase())?.name ||
+                          'Varsayılan'}
                       </p>
                     </div>
                   </div>
@@ -451,12 +436,7 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
                     <Controller
                       name='linkedin'
                       control={control}
-                      render={({ field }) => (
-                        <Input
-                          {...field}
-                          placeholder='LinkedIn profil URLsi'
-                        />
-                      )}
+                      render={({ field }) => <Input {...field} placeholder='LinkedIn profil URLsi' />}
                     />
                     {errors.linkedin && <p className='text-sm text-red-500 mt-1'>{errors.linkedin.message}</p>}
                   </div>
@@ -465,12 +445,7 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
                     <Controller
                       name='github'
                       control={control}
-                      render={({ field }) => (
-                        <Input
-                          {...field}
-                          placeholder='GitHub profil URLsi'
-                        />
-                      )}
+                      render={({ field }) => <Input {...field} placeholder='GitHub profil URLsi' />}
                     />
                     {errors.github && <p className='text-sm text-red-500 mt-1'>{errors.github.message}</p>}
                   </div>
@@ -481,14 +456,11 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
                   <Controller
                     name='portfolioWebsite'
                     control={control}
-                    render={({ field }) => (
-                      <Input
-                        {...field}
-                        placeholder='Portfolyo website URLsi'
-                      />
-                    )}
+                    render={({ field }) => <Input {...field} placeholder='Portfolyo website URLsi' />}
                   />
-                  {errors.portfolioWebsite && <p className='text-sm text-red-500 mt-1'>{errors.portfolioWebsite.message}</p>}
+                  {errors.portfolioWebsite && (
+                    <p className='text-sm text-red-500 mt-1'>{errors.portfolioWebsite.message}</p>
+                  )}
                 </div>
 
                 <div>
@@ -497,11 +469,7 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
                     name='aboutMe'
                     control={control}
                     render={({ field }) => (
-                      <Textarea
-                        {...field}
-                        placeholder='Kendiniz hakkında detaylı bir açıklama...'
-                        rows={4}
-                      />
+                      <Textarea {...field} placeholder='Kendiniz hakkında detaylı bir açıklama...' rows={4} />
                     )}
                   />
                   {errors.aboutMe && <p className='text-sm text-red-500 mt-1'>{errors.aboutMe.message}</p>}

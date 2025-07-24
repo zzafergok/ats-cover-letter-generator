@@ -169,7 +169,9 @@ export function AuthHeader() {
             <div className='flex items-center space-x-8'>
               <Link href='/dashboard' className='flex items-center space-x-2'>
                 {/* <Logo size='sm' showText={false} className='hover:scale-105 transition-transform' /> */}
-                <span className='text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent hidden sm:block'>{t('common.appName')}</span>
+                <span className='text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent hidden sm:block'>
+                  {t('common.appName')}
+                </span>
               </Link>
 
               <nav className='hidden lg:flex items-center space-x-1'>

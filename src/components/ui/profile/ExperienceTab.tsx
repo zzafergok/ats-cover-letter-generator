@@ -17,12 +17,7 @@ interface ExperienceTabProps {
   onDeleteExperience?: (id: string, name: string) => void
 }
 
-export function ExperienceTab({ 
-  profile, 
-  onOpenModal, 
-  onOpenEditModal,
-  onDeleteExperience
-}: ExperienceTabProps) {
+export function ExperienceTab({ profile, onOpenModal, onOpenEditModal, onDeleteExperience }: ExperienceTabProps) {
   return (
     <div className='space-y-6'>
       <div className='flex justify-between items-center'>
@@ -62,10 +57,7 @@ export function ExperienceTab({
                         </Badge>
                       )}
                       {exp.isCurrent && (
-                        <Badge
-                          variant='outline'
-                          className='text-xs bg-orange-50 text-orange-700 border-orange-200'
-                        >
+                        <Badge variant='outline' className='text-xs bg-orange-50 text-orange-700 border-orange-200'>
                           Aktif
                         </Badge>
                       )}
@@ -127,7 +119,9 @@ export function ExperienceTab({
             <CardContent className='p-12 text-center'>
               <Briefcase className='h-12 w-12 text-muted-foreground mx-auto mb-4' />
               <p className='text-muted-foreground mb-4'>Henüz iş deneyiminiz bulunmuyor</p>
-              <Button onClick={onOpenModal} variant='outline'>İlk deneyiminizi ekleyin</Button>
+              <Button onClick={onOpenModal} variant='outline'>
+                İlk deneyiminizi ekleyin
+              </Button>
             </CardContent>
           </Card>
         )}

@@ -33,6 +33,12 @@ interface CoverLetterActions {
   updateBasicCoverLetter: (id: string, data: CoverLetterBasicUpdateData) => Promise<CoverLetterBasic>
   deleteBasicCoverLetter: (id: string) => Promise<void>
   downloadBasicCoverLetterPdf: (id: string) => Promise<void>
+  downloadBasicCoverLetterCustomPdf: (data: {
+    content: string
+    positionTitle: string
+    companyName: string
+    language?: 'TURKISH' | 'ENGLISH'
+  }) => Promise<void>
 
   // Detailed Cover Letter Actions
   createDetailedCoverLetter: (data: CoverLetterDetailedGenerateData) => Promise<CoverLetterDetailed>
@@ -41,6 +47,12 @@ interface CoverLetterActions {
   updateDetailedCoverLetter: (id: string, data: CoverLetterDetailedUpdateData) => Promise<CoverLetterDetailed>
   deleteDetailedCoverLetter: (id: string) => Promise<void>
   downloadDetailedCoverLetterPdf: (id: string) => Promise<void>
+  downloadDetailedCoverLetterCustomPdf: (data: {
+    content: string
+    positionTitle: string
+    companyName: string
+    language?: 'TURKISH' | 'ENGLISH'
+  }) => Promise<void>
 
   // Utility Actions
   setSelectedType: (type: CoverLetterType) => void
@@ -136,19 +148,19 @@ export const useCoverLetterStore = create<CoverLetterStore>()(
         set({ isLoading: true, error: null })
         try {
           const blob = await coverLetterApi.basic.downloadPdf(id)
-          
+
           // Try to get filename from Content-Disposition header or use default
           let filename = `Cover_Letter_${id}.pdf`
-          
+
           // Find the cover letter to get company and position info for better filename
           const state = get()
-          const coverLetter = state.basicCoverLetters.find(letter => letter.id === id)
+          const coverLetter = state.basicCoverLetters.find((letter) => letter.id === id)
           if (coverLetter) {
             const cleanCompany = coverLetter.companyName.replace(/[^a-zA-Z0-9]/g, '_')
             const cleanPosition = coverLetter.positionTitle.replace(/[^a-zA-Z0-9]/g, '_')
             filename = `${cleanCompany}_${cleanPosition}_Cover_Letter.pdf`
           }
-          
+
           const url = window.URL.createObjectURL(blob)
           const a = document.createElement('a')
           a.href = url
@@ -160,6 +172,31 @@ export const useCoverLetterStore = create<CoverLetterStore>()(
           set({ isLoading: false })
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || 'PDF indirilirken hata oluştu'
+          set({ isLoading: false, error: errorMessage })
+        }
+      },
+
+      downloadBasicCoverLetterCustomPdf: async (data) => {
+        set({ isLoading: true, error: null })
+        try {
+          const blob = await coverLetterApi.basic.downloadCustomPdf(data)
+
+          // Create filename based on the provided data
+          const cleanCompany = data.companyName.replace(/[^a-zA-Z0-9]/g, '_')
+          const cleanPosition = data.positionTitle.replace(/[^a-zA-Z0-9]/g, '_')
+          const filename = `${cleanCompany}_${cleanPosition}_Edited_Cover_Letter.pdf`
+
+          const url = window.URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = filename
+          document.body.appendChild(a)
+          a.click()
+          window.URL.revokeObjectURL(url)
+          document.body.removeChild(a)
+          set({ isLoading: false })
+        } catch (error: any) {
+          const errorMessage = error.response?.data?.message || 'Düzenlenmiş PDF indirilirken hata oluştu'
           set({ isLoading: false, error: errorMessage })
         }
       },
@@ -236,10 +273,23 @@ export const useCoverLetterStore = create<CoverLetterStore>()(
         set({ isLoading: true, error: null })
         try {
           const blob = await coverLetterApi.detailed.downloadPdf(id)
+
+          // Try to get filename from Content-Disposition header or use default
+          let filename = `Detailed_Cover_Letter_${id}.pdf`
+
+          // Find the cover letter to get company and position info for better filename
+          const state = get()
+          const coverLetter = state.detailedCoverLetters.find((letter) => letter.id === id)
+          if (coverLetter) {
+            const cleanCompany = coverLetter.companyName.replace(/[^a-zA-Z0-9]/g, '_')
+            const cleanPosition = coverLetter.positionTitle.replace(/[^a-zA-Z0-9]/g, '_')
+            filename = `${cleanCompany}_${cleanPosition}_Cover_Letter.pdf`
+          }
+
           const url = window.URL.createObjectURL(blob)
           const a = document.createElement('a')
           a.href = url
-          a.download = `detayli-on-yazi-${id}.pdf`
+          a.download = filename
           document.body.appendChild(a)
           a.click()
           window.URL.revokeObjectURL(url)
@@ -247,6 +297,31 @@ export const useCoverLetterStore = create<CoverLetterStore>()(
           set({ isLoading: false })
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || 'PDF indirilirken hata oluştu'
+          set({ isLoading: false, error: errorMessage })
+        }
+      },
+
+      downloadDetailedCoverLetterCustomPdf: async (data) => {
+        set({ isLoading: true, error: null })
+        try {
+          const blob = await coverLetterApi.detailed.downloadCustomPdf(data)
+
+          // Create filename based on the provided data
+          const cleanCompany = data.companyName.replace(/[^a-zA-Z0-9]/g, '_')
+          const cleanPosition = data.positionTitle.replace(/[^a-zA-Z0-9]/g, '_')
+          const filename = `${cleanCompany}_${cleanPosition}_Edited_Cover_Letter.pdf`
+
+          const url = window.URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = filename
+          document.body.appendChild(a)
+          a.click()
+          window.URL.revokeObjectURL(url)
+          document.body.removeChild(a)
+          set({ isLoading: false })
+        } catch (error: any) {
+          const errorMessage = error.response?.data?.message || 'Düzenlenmiş PDF indirilirken hata oluştu'
           set({ isLoading: false, error: errorMessage })
         }
       },

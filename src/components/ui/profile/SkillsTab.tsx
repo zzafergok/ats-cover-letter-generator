@@ -52,7 +52,10 @@ export function SkillsTab({ profile, onOpenModal, onOpenEditModal, onDeleteSkill
                     if (!skill) return null
                     const levelInfo = skillLevels.find((l) => l.value === skill.level)
                     return (
-                      <div key={skill.id} className='flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors'>
+                      <div
+                        key={skill.id}
+                        className='flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors'
+                      >
                         <div className='flex-1'>
                           <p className='font-medium'>{skill.name}</p>
                           {skill.yearsOfExperience && (
@@ -64,9 +67,9 @@ export function SkillsTab({ profile, onOpenModal, onOpenEditModal, onDeleteSkill
                           {(onOpenEditModal || onDeleteSkill) && (
                             <div className='flex space-x-1'>
                               {onOpenEditModal && (
-                                <Button 
-                                  variant='ghost' 
-                                  size='sm' 
+                                <Button
+                                  variant='ghost'
+                                  size='sm'
                                   onClick={() => onOpenEditModal(skill.id, skill)}
                                   className='h-8 w-8 p-0'
                                 >
@@ -74,9 +77,9 @@ export function SkillsTab({ profile, onOpenModal, onOpenEditModal, onDeleteSkill
                                 </Button>
                               )}
                               {onDeleteSkill && (
-                                <Button 
-                                  variant='ghost' 
-                                  size='sm' 
+                                <Button
+                                  variant='ghost'
+                                  size='sm'
                                   onClick={() => onDeleteSkill(skill.id, skill.name)}
                                   className='h-8 w-8 p-0 text-destructive hover:text-destructive'
                                   title='Yeteneği Sil'
@@ -100,7 +103,9 @@ export function SkillsTab({ profile, onOpenModal, onOpenEditModal, onDeleteSkill
           <CardContent className='p-12 text-center'>
             <Star className='h-12 w-12 text-muted-foreground mx-auto mb-4' />
             <p className='text-muted-foreground mb-4'>Henüz yeteneğiniz bulunmuyor</p>
-            <Button onClick={onOpenModal} variant='outline'>İlk yeteneğinizi ekleyin</Button>
+            <Button onClick={onOpenModal} variant='outline'>
+              İlk yeteneğinizi ekleyin
+            </Button>
           </CardContent>
         </Card>
       )}

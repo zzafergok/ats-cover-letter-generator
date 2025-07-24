@@ -230,7 +230,7 @@ export function CoverLetterViewer({
   readonly = false,
 }: CoverLetterViewerProps) {
   // State management
-  const [editedContent, setEditedContent] = useState(coverLetter.content)
+  const [editedContent, setEditedContent] = useState(coverLetter.content || coverLetter.generatedContent || '')
   const [viewMode, setViewMode] = useState<ViewMode>('preview')
   const [saveDialogOpen, setSaveDialogOpen] = useState(false)
   const [downloadDialogOpen, setDownloadDialogOpen] = useState(false)
@@ -246,7 +246,7 @@ export function CoverLetterViewer({
 
   // Custom hooks
   const { isCopied, copyToClipboard } = useClipboard()
-  const contentStats = useContentStats(editedContent)
+  const contentStats = useContentStats(editedContent || '')
 
   // Computed values
   const typeConfig = useMemo(
@@ -270,7 +270,8 @@ export function CoverLetterViewer({
   )
 
   const handleSave = useCallback(async () => {
-    if (editedContent === coverLetter.content) return
+    const currentContent = coverLetter.content || coverLetter.generatedContent || ''
+    if (editedContent === currentContent) return
 
     try {
       if (type === 'basic') {
@@ -291,6 +292,7 @@ export function CoverLetterViewer({
   }, [
     editedContent,
     coverLetter.content,
+    coverLetter.generatedContent,
     coverLetter.id,
     type,
     updateBasicCoverLetter,
@@ -312,11 +314,12 @@ export function CoverLetterViewer({
   }, [coverLetter.id, type, downloadBasicCoverLetterPdf, downloadDetailedCoverLetterPdf])
 
   const handleCopy = useCallback(() => {
-    copyToClipboard(editedContent)
+    copyToClipboard(editedContent || '')
   }, [copyToClipboard, editedContent])
 
   // Content validation
-  const hasContent = coverLetter.content.trim().length > 0
+  const content = coverLetter.content || coverLetter.generatedContent || ''
+  const hasContent = content.trim().length > 0
 
   if (!hasContent) {
     return (
@@ -407,14 +410,14 @@ export function CoverLetterViewer({
 
           <TabsContent value='preview' className='mt-4'>
             <ScrollArea className='h-[500px] w-full rounded-md border p-4'>
-              <CoverLetterRenderer content={editedContent} type={type} />
+              <CoverLetterRenderer content={editedContent || ''} type={type} />
             </ScrollArea>
           </TabsContent>
 
           {!readonly && (
             <TabsContent value='edit' className='mt-4'>
               <Textarea
-                value={editedContent}
+                value={editedContent || ''}
                 onChange={(e) => handleContentChange(e.target.value)}
                 rows={20}
                 className='font-mono text-sm'
@@ -436,7 +439,7 @@ export function CoverLetterViewer({
               {/* Save button */}
               <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button variant='outline' disabled={editedContent === coverLetter.content}>
+                  <Button variant='outline' disabled={editedContent === content}>
                     <Save className='h-4 w-4 mr-2' />
                     Değişiklikleri Kaydet
                   </Button>

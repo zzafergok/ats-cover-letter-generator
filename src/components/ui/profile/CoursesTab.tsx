@@ -48,16 +48,14 @@ export function CoursesTab({ profile, onOpenModal, onOpenEditModal, onDeleteCour
                       </p>
                     )}
                     {course.duration && <Badge variant='secondary'>{course.duration}</Badge>}
-                    {course.description && (
-                      <p className='text-sm text-muted-foreground mt-2'>{course.description}</p>
-                    )}
+                    {course.description && <p className='text-sm text-muted-foreground mt-2'>{course.description}</p>}
                   </div>
                   {(onOpenEditModal || onDeleteCourse) && (
                     <div className='flex space-x-2'>
                       {onOpenEditModal && (
-                        <Button 
-                          variant='ghost' 
-                          size='sm' 
+                        <Button
+                          variant='ghost'
+                          size='sm'
                           onClick={() => onOpenEditModal(course.id, course)}
                           title='Kursu Düzenle'
                         >
@@ -65,9 +63,9 @@ export function CoursesTab({ profile, onOpenModal, onOpenEditModal, onDeleteCour
                         </Button>
                       )}
                       {onDeleteCourse && (
-                        <Button 
-                          variant='ghost' 
-                          size='sm' 
+                        <Button
+                          variant='ghost'
+                          size='sm'
                           onClick={() => onDeleteCourse(course.id, course.courseName)}
                           className='text-destructive hover:text-destructive'
                           title='Kursu Sil'
@@ -88,7 +86,9 @@ export function CoursesTab({ profile, onOpenModal, onOpenEditModal, onDeleteCour
             <CardContent className='p-12 text-center'>
               <BookOpen className='h-12 w-12 text-muted-foreground mx-auto mb-4' />
               <p className='text-muted-foreground mb-4'>Henüz kursunuz bulunmuyor</p>
-              <Button onClick={onOpenModal} variant='outline'>İlk kursunuzu ekleyin</Button>
+              <Button onClick={onOpenModal} variant='outline'>
+                İlk kursunuzu ekleyin
+              </Button>
             </CardContent>
           </Card>
         )}

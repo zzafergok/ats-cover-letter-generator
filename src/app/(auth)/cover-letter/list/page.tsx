@@ -9,9 +9,7 @@ export default function CoverLetterListPage() {
       <div className='max-w-6xl mx-auto'>
         <div className='mb-6'>
           <h1 className='text-3xl font-bold tracking-tight'>Ön Yazı Arşivi</h1>
-          <p className='text-muted-foreground mt-2'>
-            Oluşturduğunuz tüm ön yazıları görüntüleyin, indirin veya silin.
-          </p>
+          <p className='text-muted-foreground mt-2'>Oluşturduğunuz tüm ön yazıları görüntüleyin, indirin veya silin.</p>
         </div>
         <CoverLetterList />
       </div>

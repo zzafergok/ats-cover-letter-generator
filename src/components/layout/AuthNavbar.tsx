@@ -17,6 +17,7 @@ import {
   FileText,
   Users,
   Layout,
+  List,
 } from 'lucide-react'
 
 import {
@@ -90,6 +91,12 @@ export function AuthHeader() {
           href: '/cover-letter/template',
           icon: Layout,
           description: t('navigation.coverLetterTemplatesDescription'),
+        },
+        {
+          name: t('navigation.coverLetterList'),
+          href: '/cover-letter/list',
+          icon: List,
+          description: t('navigation.coverLetterListDescription'),
         },
       ],
     },

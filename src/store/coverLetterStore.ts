@@ -136,10 +136,23 @@ export const useCoverLetterStore = create<CoverLetterStore>()(
         set({ isLoading: true, error: null })
         try {
           const blob = await coverLetterApi.basic.downloadPdf(id)
+          
+          // Try to get filename from Content-Disposition header or use default
+          let filename = `Cover_Letter_${id}.pdf`
+          
+          // Find the cover letter to get company and position info for better filename
+          const state = get()
+          const coverLetter = state.basicCoverLetters.find(letter => letter.id === id)
+          if (coverLetter) {
+            const cleanCompany = coverLetter.companyName.replace(/[^a-zA-Z0-9]/g, '_')
+            const cleanPosition = coverLetter.positionTitle.replace(/[^a-zA-Z0-9]/g, '_')
+            filename = `${cleanCompany}_${cleanPosition}_Cover_Letter.pdf`
+          }
+          
           const url = window.URL.createObjectURL(blob)
           const a = document.createElement('a')
           a.href = url
-          a.download = `temel-on-yazi-${id}.pdf`
+          a.download = filename
           document.body.appendChild(a)
           a.click()
           window.URL.revokeObjectURL(url)

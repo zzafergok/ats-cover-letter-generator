@@ -1,14 +1,22 @@
+/* eslint-disable react/no-unescaped-entities */
 'use client'
 
 import React, { useState, useMemo, useCallback } from 'react'
-import { Download, Save, Copy, Check, Edit, FileText, Mail, Eye, EyeOff } from 'lucide-react'
+import { Download, Copy, Check, Edit, FileText, Mail, Eye, EyeOff } from 'lucide-react'
 import { Button } from '@/components/core/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/core/card'
 import { Textarea } from '@/components/core/textarea'
-import { Input } from '@/components/core/input'
-import { Label } from '@/components/core/label'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/core/dialog'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/core/select'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/core/alert-dialog'
 import { Badge } from '@/components/core/badge'
 import { Separator } from '@/components/core/separator'
 import { Alert, AlertDescription } from '@/components/core/alert'
@@ -19,7 +27,7 @@ import { useClipboard } from '@/hooks/useClipboard'
 // Types
 type ContentType = 'cv' | 'cover-letter' | 'cover-letter-basic' | 'cover-letter-detailed'
 type ViewMode = 'preview' | 'edit' | 'raw'
-type DownloadFormat = 'pdf' | 'docx'
+type DownloadFormat = 'pdf'
 
 interface SaveData {
   title: string
@@ -71,7 +79,7 @@ const ContentRenderer: React.FC<{ content: string; type: ContentType }> = ({ con
     if (!content || typeof content !== 'string') {
       return 'İçerik bulunamadı.'
     }
-    
+
     // Basic markdown-like formatting with improved line break handling
     return content
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
@@ -99,7 +107,6 @@ export function ContentViewer({
   title,
   type,
   metadata,
-  onSave,
   onDownload,
   onEdit,
   className,
@@ -107,12 +114,9 @@ export function ContentViewer({
 }: ContentViewerProps) {
   // State management
   const [editedContent, setEditedContent] = useState(content)
-  const [saveTitle, setSaveTitle] = useState('')
   const [viewMode, setViewMode] = useState<ViewMode>('preview')
-  const [isSaving, setIsSaving] = useState(false)
   const [isDownloading, setIsDownloading] = useState(false)
-  const [downloadFormat, setDownloadFormat] = useState<DownloadFormat>('pdf')
-  const [saveDialogOpen, setSaveDialogOpen] = useState(false)
+  const [downloadFormat] = useState<DownloadFormat>('pdf')
   const [downloadDialogOpen, setDownloadDialogOpen] = useState(false)
 
   // Custom hooks
@@ -165,25 +169,6 @@ export function ContentViewer({
     },
     [onEdit],
   )
-
-  const handleSave = useCallback(async () => {
-    if (!onSave || !saveTitle.trim()) return
-
-    try {
-      setIsSaving(true)
-      await onSave({
-        title: saveTitle,
-        content: editedContent,
-      })
-      setSaveTitle('')
-      setSaveDialogOpen(false)
-    } catch (error) {
-      console.error('Save error:', error)
-      // Handle error (could add toast notification here)
-    } finally {
-      setIsSaving(false)
-    }
-  }, [onSave, saveTitle, editedContent])
 
   const handleDownload = useCallback(async () => {
     if (!onDownload) return
@@ -331,73 +316,55 @@ export function ContentViewer({
         {!readonly && (
           <>
             <Separator />
-            <div className='flex flex-wrap gap-2'>
-              {/* Save button */}
-              {onSave && (
-                <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button variant='outline'>
-                      <Save className='h-4 w-4 mr-2' />
-                      Kaydet
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>{typeConfig.saveLabel}</DialogTitle>
-                    </DialogHeader>
-                    <div className='space-y-4'>
-                      <div className='space-y-2'>
-                        <Label htmlFor='saveTitle'>Başlık</Label>
-                        <Input
-                          id='saveTitle'
-                          value={saveTitle}
-                          onChange={(e) => setSaveTitle(e.target.value)}
-                          placeholder={`${typeConfig.label} başlığı girin`}
-                        />
-                      </div>
-                      <Button onClick={handleSave} disabled={!saveTitle.trim() || isSaving} className='w-full'>
-                        {isSaving ? 'Kaydediliyor...' : 'Kaydet'}
-                      </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              )}
-
+            <div className='flex items-center justify-end'>
               {/* Download button */}
               {onDownload && (
-                <Dialog open={downloadDialogOpen} onOpenChange={setDownloadDialogOpen}>
-                  <DialogTrigger asChild>
+                <AlertDialog open={downloadDialogOpen} onOpenChange={setDownloadDialogOpen}>
+                  <AlertDialogTrigger asChild>
                     <Button variant='outline'>
                       <Download className='h-4 w-4 mr-2' />
                       İndir
                     </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>{typeConfig.downloadLabel}</DialogTitle>
-                    </DialogHeader>
-                    <div className='space-y-4'>
-                      <div className='space-y-2'>
-                        <Label htmlFor='downloadFormat'>Format</Label>
-                        <Select
-                          value={downloadFormat}
-                          onValueChange={(value: DownloadFormat) => setDownloadFormat(value)}
-                        >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value='pdf'>PDF</SelectItem>
-                            <SelectItem value='docx'>Word (DOCX)</SelectItem>
-                          </SelectContent>
-                        </Select>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className='flex items-center gap-2'>
+                        <Download className='h-5 w-5 text-primary' />
+                        PDF Olarak İndir
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        "{title}" dosyasını PDF olarak indirmek istediğinizden emin misiniz?
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <div className='flex items-center gap-3 p-4 bg-muted/50 rounded-lg my-4'>
+                      <div className='w-10 h-10 bg-red-100 dark:bg-red-900/20 rounded-lg flex items-center justify-center'>
+                        <FileText className='h-5 w-5 text-red-600 dark:text-red-400' />
                       </div>
-                      <Button onClick={handleDownload} disabled={isDownloading} className='w-full'>
-                        {isDownloading ? 'İndiriliyor...' : `${downloadFormat.toUpperCase()} olarak İndir`}
-                      </Button>
+                      <div className='flex-1'>
+                        <p className='font-medium text-sm'>PDF Formatında İndirilecek</p>
+                        <p className='text-xs text-muted-foreground'>
+                          Dosya otomatik olarak indirme klasörünüze kaydedilecektir
+                        </p>
+                      </div>
                     </div>
-                  </DialogContent>
-                </Dialog>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>İptal</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleDownload} disabled={isDownloading}>
+                        {isDownloading ? (
+                          <>
+                            <div className='w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2' />
+                            İndiriliyor...
+                          </>
+                        ) : (
+                          <>
+                            <Download className='h-4 w-4 mr-2' />
+                            İndir
+                          </>
+                        )}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               )}
             </div>
           </>

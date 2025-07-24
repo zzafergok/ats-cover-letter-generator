@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useCoverLetterStore } from '@/store/coverLetterStore'
 import { useCVStore } from '@/store/cvStore'
 import { ContentViewer } from '@/components/ui/common/ContentViewer'
+import { coverLetterApi } from '@/lib/api/api'
 import type { CoverLetterBasic, CoverLetterBasicGenerateData, CVUpload, Language } from '@/types/api.types'
 
 // Validation schema matching API CoverLetterBasicGenerateData
@@ -46,7 +47,7 @@ export function BasicCoverLetterCreator({ onCreated, className }: BasicCoverLett
   const [generatedContent, setGeneratedContent] = useState<string | null>(null)
   const [generatedCoverLetter, setGeneratedCoverLetter] = useState<CoverLetterBasic | null>(null)
 
-  const { createBasicCoverLetter, isGenerating, error, clearError } = useCoverLetterStore()
+  const { createBasicCoverLetter, isGenerating, isLoading, error, clearError } = useCoverLetterStore()
   const { uploadedCVs, getUploadedCVs, selectedCV } = useCVStore()
 
   const {
@@ -74,6 +75,9 @@ export function BasicCoverLetterCreator({ onCreated, className }: BasicCoverLett
   const onSubmit = async (data: BasicCoverLetterForm) => {
     try {
       clearError()
+      // Reset preview content before generating new cover letter
+      setGeneratedContent(null)
+      setGeneratedCoverLetter(null)
 
       const coverLetterData: CoverLetterBasicGenerateData = {
         cvUploadId: data.cvUploadId,
@@ -85,13 +89,22 @@ export function BasicCoverLetterCreator({ onCreated, className }: BasicCoverLett
 
       const createdLetter = await createBasicCoverLetter(coverLetterData)
       console.log('Created cover letter:', createdLetter)
-      setGeneratedCoverLetter(createdLetter)
       
-      // Handle both 'content' and 'generatedContent' properties for backward compatibility
-      const content = createdLetter.content || (createdLetter as any).generatedContent || ''
-      setGeneratedContent(content)
-      console.log('Generated content set:', content)
-      onCreated?.(createdLetter)
+      // Create a proper CoverLetterBasic object with all required fields
+      const fullCoverLetter: CoverLetterBasic = {
+        id: createdLetter.id,
+        content: createdLetter.content || (createdLetter as any).generatedContent || '',
+        positionTitle: data.positionTitle,
+        companyName: data.companyName,
+        language: data.language as Language,
+        createdAt: createdLetter.createdAt,
+        updatedAt: createdLetter.updatedAt || createdLetter.createdAt,
+      }
+      
+      setGeneratedCoverLetter(fullCoverLetter)
+      setGeneratedContent(fullCoverLetter.content)
+      console.log('Generated content set:', fullCoverLetter.content)
+      onCreated?.(fullCoverLetter)
     } catch (error) {
       console.error('Basic cover letter creation error:', error)
     }
@@ -338,9 +351,30 @@ export function BasicCoverLetterCreator({ onCreated, className }: BasicCoverLett
                   console.log('Save Cover Letter:', { title, content })
                 }}
                 onDownload={async (format) => {
-                  // Download functionality can be implemented here
-                  console.log('Download Cover Letter as:', format)
+                  if (format === 'pdf' && generatedCoverLetter?.id) {
+                    try {
+                      // Create a better filename using current cover letter data
+                      const cleanCompany = generatedCoverLetter.companyName.replace(/[^a-zA-Z0-9]/g, '_')
+                      const cleanPosition = generatedCoverLetter.positionTitle.replace(/[^a-zA-Z0-9]/g, '_')
+                      const filename = `${cleanCompany}_${cleanPosition}_Cover_Letter.pdf`
+                      
+                      const blob = await coverLetterApi.basic.downloadPdf(generatedCoverLetter.id)
+                      const url = window.URL.createObjectURL(blob)
+                      const a = document.createElement('a')
+                      a.href = url
+                      a.download = filename
+                      document.body.appendChild(a)
+                      a.click()
+                      window.URL.revokeObjectURL(url)
+                      document.body.removeChild(a)
+                    } catch (error) {
+                      console.error('PDF download failed:', error)
+                    }
+                  } else {
+                    console.log('Download Cover Letter as:', format)
+                  }
                 }}
+                readonly={isLoading}
               />
             </CardContent>
           </Card>

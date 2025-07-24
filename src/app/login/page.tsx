@@ -111,11 +111,11 @@ const LoginContent: React.FC = () => {
     }
   }
 
-  const fillDemoAccount = (type: 'ortak' | 'zafer' | 'akin') => {
+  const fillDemoAccount = (type: 'ahmet' | 'admin' | 'mehmet') => {
     const demoAccounts = {
-      ortak: { email: 'ortak@example.com', password: 'Test123!' },
-      zafer: { email: 'zafer@example.com', password: 'Test123!' },
-      akin: { email: 'akin@example.com', password: 'Test123!' },
+      ahmet: { email: 'ahmet.yilmaz@test.com', password: 'test123456' },
+      admin: { email: 'admin@atscv.com', password: 'test123456' },
+      mehmet: { email: 'mehmet.demir@test.com', password: 'test123456' },
     }
 
     const account = demoAccounts[type]
@@ -220,7 +220,7 @@ const LoginContent: React.FC = () => {
                     type='button'
                     variant='outline'
                     size='sm'
-                    onClick={() => fillDemoAccount('ortak')}
+                    onClick={() => fillDemoAccount('ahmet')}
                     disabled={isLoading}
                     className='text-xs theme-transition-colors'
                   >
@@ -230,7 +230,7 @@ const LoginContent: React.FC = () => {
                     type='button'
                     variant='outline'
                     size='sm'
-                    onClick={() => fillDemoAccount('zafer')}
+                    onClick={() => fillDemoAccount('admin')}
                     disabled={isLoading}
                     className='text-xs theme-transition-colors'
                   >
@@ -240,7 +240,7 @@ const LoginContent: React.FC = () => {
                     type='button'
                     variant='outline'
                     size='sm'
-                    onClick={() => fillDemoAccount('akin')}
+                    onClick={() => fillDemoAccount('mehmet')}
                     disabled={isLoading}
                     className='text-xs theme-transition-colors'
                   >

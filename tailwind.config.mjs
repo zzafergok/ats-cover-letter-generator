@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   darkMode: ['class'],
   content: ['./pages/**/*.{ts,tsx}', './components/**/*.{ts,tsx}', './app/**/*.{ts,tsx}', './src/**/*.{ts,tsx}'],
   theme: {
@@ -21,17 +21,17 @@ module.exports = {
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
-          50: 'hsl(210, 100%, 97%)',
-          100: 'hsl(210, 100%, 93%)',
-          200: 'hsl(210, 100%, 87%)',
-          300: 'hsl(210, 100%, 78%)',
-          400: 'hsl(210, 100%, 66%)',
-          500: 'hsl(210, 100%, 56%)',
-          600: 'hsl(210, 100%, 47%)',
-          700: 'hsl(210, 100%, 39%)',
-          800: 'hsl(210, 100%, 31%)',
-          900: 'hsl(210, 100%, 24%)',
-          950: 'hsl(210, 100%, 15%)',
+          50: 'hsl(0, 65%, 97%)',
+          100: 'hsl(0, 65%, 93%)',
+          200: 'hsl(0, 65%, 87%)',
+          300: 'hsl(0, 65%, 78%)',
+          400: 'hsl(0, 65%, 66%)',
+          500: 'hsl(0, 65%, 56%)',
+          600: 'hsl(0, 65%, 47%)',
+          700: 'hsl(0, 65%, 39%)',
+          800: 'hsl(0, 65%, 31%)',
+          900: 'hsl(0, 65%, 24%)',
+          950: 'hsl(0, 65%, 15%)',
         },
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
@@ -146,11 +146,11 @@ module.exports = {
         'pulse-subtle': 'pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       },
       boxShadow: {
-        ocean: '0 4px 6px -1px rgba(0, 119, 182, 0.1), 0 2px 4px -1px rgba(0, 119, 182, 0.06)',
-        'ocean-lg': '0 10px 15px -3px rgba(0, 119, 182, 0.1), 0 4px 6px -2px rgba(0, 119, 182, 0.05)',
-        'ocean-xl': '0 20px 25px -5px rgba(0, 119, 182, 0.1), 0 10px 10px -5px rgba(0, 119, 182, 0.04)',
-        glow: '0 0 20px rgba(0, 119, 182, 0.3)',
-        'glow-lg': '0 0 40px rgba(0, 119, 182, 0.2)',
+        primary: '0 4px 6px -1px rgba(216, 64, 64, 0.1), 0 2px 4px -1px rgba(216, 64, 64, 0.06)',
+        'primary-lg': '0 10px 15px -3px rgba(216, 64, 64, 0.1), 0 4px 6px -2px rgba(216, 64, 64, 0.05)',
+        'primary-xl': '0 20px 25px -5px rgba(216, 64, 64, 0.1), 0 10px 10px -5px rgba(216, 64, 64, 0.04)',
+        glow: '0 0 20px rgba(216, 64, 64, 0.3)',
+        'glow-lg': '0 0 40px rgba(216, 64, 64, 0.2)',
       },
       backdropBlur: {
         xs: '2px',

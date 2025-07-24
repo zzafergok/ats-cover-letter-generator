@@ -10,7 +10,7 @@ import './globals.css'
 
 export const metadata: Metadata = {
   title: 'Talent Architect',
-  description: 'Modern task management platform',
+  description: 'Build Better Careers',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -18,7 +18,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang='tr'>
       <body className=''>
         <ReactQueryProvider>
-          {/* Mevcut AuthProvider korunuyor */}
           <AuthProvider>
             <ThemeProvider>
               <I18nProvider>

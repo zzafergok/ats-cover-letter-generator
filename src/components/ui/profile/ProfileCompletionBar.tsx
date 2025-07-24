@@ -85,9 +85,9 @@ export function ProfileCompletionBar({ profile }: ProfileCompletionBarProps) {
 
   const getProgressColor = () => {
     if (completionPercentage >= 90) return 'bg-green-500'
-    if (completionPercentage >= 70) return 'bg-blue-500'
-    if (completionPercentage >= 50) return 'bg-yellow-500'
-    return 'bg-red-500'
+    if (completionPercentage >= 70) return 'bg-primary'
+    if (completionPercentage >= 50) return 'bg-primary/70'
+    return 'bg-primary/50'
   }
 
   const getMissingItems = () => {

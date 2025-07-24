@@ -16,8 +16,8 @@
     --popover: 0 0% 98%;
     --popover-foreground: 0 0% 13%;
 
-    /* Ana deniz mavisi tema renkleri */
-    --primary: 200 75% 45%;
+    /* Ana kırmızı tema renkleri - #D84040 base */
+    --primary: 0 65% 56%;
     --primary-foreground: 0 0% 98%;
 
     /* İkincil renk paleti */
@@ -39,7 +39,7 @@
     /* Border ve input renkleri */
     --border: 0 0% 90%; /* HSL-200 benzeri */
     --input: 0 0% 90%;
-    --ring: 200 75% 45%;
+    --ring: 0 65% 56%;
 
     /* Border radius */
     --radius: 0.75rem;
@@ -60,8 +60,8 @@
     --popover: 0 0% 13%;
     --popover-foreground: 0 0% 98%;
 
-    /* Dark mode ana deniz mavisi tema renkleri */
-    --primary: 200 80% 58%;
+    /* Dark mode ana kırmızı tema renkleri */
+    --primary: 0 65% 60%;
     --primary-foreground: 0 0% 9%;
 
     /* Dark mode ikincil renk paleti */
@@ -83,7 +83,7 @@
     /* Dark mode border ve input renkleri */
     --border: 0 0% 17%; /* HSL-800 benzeri */
     --input: 0 0% 17%;
-    --ring: 200 80% 58%;
+    --ring: 0 65% 60%;
   }
 
   /* Tema geçişleri için özel CSS */
@@ -215,7 +215,7 @@
   }
 
   .card-interactive {
-    @apply card-base transition-all hover:shadow-md hover:border-primary/20;
+    @apply card-base transition-all hover:shadow-md hover:border-primary/20 hover:shadow-primary/5;
   }
 
   /* Button Improvements */
@@ -257,6 +257,15 @@
   /* Focus States */
   .focus-ring {
     @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background;
+  }
+
+  /* Subtle Primary Accents */
+  .accent-border {
+    @apply border-l-2 border-primary/20;
+  }
+
+  .accent-bg {
+    @apply bg-primary/5;
   }
 
   /* Glass Effect */

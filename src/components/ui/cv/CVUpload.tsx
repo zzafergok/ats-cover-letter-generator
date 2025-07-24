@@ -18,26 +18,31 @@ interface CVUploadProps {
 }
 
 export function CVUpload({ onUploadSuccess, maxFiles = 1, className }: CVUploadProps) {
-  const { uploadCV, isUploading, error, clearError } = useCVStore()
+  const { uploadCV, isUploading, error, clearError, getUploadedCVs } = useCVStore()
 
   const [uploadProgress, setUploadProgress] = useState(0)
   const [uploadSuccess, setUploadSuccess] = useState(false)
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [processingMessage, setProcessingMessage] = useState('')
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
       clearError()
       setUploadSuccess(false)
+      setIsProcessing(false)
+      setProcessingMessage('')
 
       for (const file of acceptedFiles) {
+        let progressInterval: NodeJS.Timeout | null = null
         try {
           setUploadProgress(0)
-          const progressInterval = setInterval(() => {
+          progressInterval = setInterval(() => {
             setUploadProgress((prev) => Math.min(prev + 10, 90))
           }, 200)
 
           const response: any = await uploadCV(file)
 
-          clearInterval(progressInterval)
+          if (progressInterval) clearInterval(progressInterval)
 
           // API response kontrolü
           if (response?.success === true) {
@@ -53,14 +58,47 @@ export function CVUpload({ onUploadSuccess, maxFiles = 1, className }: CVUploadP
             throw new Error(response?.message || 'CV yüklenirken bir hata oluştu')
           }
         } catch (error: any) {
+          if (progressInterval) clearInterval(progressInterval)
           setUploadProgress(0)
           setUploadSuccess(false)
-          // Store'daki error handling'e güvenmek yerine manuel set
-          console.error('CV upload failed:', error)
+          
+          // Check if it's a processing error (CV_009 or similar processing messages)
+          const errorMessage = error.response?.data?.message || error.message || 'CV yüklenirken bir hata oluştu'
+          
+          if (errorMessage.includes('CV_009') || errorMessage.includes('işleniyor') || errorMessage.includes('processing')) {
+            // Handle processing state
+            setIsProcessing(true)
+            setProcessingMessage('CV dosyanız işleniyor. Bu işlem birkaç dakika sürebilir...')
+            
+            // Poll for completion every 3 seconds
+            const pollInterval = setInterval(async () => {
+              try {
+                await getUploadedCVs()
+                // Check if processing is complete by refreshing uploaded CVs
+                // If successful, the store will update and we can clear processing state
+                setIsProcessing(false)
+                setProcessingMessage('')
+                clearInterval(pollInterval)
+              } catch (pollError) {
+                // Continue polling if still processing
+                console.log('Still processing...', pollError)
+              }
+            }, 3000)
+            
+            // Stop polling after 5 minutes
+            setTimeout(() => {
+              clearInterval(pollInterval)
+              setIsProcessing(false)
+              setProcessingMessage('')
+            }, 300000)
+          } else {
+            // Store'daki error handling'e güvenmek yerine manuel set
+            console.error('CV upload failed:', error)
+          }
         }
       }
     },
-    [uploadCV, clearError, onUploadSuccess],
+    [uploadCV, clearError, onUploadSuccess, getUploadedCVs],
   )
 
   const { getRootProps, getInputProps, isDragActive, fileRejections } = useDropzone({
@@ -72,7 +110,7 @@ export function CVUpload({ onUploadSuccess, maxFiles = 1, className }: CVUploadP
     },
     maxFiles,
     maxSize: 10 * 1024 * 1024, // 10MB
-    disabled: isUploading,
+    disabled: isUploading || isProcessing,
   })
 
   return (
@@ -94,20 +132,25 @@ export function CVUpload({ onUploadSuccess, maxFiles = 1, className }: CVUploadP
                 ? 'border-primary bg-primary/5'
                 : 'border-muted-foreground/25 hover:border-primary hover:bg-primary/5'
             }
-            ${isUploading ? 'pointer-events-none opacity-50' : ''}
+            ${isUploading || isProcessing ? 'pointer-events-none opacity-50' : ''}
           `}
         >
           <input {...getInputProps()} />
 
-          {isUploading ? (
+          {isUploading || isProcessing ? (
             <div className='space-y-4'>
               <div className='animate-pulse'>
                 <File className='mx-auto h-12 w-12 text-primary' />
               </div>
               <div className='space-y-2'>
-                <p className='text-sm font-medium'>CV yükleniyor...</p>
-                <Progress value={uploadProgress} className='w-full' />
-                <p className='text-xs text-muted-foreground'>{uploadProgress}%</p>
+                <p className='text-sm font-medium'>
+                  {isProcessing ? 'CV işleniyor...' : 'CV yükleniyor...'}
+                </p>
+                {!isProcessing && <Progress value={uploadProgress} className='w-full' />}
+                {!isProcessing && <p className='text-xs text-muted-foreground'>{uploadProgress}%</p>}
+                {isProcessing && (
+                  <p className='text-xs text-muted-foreground'>{processingMessage}</p>
+                )}
               </div>
             </div>
           ) : (

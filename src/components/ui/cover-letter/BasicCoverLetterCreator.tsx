@@ -84,8 +84,13 @@ export function BasicCoverLetterCreator({ onCreated, className }: BasicCoverLett
       }
 
       const createdLetter = await createBasicCoverLetter(coverLetterData)
+      console.log('Created cover letter:', createdLetter)
       setGeneratedCoverLetter(createdLetter)
-      setGeneratedContent(createdLetter.content)
+      
+      // Handle both 'content' and 'generatedContent' properties for backward compatibility
+      const content = createdLetter.content || (createdLetter as any).generatedContent || ''
+      setGeneratedContent(content)
+      console.log('Generated content set:', content)
       onCreated?.(createdLetter)
     } catch (error) {
       console.error('Basic cover letter creation error:', error)
@@ -108,27 +113,37 @@ export function BasicCoverLetterCreator({ onCreated, className }: BasicCoverLett
   }
 
   // If generated content exists, show it alongside the form
-  const shouldShowContent = generatedContent && generatedCoverLetter
+  const shouldShowContent = generatedContent && generatedCoverLetter && generatedContent.trim().length > 0
+  
+  console.log('Should show content:', shouldShowContent, {
+    generatedContent: !!generatedContent,
+    generatedCoverLetter: !!generatedCoverLetter,
+    contentLength: generatedContent?.length || 0
+  })
 
   return (
     <div className={className}>
-      <Card>
-        <CardHeader>
-          <div className='flex items-center gap-4'>
-            <div className='flex-shrink-0'>
-              <div className='w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center'>
-                <Mail className='w-6 h-6 text-primary' />
+      <div className={`grid gap-4 md:gap-6 ${shouldShowContent ? 'xl:grid-cols-2' : 'grid-cols-1'}`}>
+        {/* Form Section */}
+        <Card>
+          <CardHeader>
+            <div className='flex items-start sm:items-center gap-3 sm:gap-4'>
+              <div className='flex-shrink-0'>
+                <div className='w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-xl flex items-center justify-center'>
+                  <Mail className='w-5 h-5 sm:w-6 sm:h-6 text-primary' />
+                </div>
+              </div>
+              <div className='flex-1 min-w-0'>
+                <CardTitle className='text-xl sm:text-2xl'>Temel Ön Yazı Oluştur</CardTitle>
+                <p className='text-sm sm:text-base text-muted-foreground mt-1'>
+                  Hızlı başvuru için basit ve etkili ön yazı oluşturun
+                </p>
               </div>
             </div>
-            <div>
-              <CardTitle className='text-2xl'>Temel Ön Yazı Oluştur</CardTitle>
-              <p className='text-muted-foreground mt-1'>Hızlı başvuru için basit ve etkili ön yazı oluşturun</p>
-            </div>
-          </div>
-        </CardHeader>
+          </CardHeader>
 
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+          <CardContent>
+            <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
             {/* CV Selection */}
             <div className='space-y-2'>
               <Label htmlFor='cvUploadId'>CV Dosyası Seçimi *</Label>
@@ -262,18 +277,24 @@ export function BasicCoverLetterCreator({ onCreated, className }: BasicCoverLett
             )}
 
             {/* Action Buttons */}
-            <div className='flex gap-3'>
+            <div className='flex flex-col sm:flex-row gap-3'>
               <Button
                 type='submit'
                 disabled={isGenerating || (!selectedCV && (!uploadedCVs || uploadedCVs.length === 0))}
                 className='flex-1'
               >
                 {isGenerating && <Loader2 className='mr-2 h-4 w-4 animate-spin' />}
-                {isGenerating ? 'Ön Yazı Oluşturuluyor...' : 'Ön Yazı Oluştur'}
+                <span className='hidden sm:inline'>
+                  {isGenerating ? 'Ön Yazı Oluşturuluyor...' : 'Ön Yazı Oluştur'}
+                </span>
+                <span className='sm:hidden'>
+                  {isGenerating ? 'Oluşturuluyor...' : 'Oluştur'}
+                </span>
               </Button>
 
-              <Button type='button' variant='outline' onClick={handleReset} disabled={isGenerating}>
-                Formu Temizle
+              <Button type='button' variant='outline' onClick={handleReset} disabled={isGenerating} className='sm:w-auto'>
+                <span className='hidden sm:inline'>Formu Temizle</span>
+                <span className='sm:hidden'>Temizle</span>
               </Button>
             </div>
 
@@ -288,16 +309,20 @@ export function BasicCoverLetterCreator({ onCreated, className }: BasicCoverLett
                 </div>
               </div>
             )}
-          </form>
-        </CardContent>
-      </Card>
+            </form>
+          </CardContent>
+        </Card>
 
-      {/* Generated Cover Letter Content */}
-      {shouldShowContent && (
-        <>
-          <div className='border-t border-border mt-6' />
-          <Card className='mt-6'>
-            <CardContent className='pt-6'>
+        {/* Generated Cover Letter Content */}
+        {shouldShowContent && (
+          <Card>
+            <CardHeader>
+              <CardTitle className='text-xl'>Oluşturulan Ön Yazı</CardTitle>
+              <p className='text-muted-foreground'>
+                {watch('positionTitle')} - {watch('companyName')}
+              </p>
+            </CardHeader>
+            <CardContent>
               <ContentViewer
                 content={generatedContent}
                 title={`${watch('positionTitle')} - ${watch('companyName')}`}
@@ -319,8 +344,8 @@ export function BasicCoverLetterCreator({ onCreated, className }: BasicCoverLett
               />
             </CardContent>
           </Card>
-        </>
-      )}
+        )}
+      </div>
     </div>
   )
 }

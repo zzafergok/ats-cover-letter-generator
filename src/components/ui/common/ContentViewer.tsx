@@ -68,15 +68,22 @@ const useContentStats = (content: string) => {
 // Content renderer for better formatting
 const ContentRenderer: React.FC<{ content: string; type: ContentType }> = ({ content, type: _type }) => {
   const formattedContent = useMemo(() => {
-    // Basic markdown-like formatting
+    if (!content || typeof content !== 'string') {
+      return 'İçerik bulunamadı.'
+    }
+    
+    // Basic markdown-like formatting with improved line break handling
     return content
-      .replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>') // Bold
-      .replace(/\\*(.*?)\\*/g, '<em>$1</em>') // Italic
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+      .replace(/\*(.*?)\*/g, '<em>$1</em>') // Italic
       .replace(/^# (.*$)/gm, '<h1 class="text-2xl font-bold mb-4">$1</h1>') // H1
       .replace(/^## (.*$)/gm, '<h2 class="text-xl font-semibold mb-3">$1</h2>') // H2
       .replace(/^### (.*$)/gm, '<h3 class="text-lg font-medium mb-2">$1</h3>') // H3
       .replace(/^- (.*$)/gm, '<li class="ml-4">• $1</li>') // Bullet points
-      .replace(/\\n/g, '<br>') // Line breaks
+      .replace(/\n\n/g, '</p><p class="mb-4">') // Paragraph breaks
+      .replace(/\n/g, '<br>') // Line breaks
+      .replace(/^/, '<p class="mb-4">') // Start with paragraph
+      .replace(/$/, '</p>') // End with paragraph
   }, [content])
 
   return (

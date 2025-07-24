@@ -23,7 +23,7 @@ export function Logo({ size = 'md', className, showText = true }: LogoProps) {
       <div className={cn('rounded-lg flex items-center justify-center overflow-hidden', currentSize.class)}>
         <Image
           src='/assets/logo/logo-cat.png'
-          alt='Starkon Kanban'
+          alt='Talent Architect'
           width={currentSize.dimensions}
           height={currentSize.dimensions}
           className='w-full h-full object-contain'
@@ -31,7 +31,7 @@ export function Logo({ size = 'md', className, showText = true }: LogoProps) {
           quality={95}
         />
       </div>
-      {showText && <span className='text-xl font-bold text-foreground'>Starkon Kanban</span>}
+      {showText && <span className='text-xl font-bold text-foreground'>Talent Architect</span>}
     </div>
   )
 }

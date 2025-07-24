@@ -129,7 +129,7 @@
   "auth": {
     "signIn": "Giriş Yap",
     "signUp": "Kayıt Ol",
-    "loading": "Starkon Kanban...",
+    "loading": "Talent Architect...",
     "unauthorized": {
       "title": "Yetkisiz Erişim",
       "message": "Bu sayfaya erişim yetkiniz bulunmamaktadır.",
@@ -523,8 +523,8 @@
   "common": {
     "deleteWarning": "Bu işlem geri alınamaz.",
     "confirmDelete": "Evet, sil",
-    "appName": "Starkon Kanban",
-    "appTitle": "Starkon Kanban",
+    "appName": "Talent Architect",
+    "appTitle": "Talent Architect",
     "loading": "Yükleniyor...",
     "error": "Bir hata oluştu",
     "success": "Başarılı",

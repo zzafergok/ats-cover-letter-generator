@@ -125,7 +125,7 @@
   "auth": {
     "signIn": "Sign In",
     "signUp": "Sign Up",
-    "loading": "Starkon Kanban...",
+    "loading": "Talent Architect...",
     "unauthorized": {
       "title": "Unauthorized Access",
       "message": "You do not have permission to access this page.",
@@ -519,8 +519,8 @@
   "common": {
     "deleteWarning": "This action cannot be undone.",
     "confirmDelete": "Yes, delete",
-    "appName": "Starkon Kanban",
-    "appTitle": "Starkon Kanban",
+    "appName": "Talent Architect",
+    "appTitle": "Talent Architect",
     "loading": "Loading...",
     "error": "An error occurred",
     "success": "Success",

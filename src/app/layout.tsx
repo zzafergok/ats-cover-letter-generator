@@ -9,7 +9,7 @@ import { ReactQueryProvider } from '@/providers/ReactQueryProvider'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Starkon Kanban',
+  title: 'Talent Architect',
   description: 'Modern task management platform',
 }
 

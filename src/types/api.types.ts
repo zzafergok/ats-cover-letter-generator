@@ -79,7 +79,6 @@ export interface UserProfile {
   github?: string
   linkedin?: string
   portfolioWebsite?: string
-  portfolioTitle?: string
   aboutMe?: string
   profilePictureUrl?: string
   avatarColor?: string

@@ -43,7 +43,6 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
     github: '',
     linkedin: '',
     portfolioWebsite: '',
-    portfolioTitle: '',
     aboutMe: '',
     avatarColor: '',
   })
@@ -106,7 +105,6 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
         github: profile.github || '',
         linkedin: profile.linkedin || '',
         portfolioWebsite: profile.portfolioWebsite || '',
-        portfolioTitle: profile.portfolioTitle || '',
         aboutMe: profile.aboutMe || '',
         avatarColor: profile.avatarColor || '#3B82F6',
       })
@@ -142,7 +140,7 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
         <div className='flex flex-col md:flex-row items-start md:items-center space-y-6 md:space-y-0 md:space-x-8'>
           {/* Avatar */}
           <div className='relative'>
-            <Avatar className='h-24 w-24 border-4 border-background shadow-lg'>
+            <Avatar className='h-24 w-24 shadow-lg'>
               <AvatarFallback
                 className='text-2xl font-semibold'
                 style={getAvatarStyle(profile?.avatarColor || '#3B82F6')}
@@ -393,14 +391,6 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
                       value={profileForm.portfolioWebsite}
                       onChange={(e) => setProfileForm((prev) => ({ ...prev, portfolioWebsite: e.target.value }))}
                       placeholder='Portfolyo website URLsi'
-                    />
-                  </div>
-                  <div>
-                    <Label>Portfolyo Başlığı</Label>
-                    <Input
-                      value={profileForm.portfolioTitle}
-                      onChange={(e) => setProfileForm((prev) => ({ ...prev, portfolioTitle: e.target.value }))}
-                      placeholder='Portfolyo başlığınız'
                     />
                   </div>
                 </div>

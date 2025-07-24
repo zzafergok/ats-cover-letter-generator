@@ -20,18 +20,18 @@ const SelectTrigger = React.forwardRef<
     className={cn(
       'flex h-10 w-full items-center justify-between rounded-md border px-3 py-2 text-sm transition-colors',
       'placeholder:text-muted-foreground',
-      'focus:outline-none focus:ring-2 focus:ring-offset-2',
+      'focus:outline-none focus:ring-1 focus:ring-inset',
       'disabled:cursor-not-allowed disabled:opacity-50',
       '[&>span]:line-clamp-1',
       // Light mode styles
       'border-neutral-200 bg-white text-neutral-900',
       'hover:border-neutral-300 hover:bg-neutral-50',
-      'focus:ring-primary-500 focus:ring-offset-white focus:border-primary-500',
+      'focus:ring-primary/50 focus:border-primary-500',
       'placeholder:text-neutral-500',
       // Dark mode styles
       'dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100',
       'dark:hover:border-neutral-600 dark:hover:bg-neutral-800',
-      'dark:focus:ring-primary-400 dark:focus:ring-offset-neutral-900 dark:focus:border-primary-400',
+      'dark:focus:ring-primary/40 dark:focus:border-primary-400',
       'dark:placeholder:text-neutral-400',
       className,
     )}

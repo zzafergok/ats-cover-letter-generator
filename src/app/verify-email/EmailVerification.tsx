@@ -118,7 +118,7 @@ const EmailVerification = () => {
                 <p className='mt-2 text-sm text-red-700 dark:text-red-300 mb-6'>{message.description}</p>
                 <button
                   onClick={handleReturnToLogin}
-                  className='w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors theme-transition-colors'
+                  className='w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-1 focus:ring-primary/50 focus:ring-inset transition-colors theme-transition-colors'
                 >
                   {t('auth.emailVerification.returnToLogin')}
                 </button>

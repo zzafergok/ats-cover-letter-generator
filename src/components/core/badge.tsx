@@ -76,7 +76,7 @@ function Badge({
     <span
       className={cn(
         // Base classes without any border, background, or color classes
-        'inline-flex items-center font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-full',
+        'inline-flex items-center font-semibold transition-colors focus:outline-none focus:ring-1 focus:ring-ring/50 focus:ring-inset rounded-full',
         // Size classes
         sizeStyles[size],
         // Hover effects without color specifications

@@ -177,7 +177,7 @@ const RegisterForm = () => {
                   value={formData.fullName}
                   onChange={handleInputChange}
                   disabled={isLoading}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all bg-background text-foreground disabled:opacity-50 ${
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-1 focus:ring-primary/50 focus:ring-inset focus:border-transparent transition-all bg-background text-foreground disabled:opacity-50 ${
                     errors.fullName ? 'border-red-500' : 'border-border'
                   }`}
                   placeholder={t('auth.register.fullNamePlaceholder')}
@@ -200,7 +200,7 @@ const RegisterForm = () => {
                   value={formData.email}
                   onChange={handleInputChange}
                   disabled={isLoading}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all bg-background text-foreground disabled:opacity-50 ${
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-1 focus:ring-primary/50 focus:ring-inset focus:border-transparent transition-all bg-background text-foreground disabled:opacity-50 ${
                     errors.email ? 'border-red-500' : 'border-border'
                   }`}
                   placeholder={t('auth.register.emailPlaceholder')}
@@ -223,7 +223,7 @@ const RegisterForm = () => {
                   value={formData.password}
                   onChange={handleInputChange}
                   disabled={isLoading}
-                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all bg-background text-foreground disabled:opacity-50 ${
+                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-1 focus:ring-primary/50 focus:ring-inset focus:border-transparent transition-all bg-background text-foreground disabled:opacity-50 ${
                     errors.password ? 'border-red-500' : 'border-border'
                   }`}
                   placeholder={t('auth.register.passwordPlaceholder')}
@@ -254,7 +254,7 @@ const RegisterForm = () => {
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
                   disabled={isLoading}
-                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all bg-background text-foreground disabled:opacity-50 ${
+                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-1 focus:ring-primary/50 focus:ring-inset focus:border-transparent transition-all bg-background text-foreground disabled:opacity-50 ${
                     errors.confirmPassword ? 'border-red-500' : 'border-border'
                   }`}
                   placeholder={t('auth.register.confirmPasswordPlaceholder')}
@@ -280,7 +280,7 @@ const RegisterForm = () => {
                   checked={agreedToTerms}
                   onChange={(e) => setAgreedToTerms(e.target.checked)}
                   disabled={isLoading}
-                  className='mt-1 w-4 h-4 text-primary bg-background border-border rounded focus:ring-primary focus:ring-2 disabled:opacity-50'
+                  className='mt-1 w-4 h-4 text-primary bg-background border-border rounded focus:ring-primary/50 focus:ring-1 focus:ring-inset disabled:opacity-50'
                 />
                 <label htmlFor='terms-agreement' className='text-sm text-muted-foreground leading-relaxed'>
                   {t('auth.register.agreements.terms.prefix')}{' '}
@@ -302,7 +302,7 @@ const RegisterForm = () => {
                   checked={agreedToPrivacy}
                   onChange={(e) => setAgreedToPrivacy(e.target.checked)}
                   disabled={isLoading}
-                  className='mt-1 w-4 h-4 text-primary bg-background border-border rounded focus:ring-primary focus:ring-2 disabled:opacity-50'
+                  className='mt-1 w-4 h-4 text-primary bg-background border-border rounded focus:ring-primary/50 focus:ring-1 focus:ring-inset disabled:opacity-50'
                 />
                 <label htmlFor='privacy-agreement' className='text-sm text-muted-foreground leading-relaxed'>
                   {t('auth.register.agreements.privacy.prefix')}{' '}
@@ -327,7 +327,7 @@ const RegisterForm = () => {
             <button
               type='submit'
               disabled={isLoading || !agreedToTerms || !agreedToPrivacy}
-              className='w-full bg-primary text-primary-foreground py-3 px-6 rounded-lg font-medium hover:bg-primary/90 focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2'
+              className='w-full bg-primary text-primary-foreground py-3 px-6 rounded-lg font-medium hover:bg-primary/90 focus:ring-1 focus:ring-primary/50 focus:ring-inset transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2'
             >
               {isLoading ? (
                 <>

@@ -169,7 +169,7 @@ export function AccordionTrigger({ children, className, hideIcon = false }: Acco
       aria-expanded={expanded}
       className={cn(
         'flex items-center justify-between w-full py-4 px-4 text-left text-base font-medium transition-colors',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2',
+        'focus:outline-none focus-visible:ring-1 focus-visible:ring-primary/50 focus-visible:ring-inset',
         'hover:bg-neutral-50 dark:hover:bg-neutral-800/50',
         expanded && 'bg-neutral-50 dark:bg-neutral-800/50',
         disabled && 'cursor-not-allowed',

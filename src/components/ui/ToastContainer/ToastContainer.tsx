@@ -279,7 +279,7 @@ export function ToastContainer({ position = 'top-right' }: ToastContainerProps) 
                 e.stopPropagation()
                 removeToast(toast.id)
               }}
-              className='shrink-0 p-1 rounded-md text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500'
+              className='shrink-0 p-1 rounded-md text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-1 focus:ring-gray-500/50 focus:ring-inset'
               aria-label='Bildirimi kapat'
             >
               <X className='h-4 w-4' />

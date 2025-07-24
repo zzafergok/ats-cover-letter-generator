@@ -166,7 +166,7 @@ const ContactPageContent = () => {
                       onChange={handleChange}
                       required
                       disabled={isLoading}
-                      className='w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all bg-background text-foreground disabled:opacity-50'
+                      className='w-full px-4 py-3 border border-border rounded-lg focus:ring-1 focus:ring-primary/50 focus:ring-inset focus:border-transparent transition-all bg-background text-foreground disabled:opacity-50'
                       placeholder='Adınız ve soyadınız'
                     />
                   </div>
@@ -179,7 +179,7 @@ const ContactPageContent = () => {
                       onChange={handleChange}
                       required
                       disabled={isLoading}
-                      className='w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all bg-background text-foreground disabled:opacity-50'
+                      className='w-full px-4 py-3 border border-border rounded-lg focus:ring-1 focus:ring-primary/50 focus:ring-inset focus:border-transparent transition-all bg-background text-foreground disabled:opacity-50'
                       placeholder='email@example.com'
                     />
                   </div>
@@ -194,7 +194,7 @@ const ContactPageContent = () => {
                     onChange={handleChange}
                     required
                     disabled={isLoading}
-                    className='w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all bg-background text-foreground disabled:opacity-50'
+                    className='w-full px-4 py-3 border border-border rounded-lg focus:ring-1 focus:ring-primary/50 focus:ring-inset focus:border-transparent transition-all bg-background text-foreground disabled:opacity-50'
                     placeholder='Mesajınızın konusu'
                   />
                 </div>
@@ -208,7 +208,7 @@ const ContactPageContent = () => {
                     required
                     disabled={isLoading}
                     rows={5}
-                    className='w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none bg-background text-foreground disabled:opacity-50'
+                    className='w-full px-4 py-3 border border-border rounded-lg focus:ring-1 focus:ring-primary/50 focus:ring-inset focus:border-transparent transition-all resize-none bg-background text-foreground disabled:opacity-50'
                     placeholder='Mesajınızı buraya yazın...'
                   />
                 </div>
@@ -216,7 +216,7 @@ const ContactPageContent = () => {
                 <button
                   type='submit'
                   disabled={isLoading}
-                  className='w-full bg-primary text-primary-foreground py-3 px-6 rounded-lg font-medium hover:bg-primary/90 focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed'
+                  className='w-full bg-primary text-primary-foreground py-3 px-6 rounded-lg font-medium hover:bg-primary/90 focus:ring-1 focus:ring-primary/50 focus:ring-inset transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed'
                 >
                   <Send className='w-4 h-4' />
                   {isLoading ? 'Gönderiliyor...' : 'Mesaj Gönder'}
@@ -301,7 +301,7 @@ const ContactPageContent = () => {
                     onChange={handleChange}
                     required
                     disabled={isLoading}
-                    className='w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all bg-background text-foreground disabled:opacity-50'
+                    className='w-full px-4 py-3 border border-border rounded-lg focus:ring-1 focus:ring-primary/50 focus:ring-inset focus:border-transparent transition-all bg-background text-foreground disabled:opacity-50'
                     placeholder={t('pages.contact.namePlaceholder')}
                   />
                 </div>
@@ -314,7 +314,7 @@ const ContactPageContent = () => {
                     onChange={handleChange}
                     required
                     disabled={isLoading}
-                    className='w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all bg-background text-foreground disabled:opacity-50'
+                    className='w-full px-4 py-3 border border-border rounded-lg focus:ring-1 focus:ring-primary/50 focus:ring-inset focus:border-transparent transition-all bg-background text-foreground disabled:opacity-50'
                     placeholder={t('pages.contact.emailPlaceholder')}
                   />
                 </div>
@@ -329,7 +329,7 @@ const ContactPageContent = () => {
                   onChange={handleChange}
                   required
                   disabled={isLoading}
-                  className='w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all bg-background text-foreground disabled:opacity-50'
+                  className='w-full px-4 py-3 border border-border rounded-lg focus:ring-1 focus:ring-primary/50 focus:ring-inset focus:border-transparent transition-all bg-background text-foreground disabled:opacity-50'
                   placeholder={t('pages.contact.subjectPlaceholder')}
                 />
               </div>
@@ -343,7 +343,7 @@ const ContactPageContent = () => {
                   required
                   disabled={isLoading}
                   rows={5}
-                  className='w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none bg-background text-foreground disabled:opacity-50'
+                  className='w-full px-4 py-3 border border-border rounded-lg focus:ring-1 focus:ring-primary/50 focus:ring-inset focus:border-transparent transition-all resize-none bg-background text-foreground disabled:opacity-50'
                   placeholder={t('pages.contact.messagePlaceholder')}
                 />
               </div>
@@ -351,7 +351,7 @@ const ContactPageContent = () => {
               <button
                 type='submit'
                 disabled={isLoading}
-                className='w-full bg-primary text-primary-foreground py-3 px-6 rounded-lg font-medium hover:bg-primary/90 focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed'
+                className='w-full bg-primary text-primary-foreground py-3 px-6 rounded-lg font-medium hover:bg-primary/90 focus:ring-1 focus:ring-primary/50 focus:ring-inset transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed'
               >
                 <Send className='w-4 h-4' />
                 {isLoading ? t('pages.contact.loading') : t('pages.contact.sendButton')}

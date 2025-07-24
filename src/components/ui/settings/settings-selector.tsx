@@ -117,7 +117,7 @@ export function SettingsSelector({
                 disabled={isTransitioning}
                 className={cn(
                   'relative group p-4 rounded-lg border-2 transition-all duration-200',
-                  'hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+                  'hover:scale-[1.02] focus:outline-none focus:ring-1 focus:ring-ring/50 focus:ring-inset',
                   isSelected
                     ? 'border-primary bg-primary/5 shadow-md'
                     : 'border-border bg-card hover:border-primary/50 hover:bg-primary/5',

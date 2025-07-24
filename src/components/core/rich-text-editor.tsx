@@ -708,7 +708,7 @@ export function RichTextEditor({
               className={cn(
                 'p-4 outline-none overflow-y-auto resize-none',
                 'prose prose-neutral dark:prose-invert max-w-none',
-                'focus:ring-2 focus:ring-primary-500 focus:ring-inset',
+                'focus:ring-1 focus:ring-primary/50 focus:ring-inset',
               )}
               style={{
                 height: typeof height === 'number' ? `${height}px` : height,

@@ -467,7 +467,7 @@ export function DatePicker({
           className={cn(
             'relative w-10 h-10 text-sm rounded-md transition-colors',
             'hover:bg-neutral-100 dark:hover:bg-neutral-700',
-            'focus:outline-none focus:ring-2 focus:ring-primary-500',
+            'focus:outline-none focus:ring-1 focus:ring-primary/50 focus:ring-inset',
             !isCurrentMonth && 'text-neutral-300 dark:text-neutral-600',
             isCurrentMonth && 'text-neutral-900 dark:text-neutral-100',
             isTodayDate && !isSelected && 'bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300',

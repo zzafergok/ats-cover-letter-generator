@@ -282,7 +282,7 @@ export function WorkExperienceModal({
                   name='employmentType'
                   control={control}
                   render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value || ''}>
                       <SelectTrigger id='employmentType'>
                         <SelectValue placeholder='İstihdam türü seçin' />
                       </SelectTrigger>
@@ -304,7 +304,7 @@ export function WorkExperienceModal({
                   name='workMode'
                   control={control}
                   render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value || ''}>
                       <SelectTrigger id='workMode'>
                         <SelectValue placeholder='Çalışma şekli seçin' />
                       </SelectTrigger>
@@ -379,7 +379,7 @@ export function WorkExperienceModal({
                     name='startMonth'
                     control={control}
                     render={({ field }) => (
-                      <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value.toString()}>
+                      <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value?.toString() || ''}>
                         <SelectTrigger>
                           <SelectValue placeholder='Ay' />
                         </SelectTrigger>

@@ -408,7 +408,7 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
                       render={({ field }) => (
                         <Select
                           onValueChange={field.onChange}
-                          value={field.value}
+                          value={field.value || ''}
                           disabled={!selectedProvinceCode || isLoadingDistricts || districts.length === 0}
                         >
                           <SelectTrigger>

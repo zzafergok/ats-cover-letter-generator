@@ -373,7 +373,7 @@ const CoverLetterGenerator = () => {
                         name='coverLetterType'
                         control={control}
                         render={({ field }) => (
-                          <Select onValueChange={field.onChange} value={field.value}>
+                          <Select onValueChange={field.onChange} value={field.value || ''}>
                             <SelectTrigger>
                               <SelectValue />
                             </SelectTrigger>
@@ -394,7 +394,7 @@ const CoverLetterGenerator = () => {
                         name='tone'
                         control={control}
                         render={({ field }) => (
-                          <Select onValueChange={field.onChange} value={field.value}>
+                          <Select onValueChange={field.onChange} value={field.value || ''}>
                             <SelectTrigger>
                               <SelectValue />
                             </SelectTrigger>

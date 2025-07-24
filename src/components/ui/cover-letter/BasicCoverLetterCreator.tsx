@@ -193,7 +193,7 @@ export function BasicCoverLetterCreator({ onCreated, className }: BasicCoverLett
                     name='cvUploadId'
                     control={control}
                     render={({ field }) => (
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value || ''}>
                         <SelectTrigger>
                           <SelectValue placeholder='Yüklenmiş CV dosyalarınızdan birini seçiniz' />
                         </SelectTrigger>
@@ -281,7 +281,7 @@ export function BasicCoverLetterCreator({ onCreated, className }: BasicCoverLett
                   render={({ field }) => (
                     <Select
                       onValueChange={field.onChange}
-                      value={field.value}
+                      value={field.value || ''}
                       disabled={isGenerating || (!selectedCV && (!uploadedCVs || uploadedCVs.length === 0))}
                     >
                       <SelectTrigger>

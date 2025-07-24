@@ -416,7 +416,7 @@ export function EducationModal({ isOpen, onClose, onSave, education, isLoading =
                     name='gradeSystem'
                     control={control}
                     render={({ field }) => (
-                      <Select onValueChange={field.onChange} value={field.value} disabled>
+                      <Select onValueChange={field.onChange} value={field.value || ''} disabled>
                         <SelectTrigger>
                           <SelectValue placeholder='Not sistemi seçin' />
                         </SelectTrigger>

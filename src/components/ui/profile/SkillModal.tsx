@@ -127,7 +127,7 @@ export function SkillModal({ isOpen, onClose, onSave, skill, isLoading = false }
                 name='category'
                 control={control}
                 render={({ field }) => (
-                  <Select onValueChange={field.onChange} value={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value || ''}>
                     <SelectTrigger>
                       <SelectValue placeholder='Kategori seçin' />
                     </SelectTrigger>
@@ -150,7 +150,7 @@ export function SkillModal({ isOpen, onClose, onSave, skill, isLoading = false }
                 name='level'
                 control={control}
                 render={({ field }) => (
-                  <Select onValueChange={field.onChange} value={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value || ''}>
                     <SelectTrigger>
                       <SelectValue placeholder='Seviye seçin' />
                     </SelectTrigger>

@@ -2,7 +2,7 @@
 'use client'
 
 import React, { useState, useMemo, useCallback } from 'react'
-import { Download, Copy, Check, Edit, FileText, Mail, Eye, EyeOff } from 'lucide-react'
+import { Download, Copy, Check, Edit, FileText, Mail, Eye } from 'lucide-react'
 import { Button } from '@/components/core/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/core/card'
 import { Textarea } from '@/components/core/textarea'
@@ -277,7 +277,7 @@ export function ContentViewer({
       <CardContent className='space-y-6'>
         {/* Content tabs for different view modes */}
         <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as ViewMode)} className='w-full'>
-          <TabsList className='grid w-full grid-cols-3 h-11'>
+          <TabsList className={`grid w-full h-11 ${readonly ? 'grid-cols-1' : 'grid-cols-2'}`}>
             <TabsTrigger
               value='preview'
               className='flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground'
@@ -294,13 +294,6 @@ export function ContentViewer({
                 Düzenle
               </TabsTrigger>
             )}
-            <TabsTrigger
-              value='raw'
-              className='flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground'
-            >
-              <EyeOff className='h-4 w-4' />
-              Ham Metin
-            </TabsTrigger>
           </TabsList>
 
           <TabsContent value='preview' className='mt-6'>
@@ -332,24 +325,6 @@ export function ContentViewer({
             </TabsContent>
           )}
 
-          <TabsContent value='raw' className='mt-6'>
-            <div className='relative'>
-              <Button
-                variant='ghost'
-                size='sm'
-                onClick={handleCopy}
-                disabled={isCopied}
-                className='absolute top-3 right-5 z-10 bg-background/80 backdrop-blur-sm hover:bg-background/90 border'
-              >
-                {isCopied ? <Check className='h-4 w-4' /> : <Copy className='h-4 w-4' />}
-              </Button>
-              <ScrollArea className='h-[500px] w-full rounded-lg border'>
-                <div className='bg-muted/30 p-6'>
-                  <pre className='whitespace-pre-wrap text-sm font-mono leading-relaxed'>{editedContent}</pre>
-                </div>
-              </ScrollArea>
-            </div>
-          </TabsContent>
         </Tabs>
 
         {/* Action buttons */}

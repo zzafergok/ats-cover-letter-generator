@@ -255,20 +255,24 @@ export interface DetailedCVResponse {
 // Cover Letter type tanımları - API dokumentasyonuna göre güncellenmiş
 export interface CoverLetterBasic {
   id: string
-  content: string
+  content?: string // Keep for backward compatibility
+  generatedContent: string // This is what the API actually returns
   positionTitle: string
   companyName: string
   language: Language
+  generationStatus: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED'
   createdAt: string
   updatedAt: string
 }
 
 export interface CoverLetterDetailed {
   id: string
-  content: string
+  content?: string // Keep for backward compatibility
+  generatedContent: string // This is what the API actually returns
   positionTitle: string
   companyName: string
   language: Language
+  generationStatus: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED'
   whyPosition?: string
   whyCompany?: string
   workMotivation?: string

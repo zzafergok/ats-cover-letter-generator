@@ -396,24 +396,28 @@ export function CoverLetterList() {
             </DialogDescription>
           </DialogHeader>
           <ScrollArea className='max-h-[60vh]'>
-            {selectedCoverLetter && (
-              <ContentViewer
-                content={selectedCoverLetter.content || ''}
-                title={`${selectedCoverLetter.positionTitle} - ${selectedCoverLetter.companyName}`}
-                type={'experience' in selectedCoverLetter ? 'cover-letter-detailed' : 'cover-letter-basic'}
-                metadata={{
-                  createdAt: selectedCoverLetter.createdAt,
-                  updatedAt: selectedCoverLetter.updatedAt,
-                  wordCount: selectedCoverLetter.content?.split(' ').length || 0,
-                  characterCount: selectedCoverLetter.content?.length || 0,
-                  estimatedReadTime: Math.ceil((selectedCoverLetter.content?.split(' ').length || 0) / 200),
-                }}
-                onDownload={async () => {
-                  await handleDownload(selectedCoverLetter)
-                }}
-                readonly={true}
-              />
-            )}
+            {selectedCoverLetter &&
+              (() => {
+                const content = selectedCoverLetter.generatedContent || selectedCoverLetter.content || ''
+                return (
+                  <ContentViewer
+                    content={content}
+                    title={`${selectedCoverLetter.positionTitle} - ${selectedCoverLetter.companyName}`}
+                    type={'experience' in selectedCoverLetter ? 'cover-letter-detailed' : 'cover-letter-basic'}
+                    metadata={{
+                      createdAt: selectedCoverLetter.createdAt,
+                      updatedAt: selectedCoverLetter.updatedAt,
+                      wordCount: content.split(' ').length || 0,
+                      characterCount: content.length || 0,
+                      estimatedReadTime: Math.ceil((content.split(' ').length || 0) / 200),
+                    }}
+                    onDownload={async (_format) => {
+                      handleDownload(selectedCoverLetter)
+                    }}
+                    readonly={false}
+                  />
+                )
+              })()}
           </ScrollArea>
         </DialogContent>
       </Dialog>

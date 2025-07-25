@@ -2,30 +2,36 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { format } from 'date-fns'
-import { tr } from 'date-fns/locale'
+
 import {
-  Mail,
-  Download,
-  Trash2,
   Eye,
+  Mail,
+  Trash2,
   Search,
   Filter,
-  MoreVertical,
+  Loader2,
   Calendar,
   Building,
   FileText,
-  Loader2,
-  AlertTriangle,
+  Download,
   Languages,
+  MoreVertical,
+  AlertTriangle,
 } from 'lucide-react'
+import { format } from 'date-fns'
+import { tr } from 'date-fns/locale'
 
-import { Button } from '@/components/core/button'
-import { Input } from '@/components/core/input'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/core/card'
 import { Badge } from '@/components/core/badge'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/core/dropdown'
+import { Input } from '@/components/core/input'
+import { Button } from '@/components/core/button'
+import { Separator } from '@/components/core/separator'
+import { ScrollArea } from '@/components/core/scroll-area'
+import { Alert, AlertDescription } from '@/components/core/alert'
+import { ContentViewer } from '@/components/ui/common/ContentViewer'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/core/card'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/core/select'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/core/dialog'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/core/dropdown'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -36,17 +42,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/core/alert-dialog'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/core/select'
-import { ScrollArea } from '@/components/core/scroll-area'
-import { Separator } from '@/components/core/separator'
-import { Alert, AlertDescription } from '@/components/core/alert'
 
 import { useCoverLetterStore } from '@/store/coverLetterStore'
-import { ContentViewer } from '@/components/ui/common/ContentViewer'
+
 import type { CoverLetterBasic, CoverLetterDetailed } from '@/types/api.types'
 
-type CoverLetter = CoverLetterBasic | CoverLetterDetailed
 type FilterType = 'all' | 'basic' | 'detailed'
+type CoverLetter = CoverLetterBasic | CoverLetterDetailed
 type SortType = 'newest' | 'oldest' | 'company' | 'position'
 
 interface CoverLetterCardProps {
@@ -126,12 +128,12 @@ function CoverLetterCard({ coverLetter, onView, onDownload, onDelete, isLoading 
 
 export function CoverLetterList() {
   const [searchTerm, setSearchTerm] = useState('')
-  const [filterType, setFilterType] = useState<FilterType>('all')
   const [sortType, setSortType] = useState<SortType>('newest')
-  const [selectedCoverLetter, setSelectedCoverLetter] = useState<CoverLetter | null>(null)
+  const [filterType, setFilterType] = useState<FilterType>('all')
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [coverLetterToDelete, setCoverLetterToDelete] = useState<CoverLetter | null>(null)
   const [downloadDialogOpen, setDownloadDialogOpen] = useState(false)
+  const [selectedCoverLetter, setSelectedCoverLetter] = useState<CoverLetter | null>(null)
+  const [coverLetterToDelete, setCoverLetterToDelete] = useState<CoverLetter | null>(null)
   const [coverLetterToDownload, setCoverLetterToDownload] = useState<CoverLetter | null>(null)
 
   const {

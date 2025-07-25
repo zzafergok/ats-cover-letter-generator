@@ -26,7 +26,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useClipboard } from '@/hooks/useClipboard'
 
 // Types
-type ContentType = 'cv' | 'cover-letter' | 'cover-letter-basic' | 'cover-letter-detailed'
+type ContentType = 'cv' | 'cover-letter' | 'cover-letter-basic' | 'cover-letter-detailed' | 'cover-letter-template'
 type ViewMode = 'preview' | 'edit' | 'raw'
 type DownloadFormat = 'pdf'
 type DownloadType = 'original' | 'edited'
@@ -49,6 +49,8 @@ interface ContentViewerProps {
     companyName?: string
     positionTitle?: string
     language?: 'TURKISH' | 'ENGLISH'
+    templateTitle?: string
+    templateCategory?: string
   }
   onSave?: (data: SaveData) => Promise<void>
   onDownload?: (format: DownloadFormat, downloadType?: DownloadType, editedContent?: string) => Promise<void>

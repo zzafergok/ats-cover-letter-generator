@@ -43,6 +43,11 @@ import {
   DistrictsResponse,
   HighSchoolsResponse,
   UniversitiesResponse,
+  CoverLetterTemplate,
+  TemplateCreateCoverLetterData,
+  TemplateCreateCoverLetterResponse,
+  TemplatesResponse,
+  TemplateCategoriesResponse,
 } from '@/types/api.types'
 
 // Cover Letter API Servisleri - API dokumentasyonuna göre güncellenmiş
@@ -98,6 +103,17 @@ export const coverLetterApi = {
       language?: 'TURKISH' | 'ENGLISH'
     }): Promise<Blob> => apiRequest.post('/cover-letter-detailed/download/custom-pdf', data, { responseType: 'blob' }),
   },
+}
+
+// Template Cover Letter Custom PDF
+export const templateCoverLetterApi = {
+  downloadCustomPdf: (data: {
+    content: string
+    positionTitle: string
+    companyName: string
+    templateTitle?: string
+    language?: 'TURKISH' | 'ENGLISH'
+  }): Promise<Blob> => apiRequest.post('/templates/download/custom-pdf', data, { responseType: 'blob' }),
 }
 
 export const authApi = {
@@ -416,4 +432,52 @@ export const schoolApi = {
   // Üniversite verilerini yenile
   refreshUniversities: (): Promise<{ success: boolean; message: string }> =>
     apiRequest.post('/universities/refresh', {}, { skipAuth: true }),
+}
+
+// Template API Servisleri - API dokumentasyonuna göre yeni
+export const templateApi = {
+  // Template servisleri
+  getAll: (params?: {
+    industry?: 'TECHNOLOGY' | 'FINANCE'
+    category?: string
+    language?: 'TURKISH' | 'ENGLISH'
+  }): Promise<{ success: boolean; data: CoverLetterTemplate[]; message?: string }> => {
+    const queryParams = new URLSearchParams()
+    if (params?.industry) queryParams.append('industry', params.industry)
+    if (params?.category) queryParams.append('category', params.category)
+    if (params?.language) queryParams.append('language', params.language)
+    
+    const queryString = queryParams.toString()
+    return apiRequest.get(`/templates${queryString ? `?${queryString}` : ''}`, { skipAuth: true })
+  },
+
+  getCategories: (): Promise<{ success: boolean; data: Record<string, string[]>; message?: string }> =>
+    apiRequest.get('/templates/categories', { skipAuth: true }),
+
+  getByIndustry: (industry: 'TECHNOLOGY' | 'FINANCE'): Promise<{ success: boolean; data: CoverLetterTemplate[]; message?: string }> =>
+    apiRequest.get(`/templates/industry/${industry}`, { skipAuth: true }),
+
+  getById: (templateId: string): Promise<{ success: boolean; data: CoverLetterTemplate; message?: string }> =>
+    apiRequest.get(`/templates/${templateId}`, { skipAuth: true }),
+
+  createCoverLetter: (data: {
+    templateId: string
+    positionTitle: string
+    companyName: string
+    personalizations: {
+      whyPosition?: string
+      whyCompany?: string
+      additionalSkills?: string
+    }
+  }): Promise<{ success: boolean; data: { content: string; templateId: string; positionTitle: string; companyName: string }; message?: string }> =>
+    apiRequest.post('/templates/create-cover-letter', data),
+
+  initialize: (): Promise<{ success: boolean; message: string }> =>
+    apiRequest.post('/templates/initialize'),
+}
+
+// PDF Test API Servisleri
+export const pdfTestApi = {
+  testTurkishCharacters: (): Promise<Blob> =>
+    apiRequest.get('/pdf-test/turkish-characters', { responseType: 'blob', skipAuth: true }),
 }

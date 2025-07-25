@@ -390,3 +390,62 @@ export interface UserProfileResponse {
   data: UserProfile
   message?: string
 }
+
+// Cover Letter Template types
+export interface CoverLetterTemplate {
+  id: string
+  title: string
+  content: string
+  category: 
+    | 'SOFTWARE_DEVELOPER'
+    | 'FRONTEND_DEVELOPER'
+    | 'BACKEND_DEVELOPER'
+    | 'FULLSTACK_DEVELOPER'
+    | 'DATA_SCIENTIST'
+    | 'FINANCIAL_ANALYST'
+    | 'INVESTMENT_BANKER'
+    | 'FINANCIAL_ADVISOR'
+    | 'ACCOUNTING_SPECIALIST'
+    | 'RISK_ANALYST'
+  language: 'TURKISH' | 'ENGLISH'
+  industry: 'TECHNOLOGY' | 'FINANCE'
+  description?: string
+  isActive: boolean
+  sortOrder: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface TemplateCreateCoverLetterData {
+  templateId: string
+  positionTitle: string
+  companyName: string
+  personalizations: {
+    whyPosition?: string
+    whyCompany?: string
+    additionalSkills?: string
+  }
+}
+
+export interface TemplateCreateCoverLetterResponse {
+  success: boolean
+  data: {
+    content: string
+    templateId: string
+    positionTitle: string
+    companyName: string
+  }
+  message?: string
+}
+
+export interface TemplatesResponse {
+  success: boolean
+  data: CoverLetterTemplate[]
+  message?: string
+}
+
+export interface TemplateCategoriesResponse {
+  success: boolean
+  data: Record<string, string[]>
+  message?: string
+}

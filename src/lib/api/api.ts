@@ -44,10 +44,6 @@ import {
   HighSchoolsResponse,
   UniversitiesResponse,
   CoverLetterTemplate,
-  TemplateCreateCoverLetterData,
-  TemplateCreateCoverLetterResponse,
-  TemplatesResponse,
-  TemplateCategoriesResponse,
 } from '@/types/api.types'
 
 // Cover Letter API Servisleri - API dokumentasyonuna göre güncellenmiş
@@ -446,19 +442,21 @@ export const templateApi = {
     if (params?.industry) queryParams.append('industry', params.industry)
     if (params?.category) queryParams.append('category', params.category)
     if (params?.language) queryParams.append('language', params.language)
-    
+
     const queryString = queryParams.toString()
-    return apiRequest.get(`/templates${queryString ? `?${queryString}` : ''}`, { skipAuth: true })
+    return apiRequest.get(`/templates${queryString ? `?${queryString}` : ''}`)
   },
 
   getCategories: (): Promise<{ success: boolean; data: Record<string, string[]>; message?: string }> =>
-    apiRequest.get('/templates/categories', { skipAuth: true }),
+    apiRequest.get('/templates/categories'),
 
-  getByIndustry: (industry: 'TECHNOLOGY' | 'FINANCE' | 'HEALTHCARE' | 'EDUCATION' | 'MARKETING'): Promise<{ success: boolean; data: CoverLetterTemplate[]; message?: string }> =>
-    apiRequest.get(`/templates/industry/${industry}`, { skipAuth: true }),
+  getByIndustry: (
+    industry: 'TECHNOLOGY' | 'FINANCE' | 'HEALTHCARE' | 'EDUCATION' | 'MARKETING',
+  ): Promise<{ success: boolean; data: CoverLetterTemplate[]; message?: string }> =>
+    apiRequest.get(`/templates/industry/${industry}`),
 
   getById: (templateId: string): Promise<{ success: boolean; data: CoverLetterTemplate; message?: string }> =>
-    apiRequest.get(`/templates/${templateId}`, { skipAuth: true }),
+    apiRequest.get(`/templates/${templateId}`),
 
   createCoverLetter: (data: {
     templateId: string
@@ -469,11 +467,13 @@ export const templateApi = {
       whyCompany?: string
       additionalSkills?: string
     }
-  }): Promise<{ success: boolean; data: { content: string; templateId: string; positionTitle: string; companyName: string }; message?: string }> =>
-    apiRequest.post('/templates/create-cover-letter', data),
+  }): Promise<{
+    success: boolean
+    data: { content: string; templateId: string; positionTitle: string; companyName: string }
+    message?: string
+  }> => apiRequest.post('/templates/create-cover-letter', data),
 
-  initialize: (): Promise<{ success: boolean; message: string }> =>
-    apiRequest.post('/templates/initialize'),
+  initialize: (): Promise<{ success: boolean; message: string }> => apiRequest.post('/templates/initialize'),
 }
 
 // PDF Test API Servisleri

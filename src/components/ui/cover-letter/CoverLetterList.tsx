@@ -14,10 +14,10 @@ import {
   MoreVertical,
   Calendar,
   Building,
-  User,
   FileText,
   Loader2,
   AlertTriangle,
+  Languages,
 } from 'lucide-react'
 
 import { Button } from '@/components/core/button'
@@ -82,10 +82,10 @@ function CoverLetterCard({ coverLetter, onView, onDownload, onDelete, isLoading 
               <div className='flex items-center gap-4 text-xs text-muted-foreground'>
                 <div className='flex items-center gap-1'>
                   <Calendar className='h-3 w-3' />
-                  <span>{format(new Date(coverLetter.createdAt), 'dd MMM yyyy', { locale: tr })}</span>
+                  <span>{format(new Date(coverLetter.createdAt), 'dd MMM yyyy HH:mm', { locale: tr })}</span>
                 </div>
                 <div className='flex items-center gap-1'>
-                  <User className='h-3 w-3' />
+                  <Languages className='h-3 w-3' />
                   <span>{coverLetter.language === 'TURKISH' ? 'Türkçe' : 'English'}</span>
                 </div>
               </div>
@@ -460,8 +460,21 @@ export function CoverLetterList() {
                           })
                         }
                       } else {
-                        // Download original version
-                        handleDownload(selectedCoverLetter)
+                        // Download original version directly without opening another dialog
+                        const isDetailed =
+                          'whyPosition' in selectedCoverLetter ||
+                          'whyCompany' in selectedCoverLetter ||
+                          'workMotivation' in selectedCoverLetter
+
+                        try {
+                          if (isDetailed) {
+                            await downloadDetailedCoverLetterPdf(selectedCoverLetter.id)
+                          } else {
+                            await downloadBasicCoverLetterPdf(selectedCoverLetter.id)
+                          }
+                        } catch (error) {
+                          console.error('Download failed:', error)
+                        }
                       }
                     }}
                     readonly={false}

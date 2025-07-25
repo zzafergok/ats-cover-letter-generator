@@ -455,3 +455,216 @@ export interface TemplateCategoriesResponse {
   data: Record<string, string[]>
   message?: string
 }
+
+// ATS CV Services Types
+export interface ATSCVGenerateData {
+  personalInfo: {
+    fullName: string
+    email: string
+    phone: string
+    location?: string
+    linkedin?: string
+    portfolio?: string
+  }
+  professionalSummary: string
+  workExperience: Array<{
+    title: string
+    company: string
+    location?: string
+    startDate: string
+    endDate?: string
+    current: boolean
+    achievements: string[]
+  }>
+  education: Array<{
+    degree: string
+    field: string
+    school: string
+    graduationDate?: string
+    gpa?: string
+  }>
+  skills: {
+    technical: string[]
+    soft: string[]
+  }
+  certifications?: Array<{
+    name: string
+    issuer: string
+    date?: string
+    credentialId?: string
+  }>
+}
+
+export interface ATSCVGenerateResponse {
+  success: boolean
+  data: {
+    cvId: string
+    pdfUrl: string
+    atsScore: number
+    generatedAt: string
+    recommendations: string[]
+  }
+  message?: string
+}
+
+export interface ATSCVTestResponse {
+  success: boolean
+  data: {
+    pdfUrl: string
+    sampleData: any
+  }
+  message?: string
+}
+
+export interface ATSCVSchemaResponse {
+  success: boolean
+  data: {
+    schema: any
+  }
+}
+
+export interface ATSValidationTipsResponse {
+  success: boolean
+  data: {
+    tips: Array<{
+      category: string
+      tip: string
+      importance: string
+    }>
+  }
+}
+
+// ATS Validation Services Types
+export interface ATSValidationData {
+  cvData: {
+    personalInfo: any
+    professionalSummary: string
+    workExperience: any[]
+    education: any[]
+    skills: any
+  }
+  jobDescription: string
+}
+
+export interface ATSValidationResponse {
+  success: boolean
+  data: {
+    overallScore: number
+    sectionScores: {
+      formatting: number
+      keywords: number
+      structure: number
+      content: number
+    }
+    recommendations: Array<{
+      section: string
+      issue: string
+      suggestion: string
+      priority: string
+    }>
+    matchedKeywords: string[]
+    missingKeywords: string[]
+  }
+}
+
+export interface ATSValidationAnalysisResponse {
+  success: boolean
+  data: {
+    scoreRange: string
+    level: string
+    description: string
+    commonIssues: string[]
+    nextSteps: string[]
+  }
+}
+
+// CV Optimization Services Types
+export interface CVOptimizationData {
+  cvData: {
+    personalInfo: any
+    professionalSummary: string
+    workExperience: any[]
+    skills: any
+  }
+  jobDescription: string
+}
+
+export interface CVOptimizationResponse {
+  success: boolean
+  data: {
+    optimizedCV: {
+      personalInfo: any
+      professionalSummary: string
+      workExperience: any[]
+    }
+    optimizationReport: {
+      improvementScore: number
+      keywordMatchImprovement: number
+      changes: Array<{
+        section: string
+        change: string
+        impact: string
+      }>
+    }
+  }
+}
+
+export interface KeywordSuggestionsData {
+  jobDescription: string
+  targetPosition: string
+}
+
+export interface KeywordSuggestionsResponse {
+  success: boolean
+  data: {
+    keywords: {
+      critical: string[]
+      important: string[]
+      recommended: string[]
+    }
+    phrases: string[]
+  }
+}
+
+export interface KeywordAnalysisData {
+  content: string
+  jobDescription: string
+}
+
+export interface KeywordAnalysisResponse {
+  success: boolean
+  data: {
+    matchScore: number
+    matchedKeywords: string[]
+    missingKeywords: string[]
+    keywordDensity: Record<string, number>
+    suggestions: string[]
+  }
+}
+
+// DOCX Export Services Types
+export interface DOCXGenerateData {
+  cvData: {
+    personalInfo: any
+    professionalSummary: string
+    workExperience: any[]
+  }
+  options: {
+    template: string
+    fontSize: number
+    fontFamily: string
+    margins: string
+    includePhoto: boolean
+  }
+}
+
+export interface DOCXGenerateResponse {
+  success: boolean
+  data: {
+    downloadUrl: string
+    fileName: string
+    fileSize: number
+    generatedAt: string
+  }
+  message?: string
+}

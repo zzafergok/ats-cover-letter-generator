@@ -26,22 +26,38 @@ import {
   RegisterResponse,
   CVUploadResponse,
   SavedCVsResponse,
+  DOCXGenerateData,
   CVUploadsResponse,
   ProvincesResponse,
   DistrictsResponse,
+  ATSCVGenerateData,
+  ATSCVTestResponse,
+  ATSValidationData,
   DetailedCVResponse,
   CVGenerateResponse,
+  CVOptimizationData,
   HighSchoolsResponse,
   CoverLetterTemplate,
+  ATSCVSchemaResponse,
   DetailedCVsResponse,
+  KeywordAnalysisData,
+  DOCXGenerateResponse,
   UniversitiesResponse,
+  ATSCVGenerateResponse,
+  ATSValidationResponse,
+  CVOptimizationResponse,
+  KeywordSuggestionsData,
   CVDetailedGenerateData,
+  KeywordAnalysisResponse,
   CoverLetterBasicResponse,
+  ATSValidationTipsResponse,
   CoverLetterBasicsResponse,
+  KeywordSuggestionsResponse,
   CoverLetterBasicUpdateData,
   CoverLetterDetailedResponse,
   CoverLetterBasicGenerateData,
   CoverLetterDetailedsResponse,
+  ATSValidationAnalysisResponse,
   CoverLetterDetailedUpdateData,
   CoverLetterDetailedGenerateData,
 } from '@/types/api.types'
@@ -312,6 +328,23 @@ export const cvApi = {
   // CV download işlemi
   download: (id: string): Promise<Blob> => apiRequest.get(`/cv/download/${id}`, { responseType: 'blob' }),
 
+  // Updated CV upload routes (cv-upload prefix)
+  uploadNew: (file: File): Promise<CVUploadResponse> => {
+    const formData = new FormData()
+    formData.append('cvFile', file)
+    return apiRequest.post('/cv-upload/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+  },
+
+  getUploadsNew: (): Promise<CVUploadsResponse> => apiRequest.get('/cv-upload/uploads'),
+
+  getUploadStatusNew: (id: string): Promise<{ success: boolean; data: CVUpload }> =>
+    apiRequest.get(`/cv-upload/upload/status/${id}`),
+
+  deleteUploadNew: (id: string): Promise<{ success: boolean; message: string }> =>
+    apiRequest.delete(`/cv-upload/uploads/${id}`),
+
   // Detailed CV işlemleri (profile-based)
   generateDetailed: (data: CVDetailedGenerateData): Promise<{ success: boolean; data: DetailedCV; message?: string }> =>
     apiRequest.post('/cv/generate-detailed', data),
@@ -474,6 +507,102 @@ export const templateApi = {
   }> => apiRequest.post('/templates/create-cover-letter', data),
 
   initialize: (): Promise<{ success: boolean; message: string }> => apiRequest.post('/templates/initialize'),
+}
+
+// ATS CV Services - API dokumentasyonuna göre yeni
+export const atsCvApi = {
+  // ATS CV oluştur
+  generate: (data: ATSCVGenerateData): Promise<ATSCVGenerateResponse> => apiRequest.post('/ats-cv/generate', data),
+
+  // Test ATS CV oluştur
+  generateTest: (): Promise<ATSCVTestResponse> => apiRequest.get('/ats-cv/test'),
+
+  // ATS Schema al
+  getSchema: (): Promise<ATSCVSchemaResponse> => apiRequest.get('/ats-cv/schema', { skipAuth: true }),
+
+  // ATS Validation Tips al
+  getValidationTips: (): Promise<ATSValidationTipsResponse> =>
+    apiRequest.get('/ats-cv/validation-tips', { skipAuth: true }),
+}
+
+// ATS Validation Services - API dokumentasyonuna göre yeni
+export const atsValidationApi = {
+  // CV'yi ATS uyumluluğu için doğrula
+  validate: (data: ATSValidationData): Promise<ATSValidationResponse> =>
+    apiRequest.post('/ats-validation/validate', data),
+
+  // Validation analizi al
+  getAnalysis: (score: number): Promise<ATSValidationAnalysisResponse> =>
+    apiRequest.get(`/ats-validation/analysis/${score}`),
+
+  // ATS en iyi uygulamaları al
+  getBestPractices: (): Promise<{
+    success: boolean
+    data: any
+  }> => apiRequest.get('/ats-validation/best-practices', { skipAuth: true }),
+
+  // Yaygın ATS sorunlarını al
+  getCommonIssues: (): Promise<{
+    success: boolean
+    data: any
+  }> => apiRequest.get('/ats-validation/common-issues', { skipAuth: true }),
+}
+
+// CV Optimization Services - API dokumentasyonuna göre yeni
+export const cvOptimizationApi = {
+  // CV'yi optimize et
+  optimize: (data: CVOptimizationData): Promise<CVOptimizationResponse> =>
+    apiRequest.post('/cv-optimization/optimize', data),
+
+  // Keyword önerileri al
+  getKeywordSuggestions: (data: KeywordSuggestionsData): Promise<KeywordSuggestionsResponse> =>
+    apiRequest.post('/cv-optimization/keyword-suggestions', data),
+
+  // Bölüm optimizasyon ipuçları al
+  getSectionTips: (
+    section: string,
+  ): Promise<{
+    success: boolean
+    data: any
+  }> => apiRequest.get(`/cv-optimization/section-tips/${section}`, { skipAuth: true }),
+
+  // Keyword analizi yap
+  analyzeKeywords: (data: KeywordAnalysisData): Promise<KeywordAnalysisResponse> =>
+    apiRequest.post('/cv-optimization/analyze-keywords', data),
+}
+
+// DOCX Export Services - API dokumentasyonuna göre yeni
+export const docxApi = {
+  // DOCX CV oluştur
+  generate: (data: DOCXGenerateData): Promise<DOCXGenerateResponse> => apiRequest.post('/docx/generate', data),
+
+  // DOCX preview
+  preview: (
+    data: any,
+  ): Promise<{
+    success: boolean
+    data: any
+  }> => apiRequest.post('/docx/preview', data),
+
+  // DOCX seçeneklerini doğrula
+  validateOptions: (
+    data: any,
+  ): Promise<{
+    success: boolean
+    data: any
+  }> => apiRequest.post('/docx/validate-options', data),
+
+  // DOCX en iyi uygulamaları al
+  getBestPractices: (): Promise<{
+    success: boolean
+    data: any
+  }> => apiRequest.get('/docx/best-practices'),
+
+  // DOCX vs PDF karşılaştırması al
+  getVsPdfComparison: (): Promise<{
+    success: boolean
+    data: any
+  }> => apiRequest.get('/docx/vs-pdf'),
 }
 
 // PDF Test API Servisleri

@@ -93,9 +93,9 @@ const refreshAccessToken = async (): Promise<string> => {
       },
     )
 
-    const { accessToken, expiresIn } = response.data.data || response.data
+    const { accessToken, refreshToken: newRefreshToken, expiresIn } = response.data.data
 
-    SessionTokenManager.setTokens(accessToken, refreshToken, expiresIn)
+    SessionTokenManager.setTokens(accessToken, newRefreshToken, expiresIn)
 
     console.log('✅ Access token refreshed successfully')
     return accessToken

@@ -58,7 +58,7 @@ interface CoverLetterCardProps {
 }
 
 function CoverLetterCard({ coverLetter, onView, onDownload, onDelete, isLoading }: CoverLetterCardProps) {
-  const isDetailed = 'experience' in coverLetter
+  const isDetailed = 'whyPosition' in coverLetter || 'whyCompany' in coverLetter || 'workMotivation' in coverLetter
 
   return (
     <Card className='group hover:shadow-md transition-shadow'>
@@ -206,7 +206,13 @@ export function CoverLetterList() {
     if (!coverLetterToDownload) return
 
     try {
-      if ('experience' in coverLetterToDownload) {
+      // Check if this is a detailed cover letter by looking for detailed-specific fields
+      const isDetailed =
+        'whyPosition' in coverLetterToDownload ||
+        'whyCompany' in coverLetterToDownload ||
+        'workMotivation' in coverLetterToDownload
+
+      if (isDetailed) {
         await downloadDetailedCoverLetterPdf(coverLetterToDownload.id)
       } else {
         await downloadBasicCoverLetterPdf(coverLetterToDownload.id)
@@ -227,7 +233,13 @@ export function CoverLetterList() {
     if (!coverLetterToDelete) return
 
     try {
-      if ('experience' in coverLetterToDelete) {
+      // Check if this is a detailed cover letter by looking for detailed-specific fields
+      const isDetailed =
+        'whyPosition' in coverLetterToDelete ||
+        'whyCompany' in coverLetterToDelete ||
+        'workMotivation' in coverLetterToDelete
+
+      if (isDetailed) {
         await deleteDetailedCoverLetter(coverLetterToDelete.id)
       } else {
         await deleteBasicCoverLetter(coverLetterToDelete.id)
@@ -405,7 +417,13 @@ export function CoverLetterList() {
                   <ContentViewer
                     content={content}
                     title={`${selectedCoverLetter.positionTitle} - ${selectedCoverLetter.companyName}`}
-                    type={'experience' in selectedCoverLetter ? 'cover-letter-detailed' : 'cover-letter-basic'}
+                    type={
+                      'whyPosition' in selectedCoverLetter ||
+                      'whyCompany' in selectedCoverLetter ||
+                      'workMotivation' in selectedCoverLetter
+                        ? 'cover-letter-detailed'
+                        : 'cover-letter-basic'
+                    }
                     metadata={{
                       createdAt: selectedCoverLetter.createdAt,
                       updatedAt: selectedCoverLetter.updatedAt,
@@ -419,7 +437,12 @@ export function CoverLetterList() {
                     onDownload={async (_format, downloadType, editedContent) => {
                       if (downloadType === 'edited' && editedContent) {
                         // Download edited version using custom PDF endpoint
-                        if ('experience' in selectedCoverLetter) {
+                        const isDetailed =
+                          'whyPosition' in selectedCoverLetter ||
+                          'whyCompany' in selectedCoverLetter ||
+                          'workMotivation' in selectedCoverLetter
+
+                        if (isDetailed) {
                           // Detailed cover letter
                           await downloadDetailedCoverLetterCustomPdf({
                             content: editedContent,

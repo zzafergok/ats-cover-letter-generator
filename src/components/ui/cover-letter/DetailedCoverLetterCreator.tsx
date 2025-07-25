@@ -79,7 +79,7 @@ export function DetailedCoverLetterCreator({ onCreated, className }: DetailedCov
         })
 
         if (result) {
-          setGeneratedContent(result.content || '')
+          setGeneratedContent(result.generatedContent || result.content || '')
           onCreated?.(result)
         }
       } catch (error) {
@@ -116,126 +116,133 @@ export function DetailedCoverLetterCreator({ onCreated, className }: DetailedCov
   const { basicComplete, motivationComplete, additionalComplete } = getSectionProgress()
   const allSectionsComplete = basicComplete && motivationComplete && additionalComplete
 
+  const shouldShowContent = !!generatedContent
+
   return (
-    <div className={`space-y-6 ${className}`}>
+    <div className={className}>
       {/* Profile Info */}
       {!profile && (
-        <Card className='bg-yellow-50 border-yellow-200'>
-          <CardContent className='p-4'>
-            <div className='flex items-center gap-3'>
-              <FileText className='h-5 w-5 text-yellow-600' />
-              <div>
-                <p className='font-medium text-yellow-800'>Profil Bilgileri Yükleniyor</p>
-                <p className='text-sm text-yellow-600'>Lütfen bekleyin...</p>
+        <div className='mb-6'>
+          <Card className='bg-yellow-50 border-yellow-200'>
+            <CardContent className='p-4'>
+              <div className='flex items-center gap-3'>
+                <FileText className='h-5 w-5 text-yellow-600' />
+                <div>
+                  <p className='font-medium text-yellow-800'>Profil Bilgileri Yükleniyor</p>
+                  <p className='text-sm text-yellow-600'>Lütfen bekleyin...</p>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      <Form.Root form={form} onSubmit={onSubmit}>
-        <div className='space-y-6'>
-          {/* Section Navigation */}
-          <Card>
-            <CardHeader>
-              <CardTitle className='text-lg'>Detaylı Ön Yazı Formu</CardTitle>
-              <div className='flex flex-wrap gap-2'>
-                <Button
-                  type='button'
-                  variant={activeSection === 'basic' ? 'default' : 'outline'}
-                  size='sm'
-                  onClick={() => setActiveSection('basic')}
-                  className='flex items-center gap-2'
-                >
-                  Temel Bilgiler
-                  {basicComplete && <span className='h-2 w-2 bg-green-500 rounded-full' />}
-                </Button>
-                <Button
-                  type='button'
-                  variant={activeSection === 'motivation' ? 'default' : 'outline'}
-                  size='sm'
-                  onClick={() => setActiveSection('motivation')}
-                  className='flex items-center gap-2'
-                >
-                  Motivasyon
-                  {motivationComplete && <span className='h-2 w-2 bg-green-500 rounded-full' />}
-                </Button>
-                <Button
-                  type='button'
-                  variant={activeSection === 'additional' ? 'default' : 'outline'}
-                  size='sm'
-                  onClick={() => setActiveSection('additional')}
-                  className='flex items-center gap-2'
-                >
-                  Ek Bilgiler
-                  {additionalComplete && <span className='h-2 w-2 bg-green-500 rounded-full' />}
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>{renderSectionContent()}</CardContent>
+            </CardContent>
           </Card>
-
-          {/* Generate Button */}
-          <div className='flex justify-center'>
-            <Button
-              type='submit'
-              disabled={isGenerating || storeIsGenerating || !allSectionsComplete}
-              className='w-full sm:w-auto min-w-[200px]'
-            >
-              {isGenerating || storeIsGenerating ? (
-                <>
-                  <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                  Ön Yazı Oluşturuluyor...
-                </>
-              ) : (
-                <>
-                  <Send className='mr-2 h-4 w-4' />
-                  Detaylı Ön Yazı Oluştur
-                </>
-              )}
-            </Button>
-          </div>
-        </div>
-      </Form.Root>
-
-      {/* Generated Content Display */}
-      {generatedContent && (
-        <div className='space-y-4'>
-          <h3 className='text-lg font-semibold'>Oluşturulan Ön Yazı</h3>
-          <ContentViewer
-            content={generatedContent}
-            title={`${form.watch('companyName')} - ${form.watch('positionTitle')} Ön Yazısı`}
-            type='cover-letter-detailed'
-            metadata={{
-              companyName: form.watch('companyName'),
-              positionTitle: form.watch('positionTitle'),
-              language: form.watch('language'),
-            }}
-            onDownload={async (_format, downloadType, editedContent) => {
-              if (downloadType === 'edited' && editedContent) {
-                // This is a temporary generated content, so we use the custom PDF endpoint
-                const { downloadDetailedCoverLetterCustomPdf } = useCoverLetterStore.getState()
-                await downloadDetailedCoverLetterCustomPdf({
-                  content: editedContent,
-                  positionTitle: form.watch('positionTitle'),
-                  companyName: form.watch('companyName'),
-                  language: form.watch('language'),
-                })
-              }
-              // For original download of temporary content, we also use custom endpoint
-              else {
-                const { downloadDetailedCoverLetterCustomPdf } = useCoverLetterStore.getState()
-                await downloadDetailedCoverLetterCustomPdf({
-                  content: generatedContent,
-                  positionTitle: form.watch('positionTitle'),
-                  companyName: form.watch('companyName'),
-                  language: form.watch('language'),
-                })
-              }
-            }}
-          />
         </div>
       )}
+
+      <div className={`grid gap-4 md:gap-6 ${shouldShowContent ? 'xl:grid-cols-2' : 'grid-cols-1'}`}>
+        {/* Form Section */}
+        <Form.Root form={form} onSubmit={onSubmit}>
+          <div className='space-y-6'>
+            {/* Section Navigation */}
+            <Card>
+              <CardHeader>
+                <CardTitle className='text-lg'>Detaylı Ön Yazı Formu</CardTitle>
+                <div className='flex flex-wrap gap-2'>
+                  <Button
+                    type='button'
+                    variant={activeSection === 'basic' ? 'default' : 'outline'}
+                    size='sm'
+                    onClick={() => setActiveSection('basic')}
+                    className='flex items-center gap-2'
+                  >
+                    Temel Bilgiler
+                    {basicComplete && <span className='h-2 w-2 bg-green-500 rounded-full' />}
+                  </Button>
+                  <Button
+                    type='button'
+                    variant={activeSection === 'motivation' ? 'default' : 'outline'}
+                    size='sm'
+                    onClick={() => setActiveSection('motivation')}
+                    className='flex items-center gap-2'
+                  >
+                    Motivasyon
+                    {motivationComplete && <span className='h-2 w-2 bg-green-500 rounded-full' />}
+                  </Button>
+                  <Button
+                    type='button'
+                    variant={activeSection === 'additional' ? 'default' : 'outline'}
+                    size='sm'
+                    onClick={() => setActiveSection('additional')}
+                    className='flex items-center gap-2'
+                  >
+                    Ek Bilgiler
+                    {additionalComplete && <span className='h-2 w-2 bg-green-500 rounded-full' />}
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>{renderSectionContent()}</CardContent>
+            </Card>
+
+            {/* Generate Button */}
+            <div className='flex justify-center'>
+              <Button
+                type='submit'
+                disabled={isGenerating || storeIsGenerating || !allSectionsComplete}
+                className='w-full sm:w-auto min-w-[200px]'
+              >
+                {isGenerating || storeIsGenerating ? (
+                  <>
+                    <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                    Ön Yazı Oluşturuluyor...
+                  </>
+                ) : (
+                  <>
+                    <Send className='mr-2 h-4 w-4' />
+                    Detaylı Ön Yazı Oluştur
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </Form.Root>
+
+        {/* Generated Content Display */}
+        {shouldShowContent && (
+          <div className='space-y-4'>
+            <h3 className='text-lg font-semibold'>Oluşturulan Ön Yazı</h3>
+            <ContentViewer
+              content={generatedContent}
+              title={`${form.watch('companyName')} - ${form.watch('positionTitle')} Ön Yazısı`}
+              type='cover-letter-detailed'
+              metadata={{
+                companyName: form.watch('companyName'),
+                positionTitle: form.watch('positionTitle'),
+                language: form.watch('language'),
+              }}
+              onDownload={async (_format, downloadType, editedContent) => {
+                if (downloadType === 'edited' && editedContent) {
+                  // This is a temporary generated content, so we use the custom PDF endpoint
+                  const { downloadDetailedCoverLetterCustomPdf } = useCoverLetterStore.getState()
+                  await downloadDetailedCoverLetterCustomPdf({
+                    content: editedContent,
+                    positionTitle: form.watch('positionTitle'),
+                    companyName: form.watch('companyName'),
+                    language: form.watch('language'),
+                  })
+                }
+                // For original download of temporary content, we also use custom endpoint
+                else {
+                  const { downloadDetailedCoverLetterCustomPdf } = useCoverLetterStore.getState()
+                  await downloadDetailedCoverLetterCustomPdf({
+                    content: generatedContent,
+                    positionTitle: form.watch('positionTitle'),
+                    companyName: form.watch('companyName'),
+                    language: form.watch('language'),
+                  })
+                }
+              }}
+            />
+          </div>
+        )}
+      </div>
     </div>
   )
 }

@@ -407,8 +407,14 @@ export interface CoverLetterTemplate {
     | 'FINANCIAL_ADVISOR'
     | 'ACCOUNTING_SPECIALIST'
     | 'RISK_ANALYST'
+    | 'NURSE'
+    | 'DOCTOR'
+    | 'PHARMACIST'
+    | 'TEACHER'
+    | 'ACADEMIC_ADMINISTRATOR'
+    | 'MARKETING_SPECIALIST'
   language: 'TURKISH' | 'ENGLISH'
-  industry: 'TECHNOLOGY' | 'FINANCE'
+  industry: 'TECHNOLOGY' | 'FINANCE' | 'HEALTHCARE' | 'EDUCATION' | 'MARKETING'
   description?: string
   isActive: boolean
   sortOrder: number

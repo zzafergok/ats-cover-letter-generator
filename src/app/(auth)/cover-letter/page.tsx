@@ -52,12 +52,12 @@ export default function CoverLetterPage() {
           </CardContent>
         </Card>
 
-        {/* Template Cover Letter Card - Coming Soon */}
-        <Card className='hover:shadow-lg transition-shadow duration-300 opacity-60'>
+        {/* Template Cover Letter Card */}
+        <Card className='hover:shadow-lg transition-shadow duration-300 border-2 hover:border-primary/20'>
           <CardHeader>
             <div className='flex items-center gap-3'>
-              <div className='w-12 h-12 bg-muted rounded-xl flex items-center justify-center'>
-                <FileText className='w-6 h-6 text-muted-foreground' />
+              <div className='w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center'>
+                <FileText className='w-6 h-6 text-primary' />
               </div>
               <div>
                 <CardTitle className='text-xl'>Şablon Ön Yazı</CardTitle>
@@ -69,20 +69,20 @@ export default function CoverLetterPage() {
             <div className='space-y-2 text-sm text-muted-foreground'>
               <div className='flex items-center gap-2'>
                 <FileText className='w-4 h-4' />
-                <span>Farklı sektör şablonları</span>
+                <span>Teknoloji ve Finans sektör şablonları</span>
               </div>
               <div className='flex items-center gap-2'>
                 <Mail className='w-4 h-4' />
-                <span>Profesyonel tasarımlar</span>
+                <span>Türkçe ve İngilizce dil seçenekleri</span>
               </div>
               <div className='flex items-center gap-2'>
                 <Settings className='w-4 h-4' />
-                <span>Kolay özelleştirme</span>
+                <span>Kolay filtreleme ve arama</span>
               </div>
             </div>
             <Link href='/cover-letter/template' className='block'>
-              <Button className='w-full' variant='outline'>
-                Şablon Seç
+              <Button className='w-full'>
+                Şablon Tabanlı Ön Yazı Oluştur
               </Button>
             </Link>
           </CardContent>

@@ -13,12 +13,12 @@ interface TemplateState {
 interface TemplateActions {
   // Template işlemleri
   getAllTemplates: (params?: {
-    industry?: 'TECHNOLOGY' | 'FINANCE'
+    industry?: 'TECHNOLOGY' | 'FINANCE' | 'HEALTHCARE' | 'EDUCATION' | 'MARKETING'
     category?: string
     language?: 'TURKISH' | 'ENGLISH'
   }) => Promise<void>
   getTemplateCategories: () => Promise<void>
-  getTemplatesByIndustry: (industry: 'TECHNOLOGY' | 'FINANCE') => Promise<void>
+  getTemplatesByIndustry: (industry: 'TECHNOLOGY' | 'FINANCE' | 'HEALTHCARE' | 'EDUCATION' | 'MARKETING') => Promise<void>
   getTemplateById: (templateId: string) => Promise<CoverLetterTemplate | null>
   
   // Cover letter oluşturma

@@ -438,7 +438,7 @@ export const schoolApi = {
 export const templateApi = {
   // Template servisleri
   getAll: (params?: {
-    industry?: 'TECHNOLOGY' | 'FINANCE'
+    industry?: 'TECHNOLOGY' | 'FINANCE' | 'HEALTHCARE' | 'EDUCATION' | 'MARKETING'
     category?: string
     language?: 'TURKISH' | 'ENGLISH'
   }): Promise<{ success: boolean; data: CoverLetterTemplate[]; message?: string }> => {
@@ -454,7 +454,7 @@ export const templateApi = {
   getCategories: (): Promise<{ success: boolean; data: Record<string, string[]>; message?: string }> =>
     apiRequest.get('/templates/categories', { skipAuth: true }),
 
-  getByIndustry: (industry: 'TECHNOLOGY' | 'FINANCE'): Promise<{ success: boolean; data: CoverLetterTemplate[]; message?: string }> =>
+  getByIndustry: (industry: 'TECHNOLOGY' | 'FINANCE' | 'HEALTHCARE' | 'EDUCATION' | 'MARKETING'): Promise<{ success: boolean; data: CoverLetterTemplate[]; message?: string }> =>
     apiRequest.get(`/templates/industry/${industry}`, { skipAuth: true }),
 
   getById: (templateId: string): Promise<{ success: boolean; data: CoverLetterTemplate; message?: string }> =>

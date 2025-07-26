@@ -25,7 +25,6 @@ import {
   ContactResponse,
   RegisterResponse,
   CVUploadResponse,
-  SavedCVsResponse,
   DOCXGenerateData,
   CVUploadsResponse,
   ProvincesResponse,
@@ -307,12 +306,13 @@ export const cvApi = {
     })
   },
 
-  getUploads: (): Promise<CVUploadsResponse> => apiRequest.get('/cv/uploads'),
+  getUploads: (): Promise<CVUploadsResponse> => apiRequest.get('/cv-upload/uploads'),
 
   getUploadStatus: (id: string): Promise<{ success: boolean; data: CVUpload }> =>
-    apiRequest.get(`/cv/upload/status/${id}`),
+    apiRequest.get(`/cv-upload/upload/status/${id}`),
 
-  deleteUpload: (id: string): Promise<{ success: boolean; message: string }> => apiRequest.delete(`/cv/uploads/${id}`),
+  deleteUpload: (id: string): Promise<{ success: boolean; message: string }> =>
+    apiRequest.delete(`/cv-upload/uploads/${id}`),
 
   // CV generation işlemleri (upload-based)
   generate: (data: CVGenerateData): Promise<CVGenerateResponse> => apiRequest.post('/cv/generate', data),
@@ -321,29 +321,8 @@ export const cvApi = {
   save: (data: CVSaveData): Promise<{ success: boolean; data: SavedCV; message?: string }> =>
     apiRequest.post('/cv/save', data),
 
-  getSaved: (): Promise<SavedCVsResponse> => apiRequest.get('/cv/saved'),
-
-  deleteSaved: (id: string): Promise<{ success: boolean; message: string }> => apiRequest.delete(`/cv/saved/${id}`),
-
   // CV download işlemi
   download: (id: string): Promise<Blob> => apiRequest.get(`/cv/download/${id}`, { responseType: 'blob' }),
-
-  // Updated CV upload routes (cv-upload prefix)
-  uploadNew: (file: File): Promise<CVUploadResponse> => {
-    const formData = new FormData()
-    formData.append('cvFile', file)
-    return apiRequest.post('/cv-upload/upload', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    })
-  },
-
-  getUploadsNew: (): Promise<CVUploadsResponse> => apiRequest.get('/cv-upload/uploads'),
-
-  getUploadStatusNew: (id: string): Promise<{ success: boolean; data: CVUpload }> =>
-    apiRequest.get(`/cv-upload/upload/status/${id}`),
-
-  deleteUploadNew: (id: string): Promise<{ success: boolean; message: string }> =>
-    apiRequest.delete(`/cv-upload/uploads/${id}`),
 
   // Detailed CV işlemleri (profile-based)
   generateDetailed: (data: CVDetailedGenerateData): Promise<{ success: boolean; data: DetailedCV; message?: string }> =>

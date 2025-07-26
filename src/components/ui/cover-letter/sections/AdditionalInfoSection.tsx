@@ -9,9 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/core/card
 
 interface AdditionalInfoSectionProps {
   form: UseFormReturn<any>
+  disabled?: boolean
 }
 
-export function AdditionalInfoSection({ form: _ }: AdditionalInfoSectionProps) {
+export function AdditionalInfoSection({ form: _, disabled = false }: AdditionalInfoSectionProps) {
   return (
     <Card>
       <CardHeader className='pb-4'>
@@ -28,6 +29,7 @@ export function AdditionalInfoSection({ form: _ }: AdditionalInfoSectionProps) {
             <Textarea
               placeholder='İş ilanında belirtilen görev ve sorumluluklarınızı buraya yazın...'
               rows={4}
+              disabled={disabled}
               {...field}
             />
           )}
@@ -38,6 +40,7 @@ export function AdditionalInfoSection({ form: _ }: AdditionalInfoSectionProps) {
             <Textarea
               placeholder='Sizi motive eden faktörler, kariyer hedefleriniz ve bu pozisyonda nasıl başarılı olacağınızı açıklayın...'
               rows={4}
+              disabled={disabled}
               {...field}
             />
           )}

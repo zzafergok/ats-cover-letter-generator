@@ -9,9 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/core/card
 
 interface MotivationSectionProps {
   form: UseFormReturn<any>
+  disabled?: boolean
 }
 
-export function MotivationSection({ form: _ }: MotivationSectionProps) {
+export function MotivationSection({ form: _, disabled = false }: MotivationSectionProps) {
   return (
     <Card>
       <CardHeader className='pb-4'>
@@ -28,6 +29,7 @@ export function MotivationSection({ form: _ }: MotivationSectionProps) {
             <Textarea
               placeholder='Bu pozisyonun sizin için neden uygun olduğunu, hangi yeteneklerinizin bu rolle uyumlu olduğunu açıklayın...'
               rows={4}
+              disabled={disabled}
               {...field}
             />
           )}
@@ -38,6 +40,7 @@ export function MotivationSection({ form: _ }: MotivationSectionProps) {
             <Textarea
               placeholder='Bu şirketin size neden çekici geldiğini, şirket kültürü ve değerleri hakkındaki düşüncelerinizi açıklayın...'
               rows={4}
+              disabled={disabled}
               {...field}
             />
           )}

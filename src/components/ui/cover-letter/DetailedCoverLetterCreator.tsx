@@ -92,15 +92,17 @@ export function DetailedCoverLetterCreator({ onCreated, className }: DetailedCov
   )
 
   const renderSectionContent = () => {
+    const isFormDisabled = isGenerating || storeIsGenerating
+
     switch (activeSection) {
       case 'basic':
-        return <BasicInfoSection form={form} />
+        return <BasicInfoSection form={form} disabled={isFormDisabled} />
       case 'motivation':
-        return <MotivationSection form={form} />
+        return <MotivationSection form={form} disabled={isFormDisabled} />
       case 'additional':
-        return <AdditionalInfoSection form={form} />
+        return <AdditionalInfoSection form={form} disabled={isFormDisabled} />
       default:
-        return <BasicInfoSection form={form} />
+        return <BasicInfoSection form={form} disabled={isFormDisabled} />
     }
   }
 
@@ -115,6 +117,26 @@ export function DetailedCoverLetterCreator({ onCreated, className }: DetailedCov
 
   const { basicComplete, motivationComplete, additionalComplete } = getSectionProgress()
   const allSectionsComplete = basicComplete && motivationComplete && additionalComplete
+
+  const canProceedToMotivation = basicComplete
+  const canProceedToAdditional = basicComplete && motivationComplete
+  const canGenerateCoverLetter = allSectionsComplete
+
+  const handleNext = () => {
+    if (activeSection === 'basic' && canProceedToMotivation) {
+      setActiveSection('motivation')
+    } else if (activeSection === 'motivation' && canProceedToAdditional) {
+      setActiveSection('additional')
+    }
+  }
+
+  const handlePrev = () => {
+    if (activeSection === 'motivation') {
+      setActiveSection('basic')
+    } else if (activeSection === 'additional') {
+      setActiveSection('motivation')
+    }
+  }
 
   const shouldShowContent = !!generatedContent
 
@@ -178,29 +200,68 @@ export function DetailedCoverLetterCreator({ onCreated, className }: DetailedCov
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent>{renderSectionContent()}</CardContent>
+              <CardContent>
+                {renderSectionContent()}
+
+                {/* Navigation Buttons */}
+                <div className='flex justify-between mt-6 pt-4 border-t'>
+                  <div>
+                    {activeSection !== 'basic' && (
+                      <Button
+                        type='button'
+                        variant='outline'
+                        onClick={handlePrev}
+                        disabled={isGenerating || storeIsGenerating}
+                      >
+                        Önceki
+                      </Button>
+                    )}
+                  </div>
+                  <div>
+                    {activeSection === 'basic' && canProceedToMotivation && (
+                      <Button type='button' onClick={handleNext} disabled={isGenerating || storeIsGenerating}>
+                        İleri
+                      </Button>
+                    )}
+                    {activeSection === 'motivation' && (
+                      <>
+                        <Button
+                          type='button'
+                          onClick={handleNext}
+                          disabled={!canProceedToAdditional || isGenerating || storeIsGenerating}
+                          className='ml-2'
+                        >
+                          İleri
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
             </Card>
 
-            {/* Generate Button */}
-            <div className='flex justify-center'>
-              <Button
-                type='submit'
-                disabled={isGenerating || storeIsGenerating || !allSectionsComplete}
-                className='w-full sm:w-auto min-w-[200px]'
-              >
-                {isGenerating || storeIsGenerating ? (
-                  <>
-                    <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                    Ön Yazı Oluşturuluyor...
-                  </>
-                ) : (
-                  <>
-                    <Send className='mr-2 h-4 w-4' />
-                    Detaylı Ön Yazı Oluştur
-                  </>
-                )}
-              </Button>
-            </div>
+            {/* Generate Button - Only show on additional section */}
+            {activeSection === 'additional' && (
+              <div className='flex justify-center'>
+                <Button
+                  type='submit'
+                  disabled={isGenerating || storeIsGenerating || !canGenerateCoverLetter}
+                  className='w-full sm:w-auto min-w-[200px]'
+                >
+                  {isGenerating || storeIsGenerating ? (
+                    <>
+                      <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                      Ön Yazı Oluşturuluyor...
+                    </>
+                  ) : (
+                    <>
+                      <Send className='mr-2 h-4 w-4' />
+                      Detaylı Ön Yazı Oluştur
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
           </div>
         </Form.Root>
 

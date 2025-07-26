@@ -10,9 +10,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/core/card
 
 interface BasicInfoSectionProps {
   form: UseFormReturn<any>
+  disabled?: boolean
 }
 
-export function BasicInfoSection({ form: _ }: BasicInfoSectionProps) {
+export function BasicInfoSection({ form: _, disabled = false }: BasicInfoSectionProps) {
   return (
     <Card>
       <CardHeader className='pb-4'>
@@ -26,17 +27,17 @@ export function BasicInfoSection({ form: _ }: BasicInfoSectionProps) {
       <CardContent className='space-y-4'>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <Form.Field name='positionTitle' label='Pozisyon Başlığı' required>
-            {(field) => <Input placeholder='Senior Yazılım Geliştirici' {...field} />}
+            {(field) => <Input placeholder='Senior Yazılım Geliştirici' disabled={disabled} {...field} />}
           </Form.Field>
 
           <Form.Field name='companyName' label='Şirket Adı' required>
-            {(field) => <Input placeholder='Tech Şirket A.Ş.' {...field} />}
+            {(field) => <Input placeholder='Tech Şirket A.Ş.' disabled={disabled} {...field} />}
           </Form.Field>
         </div>
 
         <Form.Field name='language' label='Dil Seçimi'>
           {(field) => (
-            <Select onValueChange={field.onChange} value={field.value}>
+            <Select onValueChange={field.onChange} value={field.value} disabled={disabled}>
               <SelectTrigger>
                 <SelectValue placeholder='Dil seçin' />
               </SelectTrigger>

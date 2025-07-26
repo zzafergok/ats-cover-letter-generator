@@ -11,6 +11,7 @@ import type {
   CoverLetterBasicUpdateData,
   CoverLetterDetailedUpdateData,
 } from '@/types/api.types'
+import { formatPdfFilename } from '@/lib/filename-utils'
 
 type CoverLetterType = 'basic' | 'detailed'
 
@@ -156,8 +157,8 @@ export const useCoverLetterStore = create<CoverLetterStore>()(
           const state = get()
           const coverLetter = state.basicCoverLetters.find((letter) => letter.id === id)
           if (coverLetter) {
-            const cleanCompany = coverLetter.companyName.replace(/[^a-zA-Z0-9]/g, '_')
-            const cleanPosition = coverLetter.positionTitle.replace(/[^a-zA-Z0-9]/g, '_')
+            const cleanCompany = formatPdfFilename(coverLetter.companyName)
+            const cleanPosition = formatPdfFilename(coverLetter.positionTitle)
             filename = `${cleanCompany}_${cleanPosition}_Cover_Letter.pdf`
           }
 
@@ -182,8 +183,8 @@ export const useCoverLetterStore = create<CoverLetterStore>()(
           const blob = await coverLetterApi.basic.downloadCustomPdf(data)
 
           // Create filename based on the provided data
-          const cleanCompany = data.companyName.replace(/[^a-zA-Z0-9]/g, '_')
-          const cleanPosition = data.positionTitle.replace(/[^a-zA-Z0-9]/g, '_')
+          const cleanCompany = formatPdfFilename(data.companyName)
+          const cleanPosition = formatPdfFilename(data.positionTitle)
           const filename = `${cleanCompany}_${cleanPosition}_Edited_Cover_Letter.pdf`
 
           const url = window.URL.createObjectURL(blob)
@@ -281,8 +282,8 @@ export const useCoverLetterStore = create<CoverLetterStore>()(
           const state = get()
           const coverLetter = state.detailedCoverLetters.find((letter) => letter.id === id)
           if (coverLetter) {
-            const cleanCompany = coverLetter.companyName.replace(/[^a-zA-Z0-9]/g, '_')
-            const cleanPosition = coverLetter.positionTitle.replace(/[^a-zA-Z0-9]/g, '_')
+            const cleanCompany = formatPdfFilename(coverLetter.companyName)
+            const cleanPosition = formatPdfFilename(coverLetter.positionTitle)
             filename = `${cleanCompany}_${cleanPosition}_Cover_Letter.pdf`
           }
 
@@ -307,8 +308,8 @@ export const useCoverLetterStore = create<CoverLetterStore>()(
           const blob = await coverLetterApi.detailed.downloadCustomPdf(data)
 
           // Create filename based on the provided data
-          const cleanCompany = data.companyName.replace(/[^a-zA-Z0-9]/g, '_')
-          const cleanPosition = data.positionTitle.replace(/[^a-zA-Z0-9]/g, '_')
+          const cleanCompany = formatPdfFilename(data.companyName)
+          const cleanPosition = formatPdfFilename(data.positionTitle)
           const filename = `${cleanCompany}_${cleanPosition}_Edited_Cover_Letter.pdf`
 
           const url = window.URL.createObjectURL(blob)

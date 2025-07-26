@@ -16,6 +16,7 @@ import { useCoverLetterStore } from '@/store/coverLetterStore'
 import { useCVStore } from '@/store/cvStore'
 import { ContentViewer } from '@/components/ui/common/ContentViewer'
 import { coverLetterApi } from '@/lib/api/api'
+import { formatPdfFilename } from '@/lib/filename-utils'
 import type { CoverLetterBasic, CoverLetterBasicGenerateData, CVUpload, Language } from '@/types/api.types'
 
 // Validation schema matching API CoverLetterBasicGenerateData
@@ -391,8 +392,8 @@ export function BasicCoverLetterCreator({ onCreated, className }: BasicCoverLett
                     if (generatedCoverLetter?.id) {
                       try {
                         // Create a better filename using current cover letter data
-                        const cleanCompany = generatedCoverLetter.companyName.replace(/[^a-zA-Z0-9]/g, '_')
-                        const cleanPosition = generatedCoverLetter.positionTitle.replace(/[^a-zA-Z0-9]/g, '_')
+                        const cleanCompany = formatPdfFilename(generatedCoverLetter.companyName)
+                        const cleanPosition = formatPdfFilename(generatedCoverLetter.positionTitle)
                         const filename = `${cleanCompany}_${cleanPosition}_Cover_Letter.pdf`
 
                         const blob = await coverLetterApi.basic.downloadPdf(generatedCoverLetter.id)

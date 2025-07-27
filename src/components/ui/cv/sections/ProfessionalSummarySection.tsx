@@ -26,6 +26,7 @@ export function ProfessionalSummarySection({
   getValues,
 }: ProfessionalSummarySectionProps) {
   const keySkills = watch('professionalSummary.keySkills') || []
+  const summaryText = watch('professionalSummary.summary') || ''
 
   const addKeySkill = () => {
     const current = getValues('professionalSummary.keySkills')
@@ -83,13 +84,19 @@ export function ProfessionalSummarySection({
 
         <div className='flex flex-col gap-2'>
           <Label htmlFor='summary'>Profesyonel Özet *</Label>
-          <Textarea
-            id='summary'
-            {...register('professionalSummary.summary')}
-            placeholder='Kendinizi ve profesyonel hedeflerinizi kısaca açıklayın...'
-            rows={4}
-            className={errors.professionalSummary?.summary ? 'border-red-500' : ''}
-          />
+          <div className='relative'>
+            <Textarea
+              id='summary'
+              {...register('professionalSummary.summary')}
+              placeholder='Kendinizi ve profesyonel hedeflerinizi kısaca açıklayın...'
+              rows={4}
+              className={errors.professionalSummary?.summary ? 'border-red-500' : ''}
+              maxLength={500}
+            />
+            <div className='absolute bottom-2 left-3 text-xs text-muted-foreground'>
+              {summaryText.length}/500 karakter
+            </div>
+          </div>
           {errors.professionalSummary?.summary && (
             <p className='text-sm text-red-500 mt-1'>{errors.professionalSummary?.summary?.message}</p>
           )}

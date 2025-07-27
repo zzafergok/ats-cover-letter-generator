@@ -493,6 +493,9 @@ export const atsCvApi = {
   // ATS CV oluştur
   generate: (data: ATSCVGenerateData): Promise<ATSCVGenerateResponse> => apiRequest.post('/ats-cv/generate', data),
 
+  // ATS CV indir
+  download: (cvId: string): Promise<Blob> => apiRequest.get(`/ats-cv/${cvId}/download`, { responseType: 'blob' }),
+
   // Test ATS CV oluştur
   generateTest: (): Promise<ATSCVTestResponse> => apiRequest.get('/ats-cv/test'),
 

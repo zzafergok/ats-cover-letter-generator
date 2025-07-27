@@ -21,8 +21,17 @@ import { atsFormSchema, ATSFormData } from '@/types/form.types'
 
 export function ATSCVForm() {
   const { profile, isLoading: profileLoading, getProfile } = useUserProfileStore()
-  const [generatedContent, setGeneratedContent] = useState<string | null>(null)
+  const [generatedCV, setGeneratedCV] = useState<{
+    cvId: string
+    fileName: string
+    fileSize: number
+    downloadUrl: string
+    applicantName: string
+    targetPosition: string
+    createdAt: string
+  } | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
+  const [isDownloading, setIsDownloading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const {
@@ -195,6 +204,33 @@ export function ATSCVForm() {
 
   const missingProfileFields = checkProfileCompleteness()
 
+  // CV download fonksiyonu
+  const handleDownloadCV = async (cvId: string, fileName: string) => {
+    setIsDownloading(true)
+    try {
+      const blob = await atsCvApi.download(cvId)
+
+      // Blob'u dosya olarak indir
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = fileName
+      document.body.appendChild(link)
+      link.click()
+
+      // Cleanup
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+
+      console.log('CV başarıyla indirildi:', fileName)
+    } catch (err) {
+      console.error('CV indirme hatası:', err)
+      setError('CV indirilirken bir hata oluştu. Lütfen tekrar deneyin.')
+    } finally {
+      setIsDownloading(false)
+    }
+  }
+
   const onSubmit = async (data: ATSFormData) => {
     console.log('🚀 ~ onSubmit ~ data:', data)
     setIsGenerating(true)
@@ -232,114 +268,156 @@ export function ATSCVForm() {
       }
 
       const result = await atsCvApi.generate(generateData)
-      setGeneratedContent(result.data.downloadUrl)
+
+      if (result.success) {
+        // CV başarıyla oluşturuldu
+        setGeneratedCV({
+          cvId: result.data.cvId,
+          fileName: result.data.fileName,
+          fileSize: result.data.fileSize,
+          downloadUrl: result.data.downloadUrl,
+          applicantName: result.data.applicantName,
+          targetPosition: result.data.targetPosition,
+          createdAt: result.data.createdAt,
+        })
+
+        // Toast mesajı ekleyebilirsiniz
+        console.log('CV başarıyla oluşturuldu:', result.message)
+      } else {
+        throw new Error(result.message || 'CV oluşturulurken beklenmeyen bir hata oluştu')
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Bir hata oluştu')
+      console.error('CV oluşturma hatası:', err)
+
+      if (err instanceof Error) {
+        setError(err.message)
+      } else if (typeof err === 'object' && err !== null && 'message' in err) {
+        setError(String(err.message))
+      } else {
+        setError('CV oluşturulurken beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.')
+      }
     } finally {
       setIsGenerating(false)
     }
   }
 
   return (
-    <div className='space-y-6'>
-      {/* Profile Status Alert */}
-      {profileLoading ? (
-        <Card>
-          <CardContent className='pt-6'>
-            <div className='flex items-center gap-3'>
-              <Clock className='h-5 w-5 animate-spin text-primary' />
-              <span>Profil bilgileriniz yükleniyor...</span>
-            </div>
-          </CardContent>
-        </Card>
-      ) : null}
+    <div className={`grid gap-4 md:gap-6 ${generatedCV ? 'xl:grid-cols-2' : 'grid-cols-1'}`}>
+      {/* Form Section */}
+      <div className='space-y-6'>
+        {/* Profile Status Alert */}
+        {profileLoading ? (
+          <Card>
+            <CardContent className='pt-6'>
+              <div className='flex items-center gap-3'>
+                <Clock className='h-5 w-5 animate-spin text-primary' />
+                <span>Profil bilgileriniz yükleniyor...</span>
+              </div>
+            </CardContent>
+          </Card>
+        ) : null}
 
-      {/* Profile Completeness Alerts */}
-      {!profileLoading && missingProfileFields.length > 0 && (
-        <div className='space-y-4'>
-          {missingProfileFields.map((missing, index) => {
-            const alertConfigs = {
-              personalInfo: {
-                sectionName: 'Kişisel Bilgiler',
-                description: 'CV oluşturmak için temel kişisel bilgilerinizi profilde tanımlamanız gerekiyor.',
-                targetTab: 'overview',
-              },
-              experience: {
-                sectionName: 'İş Deneyimi',
-                description: "Profesyonel deneyimlerinizi profilde ekleyerek CV'nizi güçlendirebilirsiniz.",
-                targetTab: 'experience',
-              },
-              education: {
-                sectionName: 'Eğitim Bilgileri',
-                description: 'Eğitim geçmişinizi profilde tanımlayarak daha kapsamlı bir CV oluşturabilirsiniz.',
-                targetTab: 'education',
-              },
-              skills: {
-                sectionName: 'Yetenekler',
-                description: "Teknik ve kişisel yeteneklerinizi profilde belirterek CV'nizi öne çıkarabilirsiniz.",
-                targetTab: 'skills',
-              },
-            }
+        {/* Profile Completeness Alerts */}
+        {!profileLoading && missingProfileFields.length > 0 && (
+          <div className='space-y-4'>
+            {missingProfileFields.map((missing, index) => {
+              const alertConfigs = {
+                personalInfo: {
+                  sectionName: 'Kişisel Bilgiler',
+                  description: 'CV oluşturmak için temel kişisel bilgilerinizi profilde tanımlamanız gerekiyor.',
+                  targetTab: 'overview',
+                },
+                experience: {
+                  sectionName: 'İş Deneyimi',
+                  description: "Profesyonel deneyimlerinizi profilde ekleyerek CV'nizi güçlendirebilirsiniz.",
+                  targetTab: 'experience',
+                },
+                education: {
+                  sectionName: 'Eğitim Bilgileri',
+                  description: 'Eğitim geçmişinizi profilde tanımlayarak daha kapsamlı bir CV oluşturabilirsiniz.',
+                  targetTab: 'education',
+                },
+                skills: {
+                  sectionName: 'Yetenekler',
+                  description: "Teknik ve kişisel yeteneklerinizi profilde belirterek CV'nizi öne çıkarabilirsiniz.",
+                  targetTab: 'skills',
+                },
+              }
 
-            const config = alertConfigs[missing.field as keyof typeof alertConfigs]
-            if (!config) return null
+              const config = alertConfigs[missing.field as keyof typeof alertConfigs]
+              if (!config) return null
 
-            return (
-              <ProfileRedirectAlert
-                key={index}
-                sectionName={config.sectionName}
-                description={config.description}
-                targetTab={config.targetTab}
-              />
-            )
-          })}
-        </div>
-      )}
+              return (
+                <ProfileRedirectAlert
+                  key={index}
+                  sectionName={config.sectionName}
+                  description={config.description}
+                  targetTab={config.targetTab}
+                />
+              )
+            })}
+          </div>
+        )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className='space-y-8'>
-        <PersonalInfoSection register={register} errors={errors} />
+        <form onSubmit={handleSubmit(onSubmit)} className='space-y-8'>
+          <PersonalInfoSection register={register} errors={errors} />
 
-        <ProfessionalSummarySection
-          register={register}
-          errors={errors}
-          watch={watch}
-          setValue={setValue}
-          getValues={getValues}
-        />
+          <ProfessionalSummarySection
+            register={register}
+            errors={errors}
+            watch={watch}
+            setValue={setValue}
+            getValues={getValues}
+          />
 
-        <WorkExperienceSection
-          register={register}
-          errors={errors}
-          watch={watch}
-          setValue={setValue}
-          getValues={getValues}
-        />
+          <WorkExperienceSection
+            register={register}
+            errors={errors}
+            watch={watch}
+            setValue={setValue}
+            getValues={getValues}
+          />
 
-        <EducationSection register={register} errors={errors} watch={watch} setValue={setValue} getValues={getValues} />
+          <EducationSection
+            register={register}
+            errors={errors}
+            watch={watch}
+            setValue={setValue}
+            getValues={getValues}
+          />
 
-        <SkillsSection register={register} errors={errors} watch={watch} setValue={setValue} getValues={getValues} />
+          <SkillsSection register={register} errors={errors} watch={watch} setValue={setValue} getValues={getValues} />
 
-        {/* Submit Button */}
-        <div className='flex justify-end pt-6'>
-          <Button type='submit' disabled={isGenerating || missingProfileFields.length > 0} className='min-w-[200px]'>
-            {isGenerating ? (
-              <>
-                <Clock className='h-4 w-4 mr-2 animate-spin' />
-                CV Oluşturuluyor...
-              </>
-            ) : (
-              <>
-                <Wand2 className='h-4 w-4 mr-2' />
-                ATS CV Oluştur
-              </>
-            )}
-          </Button>
-        </div>
-      </form>
+          {/* Submit Button */}
+          <div className='flex justify-end pt-6'>
+            <Button type='submit' disabled={isGenerating || missingProfileFields.length > 0} className='min-w-[200px]'>
+              {isGenerating ? (
+                <>
+                  <Clock className='h-4 w-4 mr-2 animate-spin' />
+                  CV Oluşturuluyor...
+                </>
+              ) : (
+                <>
+                  <Wand2 className='h-4 w-4 mr-2' />
+                  ATS CV Oluştur
+                </>
+              )}
+            </Button>
+          </div>
+        </form>
+
+        {/* Error Display */}
+        {error && (
+          <Alert variant='destructive'>
+            <AlertCircle className='h-4 w-4' />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+      </div>
 
       {/* Generated Content */}
-      {generatedContent && (
-        <Card>
+      {generatedCV && (
+        <Card className='h-max'>
           <CardHeader>
             <CardTitle className='flex items-center gap-2'>
               <CheckCircle className='h-5 w-5 text-green-500' />
@@ -348,21 +426,51 @@ export function ATSCVForm() {
           </CardHeader>
           <CardContent>
             <div className='space-y-4'>
-              <p>CV başarıyla oluşturuldu!</p>
-              <Button onClick={() => window.open(generatedContent || '', '_blank', 'noopener,noreferrer')}>
-                CV&apos;yi İndir
-              </Button>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4 text-sm'>
+                <div>
+                  <p>
+                    <strong>Dosya Adı:</strong> {generatedCV.fileName}
+                  </p>
+                  <p>
+                    <strong>Boyut:</strong> {(generatedCV.fileSize / 1024).toFixed(1)} KB
+                  </p>
+                </div>
+                <div>
+                  <p>
+                    <strong>Başvurucu:</strong> {generatedCV.applicantName}
+                  </p>
+                  <p>
+                    <strong>Pozisyon:</strong> {generatedCV.targetPosition}
+                  </p>
+                </div>
+              </div>
+              <div className='flex gap-3'>
+                <Button
+                  onClick={() => handleDownloadCV(generatedCV.cvId, generatedCV.fileName)}
+                  disabled={isDownloading}
+                >
+                  {isDownloading ? (
+                    <>
+                      <Clock className='h-4 w-4 mr-2 animate-spin' />
+                      İndiriliyor...
+                    </>
+                  ) : (
+                    'CV&apos;yi İndir'
+                  )}
+                </Button>
+                <Button
+                  variant='outline'
+                  onClick={() => {
+                    navigator.clipboard.writeText(window.location.origin + generatedCV.downloadUrl)
+                    console.log('Download link kopyalandı')
+                  }}
+                >
+                  Linki Kopyala
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
-      )}
-
-      {/* Error Display */}
-      {error && (
-        <Alert variant='destructive'>
-          <AlertCircle className='h-4 w-4' />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
       )}
     </div>
   )

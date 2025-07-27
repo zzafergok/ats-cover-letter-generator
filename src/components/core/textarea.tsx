@@ -80,7 +80,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     const displayValue = value !== undefined ? value : internalValue
 
     return (
-      <div className='relative'>
+      <div className='relative w-full'>
         <textarea
           ref={textareaRef}
           className={cn(

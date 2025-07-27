@@ -396,7 +396,7 @@ export interface CoverLetterTemplate {
   id: string
   title: string
   content: string
-  category: 
+  category:
     | 'SOFTWARE_DEVELOPER'
     | 'FRONTEND_DEVELOPER'
     | 'BACKEND_DEVELOPER'

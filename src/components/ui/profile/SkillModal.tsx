@@ -10,6 +10,7 @@ import { Input } from '@/components/core/input'
 import { Label } from '@/components/core/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/core/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/core/select'
+import { SKILL_CATEGORIES } from '@/constants/proficiency-levels'
 import type { Skill } from '@/types/api.types'
 
 interface SkillModalProps {
@@ -26,8 +27,6 @@ const skillLevels = [
   { value: 'ADVANCED', label: 'İleri' },
   { value: 'EXPERT', label: 'Uzman' },
 ] as const
-
-const skillCategories = ['TECHNICAL', 'SOFT_SKILL', 'LANGUAGE', 'TOOL', 'FRAMEWORK', 'OTHER'] as const
 
 // Zod schema for form validation
 const skillSchema = z.object({
@@ -85,18 +84,6 @@ export function SkillModal({ isOpen, onClose, onSave, skill, isLoading = false }
     }
   }
 
-  const getCategoryLabel = (category: string) => {
-    const labels: Record<string, string> = {
-      TECHNICAL: 'Teknik',
-      SOFT_SKILL: 'Soft Skill',
-      LANGUAGE: 'Dil',
-      TOOL: 'Araç',
-      FRAMEWORK: 'Framework',
-      OTHER: 'Diğer',
-    }
-    return labels[category] || category
-  }
-
   if (!isOpen) return null
 
   return (
@@ -132,9 +119,9 @@ export function SkillModal({ isOpen, onClose, onSave, skill, isLoading = false }
                       <SelectValue placeholder='Kategori seçin' />
                     </SelectTrigger>
                     <SelectContent>
-                      {skillCategories.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {getCategoryLabel(category)}
+                      {SKILL_CATEGORIES.map((category) => (
+                        <SelectItem key={category.value} value={category.value}>
+                          {category.label}
                         </SelectItem>
                       ))}
                     </SelectContent>

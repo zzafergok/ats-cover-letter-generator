@@ -23,6 +23,7 @@ import {
   Clock,
 } from 'lucide-react'
 
+import { LANGUAGE_PROFICIENCY_LEVELS, SKILL_PROFICIENCY_LEVELS } from '@/constants/proficiency-levels'
 import { Input } from '@/components/core/input'
 import { Label } from '@/components/core/label'
 import { Button } from '@/components/core/button'
@@ -1426,10 +1427,11 @@ PDF indirmek için aşağıdaki butonu kullanın.`)
                               <SelectValue placeholder='Seviye seçin' />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value='Beginner'>Beginner</SelectItem>
-                              <SelectItem value='Intermediate'>Intermediate</SelectItem>
-                              <SelectItem value='Advanced'>Advanced</SelectItem>
-                              <SelectItem value='Expert'>Expert</SelectItem>
+                              {SKILL_PROFICIENCY_LEVELS.map((level) => (
+                                <SelectItem key={level.value} value={level.value}>
+                                  {level.label}
+                                </SelectItem>
+                              ))}
                             </SelectContent>
                           </Select>
                           {(watch(`skills.technical.${catIndex}.items`)?.length || 0) > 1 && (
@@ -1520,11 +1522,16 @@ PDF indirmek için aşağıdaki butonu kullanın.`)
                         <SelectValue placeholder='Seviye seçin' />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value='Native'>Ana Dil (Native)</SelectItem>
-                        <SelectItem value='Fluent'>Akıcı (Fluent)</SelectItem>
-                        <SelectItem value='Advanced'>İleri (Advanced)</SelectItem>
-                        <SelectItem value='Intermediate'>Orta (Intermediate)</SelectItem>
-                        <SelectItem value='Basic'>Temel (Basic)</SelectItem>
+                        {LANGUAGE_PROFICIENCY_LEVELS.map(
+                          (level: {
+                            value: 'Native' | 'Fluent' | 'Advanced' | 'Intermediate' | 'Basic'
+                            label: string
+                          }) => (
+                            <SelectItem key={level.value} value={level.value}>
+                              {level.label}
+                            </SelectItem>
+                          ),
+                        )}
                       </SelectContent>
                     </Select>
                     {languages.length > 0 && (

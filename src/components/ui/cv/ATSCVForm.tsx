@@ -1498,10 +1498,15 @@ PDF indirmek için aşağıdaki butonu kullanın.`)
                   Dil Ekle
                 </Button>
               </div>
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+
+              <div className='flex items-center w-full gap-4'>
                 {languages.map((_, index) => (
-                  <div key={index} className='flex gap-2'>
-                    <Input placeholder='İngilizce, Almanca vs.' {...register(`skills.languages.${index}.language`)} />
+                  <div key={index} className='flex w-full gap-2'>
+                    <Input
+                      className='w-full'
+                      placeholder='İngilizce, Almanca vs.'
+                      {...register(`skills.languages.${index}.language`)}
+                    />
                     <Select
                       value={watch(`skills.languages.${index}.proficiency`) || ''}
                       onValueChange={(value) =>

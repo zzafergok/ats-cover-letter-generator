@@ -160,7 +160,7 @@ export default function DashboardPage() {
 
   return (
     <div className='max-h-screen bg-background'>
-      <div className='container mx-auto px-4 py-6 space-y-6'>
+      <div className='container mx-auto px-4 lg:px-8 py-6 space-y-6'>
         <PageHeader
           title={t('dashboard.title', 'Dashboard')}
           subtitle={t('dashboard.subtitle', 'ATS uyumlu CV ve ön yazı oluşturma platformunuz')}

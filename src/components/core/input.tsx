@@ -88,7 +88,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     }
 
     return (
-      <div>
+      <>
         <input
           type={type}
           className={cn(
@@ -101,7 +101,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           {...props}
         />
         {error && <p className='mt-1 text-xs text-red-600 dark:text-red-400'>{error}</p>}
-      </div>
+      </>
     )
   },
 )

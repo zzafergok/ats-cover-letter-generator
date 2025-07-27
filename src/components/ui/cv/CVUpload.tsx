@@ -13,11 +13,12 @@ import { Progress } from '@/components/core/progress'
 
 interface CVUploadProps {
   onUploadSuccess?: (cv: any) => void
+  onUploadComplete?: () => void
   maxFiles?: number
   className?: string
 }
 
-export function CVUpload({ onUploadSuccess, maxFiles = 1, className }: CVUploadProps) {
+export function CVUpload({ onUploadSuccess, onUploadComplete, maxFiles = 1, className }: CVUploadProps) {
   const { uploadCV, isUploading, error, clearError, getUploadedCVs } = useCVStore()
 
   const [uploadProgress, setUploadProgress] = useState(0)
@@ -53,6 +54,7 @@ export function CVUpload({ onUploadSuccess, maxFiles = 1, className }: CVUploadP
               setUploadProgress(0)
               setUploadSuccess(false)
               onUploadSuccess?.(response.data)
+              onUploadComplete?.()
             }, 2000)
           } else {
             throw new Error(response?.message || 'CV yüklenirken bir hata oluştu')

@@ -459,52 +459,110 @@ export interface TemplateCategoriesResponse {
 // ATS CV Services Types
 export interface ATSCVGenerateData {
   personalInfo: {
-    fullName: string
+    firstName: string
+    lastName: string
     email: string
     phone: string
-    location?: string
-    linkedin?: string
+    address: {
+      street?: string
+      city: string
+      state?: string
+      postalCode?: string
+      country: string
+    }
+    linkedIn?: string
+    website?: string
+    github?: string
     portfolio?: string
   }
-  professionalSummary: string
+  professionalSummary: {
+    summary: string
+    targetPosition: string
+    yearsOfExperience: number
+    keySkills: string[]
+  }
   workExperience: Array<{
-    title: string
-    company: string
-    location?: string
+    id: string
+    companyName: string
+    position: string
+    location: string
     startDate: string
     endDate?: string
-    current: boolean
+    isCurrentRole: boolean
     achievements: string[]
+    technologies?: string[]
+    industryType?: string
   }>
   education: Array<{
+    id: string
+    institution: string
     degree: string
-    field: string
-    school: string
-    graduationDate?: string
-    gpa?: string
+    fieldOfStudy: string
+    location: string
+    startDate: string
+    endDate?: string
+    gpa?: number
+    honors?: string[]
+    relevantCoursework?: string[]
   }>
   skills: {
-    technical: string[]
+    technical: Array<{
+      category: string
+      items: Array<{
+        name: string
+        proficiencyLevel: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert'
+      }>
+    }>
+    languages: Array<{
+      language: string
+      proficiency: 'Native' | 'Fluent' | 'Advanced' | 'Intermediate' | 'Basic'
+    }>
     soft: string[]
   }
   certifications?: Array<{
+    id: string
     name: string
-    issuer: string
-    date?: string
+    issuingOrganization: string
+    issueDate: string
+    expirationDate?: string
     credentialId?: string
+    verificationUrl?: string
   }>
+  projects?: Array<{
+    id: string
+    name: string
+    description: string
+    technologies: string[]
+    startDate: string
+    endDate?: string
+    url?: string
+    achievements: string[]
+  }>
+  configuration: {
+    targetCompany?: string
+    jobDescription?: string
+    language: 'TURKISH' | 'ENGLISH'
+    cvType: 'ATS_OPTIMIZED' | 'TECHNICAL' | 'EXECUTIVE'
+    templateStyle: 'MINIMAL' | 'PROFESSIONAL' | 'MODERN'
+    useAI?: boolean
+  }
 }
 
 export interface ATSCVGenerateResponse {
   success: boolean
+  message: string
   data: {
     cvId: string
-    pdfUrl: string
-    atsScore: number
-    generatedAt: string
-    recommendations: string[]
+    fileName: string
+    fileSize: number
+    generationStatus: 'COMPLETED' | 'PROCESSING' | 'FAILED'
+    downloadUrl: string
+    createdAt: string
+    applicantName: string
+    targetPosition: string
+    language: 'TURKISH' | 'ENGLISH'
+    useAI: boolean
   }
-  message?: string
 }
 
 export interface ATSCVTestResponse {

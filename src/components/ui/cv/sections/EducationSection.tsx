@@ -8,6 +8,7 @@ import { Label } from '@/components/core/label'
 import { Button } from '@/components/core/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/core/card'
 import { MonthYearPicker } from '@/components/core/month-year-picker'
+import { FormError } from '@/components/core/form-error'
 import { ATSFormData } from '@/types/form.types'
 
 interface EducationSectionProps {
@@ -79,11 +80,9 @@ export function EducationSection({ register, errors, watch, setValue, getValues 
                 <Input
                   {...register(`education.${index}.degree`)}
                   placeholder='Lisans, Yüksek Lisans, Doktora...'
-                  className={errors.education?.[index]?.degree ? 'border-red-500' : ''}
+                  className={errors.education?.[index]?.degree ? 'border-destructive' : ''}
                 />
-                {errors.education?.[index]?.degree && (
-                  <p className='text-sm text-red-500 mt-1'>{errors.education[index].degree.message}</p>
-                )}
+                <FormError message={errors.education?.[index]?.degree?.message} />
               </div>
 
               <div className='flex flex-col gap-2'>
@@ -91,11 +90,9 @@ export function EducationSection({ register, errors, watch, setValue, getValues 
                 <Input
                   {...register(`education.${index}.fieldOfStudy`)}
                   placeholder='Bilgisayar Mühendisliği, İşletme...'
-                  className={errors.education?.[index]?.fieldOfStudy ? 'border-red-500' : ''}
+                  className={errors.education?.[index]?.fieldOfStudy ? 'border-destructive' : ''}
                 />
-                {errors.education?.[index]?.fieldOfStudy && (
-                  <p className='text-sm text-red-500 mt-1'>{errors.education[index].fieldOfStudy.message}</p>
-                )}
+                <FormError message={errors.education?.[index]?.fieldOfStudy?.message} />
               </div>
 
               <div className='flex flex-col gap-2'>
@@ -103,11 +100,9 @@ export function EducationSection({ register, errors, watch, setValue, getValues 
                 <Input
                   {...register(`education.${index}.institution`)}
                   placeholder='İstanbul Teknik Üniversitesi'
-                  className={errors.education?.[index]?.institution ? 'border-red-500' : ''}
+                  className={errors.education?.[index]?.institution ? 'border-destructive' : ''}
                 />
-                {errors.education?.[index]?.institution && (
-                  <p className='text-sm text-red-500 mt-1'>{errors.education[index].institution.message}</p>
-                )}
+                <FormError message={errors.education?.[index]?.institution?.message} />
               </div>
 
               <div className='flex flex-col gap-2'>
@@ -115,11 +110,9 @@ export function EducationSection({ register, errors, watch, setValue, getValues 
                 <Input
                   {...register(`education.${index}.location`)}
                   placeholder='İstanbul, Türkiye'
-                  className={errors.education?.[index]?.location ? 'border-red-500' : ''}
+                  className={errors.education?.[index]?.location ? 'border-destructive' : ''}
                 />
-                {errors.education?.[index]?.location && (
-                  <p className='text-sm text-red-500 mt-1'>{errors.education[index].location.message}</p>
-                )}
+                <FormError message={errors.education?.[index]?.location?.message} />
               </div>
 
               <div className='flex flex-col gap-2'>
@@ -128,9 +121,7 @@ export function EducationSection({ register, errors, watch, setValue, getValues 
                   value={watch(`education.${index}.startDate`) || ''}
                   onChange={(value) => setValue(`education.${index}.startDate`, value || '')}
                 />
-                {errors.education?.[index]?.startDate && (
-                  <p className='text-sm text-red-500 mt-1'>{errors.education[index].startDate.message}</p>
-                )}
+                <FormError message={errors.education?.[index]?.startDate?.message} />
               </div>
 
               <div className='flex flex-col gap-2'>
@@ -155,7 +146,7 @@ export function EducationSection({ register, errors, watch, setValue, getValues 
             </div>
           </div>
         ))}
-        {errors.education && <p className='text-sm text-red-500'>{errors.education.message}</p>}
+        <FormError message={errors.education?.message} />
       </CardContent>
     </Card>
   )

@@ -9,6 +9,7 @@ import { Button } from '@/components/core/button'
 import { Textarea } from '@/components/core/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/core/card'
 import { MonthYearPicker } from '@/components/core/month-year-picker'
+import { FormError } from '@/components/core/form-error'
 import { ATSFormData } from '@/types/form.types'
 
 interface WorkExperienceSectionProps {
@@ -99,11 +100,9 @@ export function WorkExperienceSection({ register, errors, watch, setValue, getVa
                 <Input
                   {...register(`workExperience.${index}.position`)}
                   placeholder='Senior Software Developer'
-                  className={errors.workExperience?.[index]?.position ? 'border-red-500' : ''}
+                  className={errors.workExperience?.[index]?.position ? 'border-destructive' : ''}
                 />
-                {errors.workExperience?.[index]?.position && (
-                  <p className='text-sm text-red-500 mt-1'>{errors.workExperience[index].position.message}</p>
-                )}
+                <FormError message={errors.workExperience?.[index]?.position?.message} />
               </div>
 
               <div className='flex flex-col gap-2'>
@@ -111,11 +110,9 @@ export function WorkExperienceSection({ register, errors, watch, setValue, getVa
                 <Input
                   {...register(`workExperience.${index}.companyName`)}
                   placeholder='ABC Technology'
-                  className={errors.workExperience?.[index]?.companyName ? 'border-red-500' : ''}
+                  className={errors.workExperience?.[index]?.companyName ? 'border-destructive' : ''}
                 />
-                {errors.workExperience?.[index]?.companyName && (
-                  <p className='text-sm text-red-500 mt-1'>{errors.workExperience[index].companyName.message}</p>
-                )}
+                <FormError message={errors.workExperience?.[index]?.companyName?.message} />
               </div>
 
               <div className='flex flex-col gap-2'>
@@ -123,11 +120,9 @@ export function WorkExperienceSection({ register, errors, watch, setValue, getVa
                 <Input
                   {...register(`workExperience.${index}.location`)}
                   placeholder='İstanbul, Türkiye'
-                  className={errors.workExperience?.[index]?.location ? 'border-red-500' : ''}
+                  className={errors.workExperience?.[index]?.location ? 'border-destructive' : ''}
                 />
-                {errors.workExperience?.[index]?.location && (
-                  <p className='text-sm text-red-500 mt-1'>{errors.workExperience[index].location.message}</p>
-                )}
+                <FormError message={errors.workExperience?.[index]?.location?.message} />
               </div>
 
               <div className='flex flex-col gap-2'>
@@ -136,9 +131,7 @@ export function WorkExperienceSection({ register, errors, watch, setValue, getVa
                   value={watch(`workExperience.${index}.startDate`) || ''}
                   onChange={(value) => setValue(`workExperience.${index}.startDate`, value || '')}
                 />
-                {errors.workExperience?.[index]?.startDate && (
-                  <p className='text-sm text-red-500 mt-1'>{errors.workExperience[index].startDate.message}</p>
-                )}
+                <FormError message={errors.workExperience?.[index]?.startDate?.message} />
               </div>
 
               <div className='flex flex-col gap-2'>
@@ -198,12 +191,12 @@ export function WorkExperienceSection({ register, errors, watch, setValue, getVa
                 ))}
               </div>
               {errors.workExperience?.[index]?.achievements && (
-                <p className='text-sm text-red-500'>{errors.workExperience[index].achievements.message}</p>
+                <FormError message={errors.workExperience?.[index]?.achievements?.message} />
               )}
             </div>
           </div>
         ))}
-        {errors.workExperience && <p className='text-sm text-red-500'>{errors.workExperience.message}</p>}
+        <FormError message={errors.workExperience?.message} />
       </CardContent>
     </Card>
   )

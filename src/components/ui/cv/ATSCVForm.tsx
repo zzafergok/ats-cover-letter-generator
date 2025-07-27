@@ -105,6 +105,7 @@ export function ATSCVForm() {
       projects: [],
     },
   })
+  console.log('🚀 ~ ATSCVForm ~ errors:', errors)
 
   // Profil verilerini form'a otomatik doldur
   useEffect(() => {

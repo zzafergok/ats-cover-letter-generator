@@ -8,6 +8,7 @@ import { Label } from '@/components/core/label'
 import { Button } from '@/components/core/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/core/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/core/select'
+import { FormError } from '@/components/core/form-error'
 import { LANGUAGE_PROFICIENCY_LEVELS, SKILL_PROFICIENCY_LEVELS, SKILL_CATEGORIES } from '@/constants/proficiency-levels'
 import { ATSFormData } from '@/types/form.types'
 
@@ -197,7 +198,7 @@ export function SkillsSection({ register, errors, watch, setValue, getValues }: 
               </div>
             ))}
           </div>
-          {errors.skills?.technical && <p className='text-sm text-red-500'>{errors.skills.technical.message}</p>}
+          <FormError message={errors.skills?.technical?.message} />
         </div>
 
         {/* Soft Skills */}
@@ -223,7 +224,7 @@ export function SkillsSection({ register, errors, watch, setValue, getValues }: 
               </div>
             ))}
           </div>
-          {errors.skills?.soft && <p className='text-sm text-red-500'>{errors.skills.soft.message}</p>}
+          <FormError message={errors.skills?.soft?.message} />
         </div>
 
         {/* Languages */}

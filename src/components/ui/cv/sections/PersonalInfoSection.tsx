@@ -6,6 +6,7 @@ import { User, Mail, Phone, MapPin, Linkedin, Globe } from 'lucide-react'
 import { Input } from '@/components/core/input'
 import { Label } from '@/components/core/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/core/card'
+import { FormError } from '@/components/core/form-error'
 import { ATSFormData } from '@/types/form.types'
 
 interface PersonalInfoSectionProps {
@@ -29,11 +30,9 @@ export function PersonalInfoSection({ register, errors }: PersonalInfoSectionPro
             <Input
               id='firstName'
               {...register('personalInfo.firstName')}
-              className={errors.personalInfo?.firstName ? 'border-red-500' : ''}
+              className={errors.personalInfo?.firstName ? 'border-destructive' : ''}
             />
-            {errors.personalInfo?.firstName && (
-              <p className='text-sm text-red-500 mt-1'>{errors.personalInfo?.firstName?.message}</p>
-            )}
+            <FormError message={errors.personalInfo?.firstName?.message} />
           </div>
 
           <div className='flex flex-col gap-2'>
@@ -41,11 +40,9 @@ export function PersonalInfoSection({ register, errors }: PersonalInfoSectionPro
             <Input
               id='lastName'
               {...register('personalInfo.lastName')}
-              className={errors.personalInfo?.lastName ? 'border-red-500' : ''}
+              className={errors.personalInfo?.lastName ? 'border-destructive' : ''}
             />
-            {errors.personalInfo?.lastName && (
-              <p className='text-sm text-red-500 mt-1'>{errors.personalInfo?.lastName?.message}</p>
-            )}
+            <FormError message={errors.personalInfo?.lastName?.message} />
           </div>
 
           <div className='flex flex-col gap-2'>
@@ -57,11 +54,9 @@ export function PersonalInfoSection({ register, errors }: PersonalInfoSectionPro
               id='email'
               type='email'
               {...register('personalInfo.email')}
-              className={errors.personalInfo?.email ? 'border-red-500' : ''}
+              className={errors.personalInfo?.email ? 'border-destructive' : ''}
             />
-            {errors.personalInfo?.email && (
-              <p className='text-sm text-red-500 mt-1'>{errors.personalInfo?.email?.message}</p>
-            )}
+            <FormError message={errors.personalInfo?.email?.message} />
           </div>
 
           <div className='flex flex-col gap-2'>
@@ -72,11 +67,9 @@ export function PersonalInfoSection({ register, errors }: PersonalInfoSectionPro
             <Input
               id='phone'
               {...register('personalInfo.phone')}
-              className={errors.personalInfo?.phone ? 'border-red-500' : ''}
+              className={errors.personalInfo?.phone ? 'border-destructive' : ''}
             />
-            {errors.personalInfo?.phone && (
-              <p className='text-sm text-red-500 mt-1'>{errors.personalInfo?.phone?.message}</p>
-            )}
+            <FormError message={errors.personalInfo?.phone?.message} />
           </div>
 
           <div className='flex flex-col gap-2'>
@@ -87,11 +80,9 @@ export function PersonalInfoSection({ register, errors }: PersonalInfoSectionPro
             <Input
               id='city'
               {...register('personalInfo.address.city')}
-              className={errors.personalInfo?.address?.city ? 'border-red-500' : ''}
+              className={errors.personalInfo?.address?.city ? 'border-destructive' : ''}
             />
-            {errors.personalInfo?.address?.city && (
-              <p className='text-sm text-red-500 mt-1'>{errors.personalInfo?.address?.city?.message}</p>
-            )}
+            <FormError message={errors.personalInfo?.address?.city?.message} />
           </div>
 
           <div className='flex flex-col gap-2'>
@@ -99,11 +90,9 @@ export function PersonalInfoSection({ register, errors }: PersonalInfoSectionPro
             <Input
               id='country'
               {...register('personalInfo.address.country')}
-              className={errors.personalInfo?.address?.country ? 'border-red-500' : ''}
+              className={errors.personalInfo?.address?.country ? 'border-destructive' : ''}
             />
-            {errors.personalInfo?.address?.country && (
-              <p className='text-sm text-red-500 mt-1'>{errors.personalInfo?.address?.country?.message}</p>
-            )}
+            <FormError message={errors.personalInfo?.address?.country?.message} />
           </div>
 
           <div className='flex flex-col gap-2'>

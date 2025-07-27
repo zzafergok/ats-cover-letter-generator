@@ -8,6 +8,7 @@ import { Label } from '@/components/core/label'
 import { Button } from '@/components/core/button'
 import { Textarea } from '@/components/core/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/core/card'
+import { FormError } from '@/components/core/form-error'
 import { ATSFormData } from '@/types/form.types'
 
 interface ProfessionalSummarySectionProps {
@@ -59,11 +60,9 @@ export function ProfessionalSummarySection({
               id='targetPosition'
               {...register('professionalSummary.targetPosition')}
               placeholder='Örn: Senior Full Stack Developer'
-              className={errors.professionalSummary?.targetPosition ? 'border-red-500' : ''}
+              className={errors.professionalSummary?.targetPosition ? 'border-destructive' : ''}
             />
-            {errors.professionalSummary?.targetPosition && (
-              <p className='text-sm text-red-500 mt-1'>{errors.professionalSummary?.targetPosition?.message}</p>
-            )}
+            <FormError message={errors.professionalSummary?.targetPosition?.message} />
           </div>
 
           <div className='flex flex-col gap-2'>
@@ -74,11 +73,9 @@ export function ProfessionalSummarySection({
               min='0'
               max='50'
               {...register('professionalSummary.yearsOfExperience', { valueAsNumber: true })}
-              className={errors.professionalSummary?.yearsOfExperience ? 'border-red-500' : ''}
+              className={errors.professionalSummary?.yearsOfExperience ? 'border-destructive' : ''}
             />
-            {errors.professionalSummary?.yearsOfExperience && (
-              <p className='text-sm text-red-500 mt-1'>{errors.professionalSummary?.yearsOfExperience?.message}</p>
-            )}
+            <FormError message={errors.professionalSummary?.yearsOfExperience?.message} />
           </div>
         </div>
 
@@ -90,16 +87,14 @@ export function ProfessionalSummarySection({
               {...register('professionalSummary.summary')}
               placeholder='Kendinizi ve profesyonel hedeflerinizi kısaca açıklayın...'
               rows={4}
-              className={errors.professionalSummary?.summary ? 'border-red-500' : ''}
+              className={errors.professionalSummary?.summary ? 'border-destructive' : ''}
               maxLength={500}
             />
             <div className='absolute bottom-2 left-3 text-xs text-muted-foreground'>
               {summaryText.length}/500 karakter
             </div>
           </div>
-          {errors.professionalSummary?.summary && (
-            <p className='text-sm text-red-500 mt-1'>{errors.professionalSummary?.summary?.message}</p>
-          )}
+          <FormError message={errors.professionalSummary?.summary?.message} />
         </div>
 
         <div className='space-y-4'>
@@ -127,9 +122,7 @@ export function ProfessionalSummarySection({
               </div>
             ))}
           </div>
-          {errors.professionalSummary?.keySkills && (
-            <p className='text-sm text-red-500'>{errors.professionalSummary?.keySkills?.message}</p>
-          )}
+          <FormError message={errors.professionalSummary?.keySkills?.message} />
         </div>
       </CardContent>
     </Card>

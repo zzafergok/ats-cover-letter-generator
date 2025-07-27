@@ -15,9 +15,7 @@ export default function CVGeneratePage() {
           </div>
           <div>
             <h1 className='text-4xl font-bold text-foreground'>ATS CV Oluşturucu</h1>
-            <p className='text-xl text-muted-foreground'>
-              Profil bilgilerinizden ATS uyumlu profesyonel CV oluşturun
-            </p>
+            <p className='text-xl text-muted-foreground'>Profil bilgilerinizden ATS uyumlu profesyonel CV oluşturun</p>
           </div>
         </div>
       </div>

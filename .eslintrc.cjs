@@ -35,6 +35,7 @@ module.exports = {
     ],
     'react/prop-types': 'off',
     'react/react-in-jsx-scope': 'off',
+    'react/no-unescaped-entities': 'off',
     'prefer-const': 'error',
     'no-var': 'error',
   },

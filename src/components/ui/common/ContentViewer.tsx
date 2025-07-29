@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
 'use client'
 
 import React, { useState, useMemo, useCallback } from 'react'
@@ -446,7 +445,8 @@ export function ContentViewer({
                         <div className='flex-1'>
                           <p className='font-medium text-sm'>Düzenlenmiş İçerik PDF Formatında İndirilecek</p>
                           <p className='text-xs text-muted-foreground'>
-                            Yaptığınız değişiklikler ile PDF dosyası oluşturulacak ve indirme klasörünüze kaydedilecektir
+                            Yaptığınız değişiklikler ile PDF dosyası oluşturulacak ve indirme klasörünüze
+                            kaydedilecektir
                           </p>
                         </div>
                       </div>

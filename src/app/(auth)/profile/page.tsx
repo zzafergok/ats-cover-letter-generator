@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { User, GraduationCap, Briefcase, Award, BookOpen, Star, X, ArrowLeft } from 'lucide-react'
+import { User, GraduationCap, Briefcase, Award, BookOpen, Star, X, ArrowLeft, FileText } from 'lucide-react'
 
 import { useUserProfileStore } from '@/store/userProfileStore'
 
@@ -20,6 +20,7 @@ import { ExperienceTab } from '@/components/ui/profile/ExperienceTab'
 import { SkillsTab } from '@/components/ui/profile/SkillsTab'
 import { CoursesTab } from '@/components/ui/profile/CoursesTab'
 import { CertificatesTab } from '@/components/ui/profile/CertificatesTab'
+import { TemplatesTab } from '@/components/ui/profile/TemplatesTab'
 import { ConfirmDeleteModal } from '@/components/ui/profile/ConfirmDeleteModal'
 import { CourseModal } from '@/components/ui/profile/CourseModal'
 import { CertificateModal } from '@/components/ui/profile/CertificateModal'
@@ -265,7 +266,7 @@ export default function ProfilePage() {
 
         {/* Profile Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className='space-y-6'>
-          <TabsList className='grid w-full grid-cols-6 lg:w-fit'>
+          <TabsList className='grid w-full grid-cols-7 lg:w-fit'>
             <TabsTrigger value='overview' className='flex items-center space-x-2'>
               <User className='h-4 w-4' />
               <span className='hidden sm:inline'>Genel</span>
@@ -289,6 +290,10 @@ export default function ProfilePage() {
             <TabsTrigger value='certificates' className='flex items-center space-x-2'>
               <Award className='h-4 w-4' />
               <span className='hidden sm:inline'>Sertifikalar</span>
+            </TabsTrigger>
+            <TabsTrigger value='templates' className='flex items-center space-x-2'>
+              <FileText className='h-4 w-4' />
+              <span className='hidden sm:inline'>CV Şablonları</span>
             </TabsTrigger>
           </TabsList>
 
@@ -345,6 +350,11 @@ export default function ProfilePage() {
               onOpenEditModal={(id, data) => openEditModal('certificate', id, data)}
               onDeleteCertificate={(id, name) => openDeleteConfirmModal('certificate', id, name)}
             />
+          </TabsContent>
+
+          {/* Templates Tab */}
+          <TabsContent value='templates' className='space-y-6'>
+            <TemplatesTab />
           </TabsContent>
         </Tabs>
       </div>

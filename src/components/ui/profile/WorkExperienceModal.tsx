@@ -379,7 +379,10 @@ export function WorkExperienceModal({
                     name='startMonth'
                     control={control}
                     render={({ field }) => (
-                      <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value?.toString() || ''}>
+                      <Select
+                        onValueChange={(value) => field.onChange(parseInt(value))}
+                        value={field.value?.toString() || ''}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder='Ay' />
                         </SelectTrigger>

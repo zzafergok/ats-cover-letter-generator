@@ -562,6 +562,11 @@ export interface ATSCVGenerateResponse {
     targetPosition: string
     language: 'TURKISH' | 'ENGLISH'
     useAI: boolean
+    optimizationMetrics?: {
+      keywordsMatched: number
+      atsScore: number
+      processingTimeMs: number
+    }
   }
 }
 
@@ -725,4 +730,72 @@ export interface DOCXGenerateResponse {
     generatedAt: string
   }
   message?: string
+}
+
+// DOCX Template PDF System Types
+export interface DOCXTemplate {
+  id: string
+  name: string
+  description?: string
+  category?: string
+  language?: string
+  targetRoles?: string[]
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface DOCXTemplateAnalysis {
+  templateId: string
+  analysis: {
+    existingPlaceholders: string[]
+    recommendedFields: string[]
+    templateStructure: {
+      sections: string[]
+    }
+    fieldMapping: {
+      [category: string]: string[]
+    }
+  }
+}
+
+export interface DOCXTemplateAnalysisResponse {
+  success: boolean
+  data: DOCXTemplateAnalysis
+}
+
+export interface DOCXTemplatesResponse {
+  success: boolean
+  data: {
+    templates: DOCXTemplate[]
+  }
+}
+
+export interface DOCXTemplatePDFData extends ATSCVGenerateData {
+  useDocxTemplate?: boolean
+  docxTemplateId?: string
+  useClaudeOptimization?: boolean
+}
+
+export interface DOCXTemplatePDFResponse {
+  success: boolean
+  message: string
+  data: {
+    cvId: string
+    fileName: string
+    fileSize: number
+    generationStatus: 'COMPLETED' | 'PROCESSING' | 'FAILED'
+    downloadUrl: string
+    createdAt: string
+    applicantName: string
+    targetPosition: string
+    language: 'TURKISH' | 'ENGLISH'
+    useAI: boolean
+    templateUsed?: string
+    optimizationMetrics?: {
+      keywordsMatched: number
+      atsScore: number
+      processingTimeMs: number
+    }
+  }
 }

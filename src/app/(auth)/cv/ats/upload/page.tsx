@@ -24,7 +24,7 @@ export default function CVUploadPage() {
 
       {/* Main Content */}
       <div className='max-w-4xl mx-auto'>
-        <CVUpload onUploadComplete={() => window.location.href = '/cv/ats/generate'} />
+        <CVUpload onUploadComplete={() => (window.location.href = '/cv/ats/generate')} />
       </div>
     </div>
   )

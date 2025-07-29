@@ -161,7 +161,7 @@ export function WorkExperienceSection({ register, errors, watch, setValue, getVa
               <div className='flex items-center justify-between'>
                 <Label className='text-base font-medium'>
                   Başarılar ve Sorumluluklar *{' '}
-                  <span className='text-xs text-muted-foreground'>(En az 2 adet gerekli)</span>
+                  <span className='text-xs text-muted-foreground'>(En az 1 adet gerekli)</span>
                 </Label>
                 <Button type='button' variant='outline' size='sm' onClick={() => addAchievement(index)}>
                   <Plus className='h-4 w-4 mr-2' />
@@ -177,7 +177,7 @@ export function WorkExperienceSection({ register, errors, watch, setValue, getVa
                       rows={2}
                       className='flex w-full'
                     />
-                    {exp.achievements.length > 2 && (
+                    {exp.achievements.length > 1 && (
                       <Button
                         type='button'
                         variant='outline'

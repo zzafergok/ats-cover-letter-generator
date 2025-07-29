@@ -29,7 +29,6 @@ import {
   CVUploadsResponse,
   ProvincesResponse,
   DistrictsResponse,
-  ATSCVGenerateData,
   ATSCVTestResponse,
   ATSValidationData,
   DetailedCVResponse,
@@ -59,6 +58,10 @@ import {
   ATSValidationAnalysisResponse,
   CoverLetterDetailedUpdateData,
   CoverLetterDetailedGenerateData,
+  DOCXTemplateAnalysisResponse,
+  DOCXTemplatesResponse,
+  DOCXTemplatePDFData,
+  DOCXTemplatePDFResponse,
 } from '@/types/api.types'
 
 // Cover Letter API Servisleri - API dokumentasyonuna göre güncellenmiş
@@ -490,8 +493,8 @@ export const templateApi = {
 
 // ATS CV Services - API dokumentasyonuna göre yeni
 export const atsCvApi = {
-  // ATS CV oluştur
-  generate: (data: ATSCVGenerateData): Promise<ATSCVGenerateResponse> => apiRequest.post('/ats-cv/generate', data),
+  // ATS CV oluştur (DOCX template desteği ile güncellenmiş)
+  generate: (data: DOCXTemplatePDFData): Promise<ATSCVGenerateResponse> => apiRequest.post('/ats-cv/generate', data),
 
   // ATS CV indir
   download: (cvId: string): Promise<Blob> => apiRequest.get(`/ats-cv/${cvId}/download`, { responseType: 'blob' }),
@@ -505,6 +508,171 @@ export const atsCvApi = {
   // ATS Validation Tips al
   getValidationTips: (): Promise<ATSValidationTipsResponse> =>
     apiRequest.get('/ats-cv/validation-tips', { skipAuth: true }),
+}
+
+// Microsoft ATS Services - Yeni Microsoft ATS sistemi
+export const atsCvMicrosoftApi = {
+  // Microsoft template listesi
+  getTemplates: (): Promise<{
+    success: boolean
+    data: {
+      templates: Array<{
+        id: string
+        name: string
+        category: string
+        language: string
+        atsScore: number
+        sections: string[]
+        description?: string
+        targetRoles?: string[]
+        experienceLevel?: string
+      }>
+    }
+    message: string
+  }> => apiRequest.get('/ats-cv-microsoft/templates'),
+
+  // Microsoft ATS CV oluştur ve PDF olarak indir
+  generate: (data: {
+    personalInfo: {
+      firstName: string
+      lastName: string
+      email: string
+      phone: string
+      address: {
+        city: string
+        country: string
+      }
+      linkedIn?: string
+      github?: string
+      portfolio?: string
+    }
+    professionalSummary: {
+      summary: string
+      targetPosition: string
+      yearsOfExperience: number
+      keySkills: string[]
+    }
+    workExperience: Array<{
+      id: string
+      companyName: string
+      position: string
+      location: string
+      startDate: string
+      endDate?: string
+      isCurrentRole: boolean
+      achievements: string[]
+      technologies?: string[]
+      industryType?: string
+    }>
+    education: Array<{
+      id: string
+      institution: string
+      degree: string
+      fieldOfStudy: string
+      location: string
+      startDate: string
+      endDate?: string
+      gpa?: number
+      honors?: string[]
+      relevantCoursework?: string[]
+    }>
+    skills: {
+      technical: Array<{
+        category: string
+        items: Array<{
+          name: string
+          proficiencyLevel: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert'
+        }>
+      }>
+      languages: Array<{
+        language: string
+        proficiency: 'Native' | 'Fluent' | 'Advanced' | 'Intermediate' | 'Basic'
+      }>
+      soft: string[]
+    }
+    certifications?: Array<{
+      id: string
+      name: string
+      issuingOrganization: string
+      issueDate: string
+      expirationDate?: string
+      credentialId?: string
+      verificationUrl?: string
+    }>
+    projects?: Array<{
+      id: string
+      name: string
+      description: string
+      technologies: string[]
+      startDate: string
+      endDate?: string
+      url?: string
+      achievements: string[]
+    }>
+    configuration: {
+      language: 'TURKISH' | 'ENGLISH'
+      microsoftTemplateId: string
+      useAIOptimization?: boolean
+      jobDescription?: string
+      targetCompany?: string
+    }
+  }): Promise<Blob> => apiRequest.post('/ats-cv-microsoft/generate', data, { responseType: 'blob' }),
+
+  // İş ilanı analizi
+  analyzeJob: (data: {
+    jobDescription: string
+    targetPosition: string
+    language: 'TURKISH' | 'ENGLISH'
+    industryType?: string
+  }): Promise<{
+    success: boolean
+    data: {
+      jobAnalysis: {
+        position: string
+        language: string
+        keywords: string[]
+        requirements: string[]
+        experienceLevel: string
+        technicalSkills: string[]
+        softSkills: string[]
+      }
+      recommendedTemplates: Array<{
+        id: string
+        name: string
+        category: string
+        atsScore: number
+        matchReason: string
+        sections: string[]
+        targetIndustries: string[]
+      }>
+      optimization: {
+        suggestedKeywords: string[]
+        cvSections: string[]
+        atsStrategies: string[]
+      }
+    }
+    message: string
+  }> => apiRequest.post('/ats-cv-microsoft/analyze-job', data),
+
+  // CV analizi
+  analyzeCV: (data: {
+    cvData: any
+    templateId: string
+  }): Promise<{
+    success: boolean
+    data: {
+      atsScore: number
+      compatibility: string
+      recommendations: string[]
+      missingKeywords: string[]
+      structureAnalysis: {
+        sectionsFound: string[]
+        sectionsRecommended: string[]
+        formatting: string
+      }
+    }
+    message: string
+  }> => apiRequest.post('/ats-cv-microsoft/analyze-cv', data),
 }
 
 // ATS Validation Services - API dokumentasyonuna göre yeni
@@ -585,6 +753,45 @@ export const docxApi = {
     success: boolean
     data: any
   }> => apiRequest.get('/docx/vs-pdf'),
+}
+
+// DOCX Template PDF System API Servisleri
+export const docxTemplatePdfApi = {
+  // Template listesi
+  getTemplates: (): Promise<DOCXTemplatesResponse> => apiRequest.get('/docx-template-pdf/templates'),
+
+  // Admin: Template yükle ve analiz et
+  uploadAndAnalyze: (templateId: string, file: File): Promise<DOCXTemplateAnalysisResponse> => {
+    const formData = new FormData()
+    formData.append('template', file)
+    return apiRequest.post(`/docx-template-pdf/admin/upload-analyze/${templateId}`, formData)
+  },
+
+  // Template ile PDF oluştur (direkt)
+  generateWithTemplate: (templateId: string, data: DOCXTemplatePDFData): Promise<DOCXTemplatePDFResponse> =>
+    apiRequest.post(`/docx-template-pdf/${templateId}`, data),
+
+  // Esnek template seçimi
+  generateFlexible: (templateId: string, data: DOCXTemplatePDFData): Promise<DOCXTemplatePDFResponse> =>
+    apiRequest.post(`/docx-template-pdf/generate/${templateId}`, data),
+
+  // Çoklu template PDF oluşturma
+  generateMultiple: (data: {
+    templateIds: string[]
+    cvData: DOCXTemplatePDFData
+  }): Promise<{ success: boolean; data: DOCXTemplatePDFResponse[] }> =>
+    apiRequest.post('/docx-template-pdf/generate-multiple', data),
+
+  // Template önizleme
+  preview: (templateId: string): Promise<Blob> =>
+    apiRequest.get(`/docx-template-pdf/preview/${templateId}`, { responseType: 'blob' }),
+
+  // Template yükleme (sadece dosya)
+  upload: (templateId: string, file: File): Promise<{ success: boolean; message: string }> => {
+    const formData = new FormData()
+    formData.append('template', file)
+    return apiRequest.post(`/docx-template-pdf/upload/${templateId}`, formData)
+  },
 }
 
 // PDF Test API Servisleri

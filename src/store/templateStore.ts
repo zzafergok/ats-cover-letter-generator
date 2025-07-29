@@ -18,9 +18,11 @@ interface TemplateActions {
     language?: 'TURKISH' | 'ENGLISH'
   }) => Promise<void>
   getTemplateCategories: () => Promise<void>
-  getTemplatesByIndustry: (industry: 'TECHNOLOGY' | 'FINANCE' | 'HEALTHCARE' | 'EDUCATION' | 'MARKETING') => Promise<void>
+  getTemplatesByIndustry: (
+    industry: 'TECHNOLOGY' | 'FINANCE' | 'HEALTHCARE' | 'EDUCATION' | 'MARKETING',
+  ) => Promise<void>
   getTemplateById: (templateId: string) => Promise<CoverLetterTemplate | null>
-  
+
   // Cover letter oluşturma
   createCoverLetterFromTemplate: (data: TemplateCreateCoverLetterData) => Promise<{
     content: string
@@ -28,7 +30,7 @@ interface TemplateActions {
     positionTitle: string
     companyName: string
   } | null>
-  
+
   // PDF download
   downloadTemplateBasedCoverLetterPdf: (data: {
     content: string
@@ -37,10 +39,10 @@ interface TemplateActions {
     templateTitle?: string
     language?: 'TURKISH' | 'ENGLISH'
   }) => Promise<void>
-  
+
   // Admin işlemleri
   initializeTemplates: () => Promise<void>
-  
+
   // Utility actions
   clearError: () => void
   reset: () => void
@@ -121,7 +123,7 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
     set({ isLoading: true, error: null })
     try {
       const blob = await templateCoverLetterApi.downloadCustomPdf(data)
-      
+
       // Create download link
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -131,7 +133,7 @@ export const useTemplateStore = create<TemplateStore>((set, get) => ({
       a.click()
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
-      
+
       set({ isLoading: false })
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || 'PDF indirme işlemi başarısız'

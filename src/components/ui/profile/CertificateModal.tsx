@@ -268,7 +268,7 @@ export function CertificateModal({ isOpen, onClose, onSave, certificate, isLoadi
               </div>
 
               <div>
-                <Label htmlFor='credentialUrl'>Doğrulama URL'si</Label>
+                <Label htmlFor='credentialUrl'>Doğrulama URL&apos;si</Label>
                 <Controller
                   name='credentialUrl'
                   control={control}

@@ -124,7 +124,7 @@ export function CVGeneratorForm({ onGenerate, className }: CVGeneratorFormProps)
         month: 'long',
         day: 'numeric',
       })
-    } catch (error) {
+    } catch {
       return 'Tarih belirtilmemiş'
     }
   }

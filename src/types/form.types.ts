@@ -30,7 +30,7 @@ export const atsFormSchema = z.object({
       .max(50, 'Deneyim yılı 50 yılı geçemez'),
     keySkills: z
       .array(z.string().min(1))
-      .min(3, 'En az 3 anahtar yetenek ekleyin')
+      .min(1, 'En az 1 anahtar yetenek ekleyin')
       .max(20, 'En fazla 20 anahtar yetenek ekleyebilirsiniz'),
   }),
   workExperience: z
@@ -45,7 +45,7 @@ export const atsFormSchema = z.object({
         isCurrentRole: z.boolean(),
         achievements: z
           .array(z.string().min(5, 'Başarı en az 5 karakter olmalıdır'))
-          .min(2, 'En az 2 başarı/sorumluluk eklemelisiniz')
+          .min(1, 'En az 1 başarı/sorumluluk eklemelisiniz')
           .max(10, 'En fazla 10 başarı/sorumluluk ekleyebilirsiniz'),
         technologies: z.string().optional(),
         industryType: z.string().optional(),

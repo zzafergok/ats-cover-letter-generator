@@ -732,6 +732,82 @@ export interface DOCXGenerateResponse {
   message?: string
 }
 
+// CV Generator Types - API dokumentasyonuna göre yeni
+export interface CVGeneratorTemplate {
+  id: string
+  name: string
+  description: string
+  language: string
+}
+
+export interface CVGeneratorData {
+  templateType: 'basic_hr' | 'office_manager' | 'simple_classic' | 'stylish_accounting' | 'minimalist_turkish'
+  data: {
+    personalInfo: {
+      fullName: string
+      address?: string
+      city?: string
+      state?: string
+      zipCode?: string
+      phone?: string
+      email: string
+    }
+    objective?: string
+    experience?: Array<{
+      jobTitle: string
+      company: string
+      location?: string
+      startDate: string
+      endDate?: string
+      description?: string
+    }>
+    education?: Array<{
+      degree: string
+      university: string
+      location?: string
+      graduationDate?: string
+      details?: string
+    }>
+    communication?: string
+    leadership?: string
+    references?: Array<{
+      name: string
+      company: string
+      contact: string
+    }>
+  }
+}
+
+export interface GeneratedCV {
+  id: string
+  templateType: string
+  generationStatus: 'COMPLETED' | 'PENDING' | 'PROCESSING' | 'FAILED'
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CVGeneratorResponse {
+  success: boolean
+  message: string
+  data: GeneratedCV
+}
+
+export interface CVGeneratorListResponse {
+  success: boolean
+  data: GeneratedCV[]
+  limitInfo: {
+    current: number
+    maximum: number
+    canCreate: boolean
+    type: string
+  }
+}
+
+export interface CVGeneratorTemplatesResponse {
+  success: boolean
+  data: CVGeneratorTemplate[]
+}
+
 // DOCX Template PDF System Types
 export interface DOCXTemplate {
   id: string

@@ -66,7 +66,7 @@ const STEPS = [
   {
     id: 'review',
     title: 'Önizleme',
-    description: 'CV\'yi gözden geçirin ve oluşturun',
+    description: "CV'yi gözden geçirin ve oluşturun",
     component: ReviewStep,
   },
 ] as const
@@ -159,7 +159,7 @@ export function ATSCVWizard() {
   const goToNext = async () => {
     // Validate current step based on step type
     let isValid = false
-    
+
     switch (STEPS[currentStep].id) {
       case 'template':
         // Template selection is handled in component
@@ -190,12 +190,12 @@ export function ATSCVWizard() {
       default:
         isValid = true
     }
-    
+
     if (!isValid) return
 
     // Mark current step as completed
-    setCompletedSteps(prev => new Set([...prev, currentStep]))
-    
+    setCompletedSteps((prev) => new Set([...prev, currentStep]))
+
     if (!isLastStep) {
       setCurrentStep(currentStep + 1)
     }
@@ -212,22 +212,22 @@ export function ATSCVWizard() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-4 space-y-6">
+    <div className='max-w-4xl mx-auto p-4 space-y-6'>
       {/* Progress Header */}
       <Card>
-        <CardContent className="pt-6">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-bold">CV Oluştur</h1>
-              <span className="text-sm text-muted-foreground">
+        <CardContent className='pt-6'>
+          <div className='space-y-4'>
+            <div className='flex items-center justify-between'>
+              <h1 className='text-2xl font-bold'>CV Oluştur</h1>
+              <span className='text-sm text-muted-foreground'>
                 {currentStep + 1} / {STEPS.length}
               </span>
             </div>
-            
-            <Progress value={progress} className="h-2" />
-            
+
+            <Progress value={progress} className='h-2' />
+
             {/* Step Navigation */}
-            <div className="flex flex-wrap gap-2">
+            <div className='flex flex-wrap gap-2'>
               {STEPS.map((step, index) => (
                 <button
                   key={step.id}
@@ -237,15 +237,13 @@ export function ATSCVWizard() {
                     index === currentStep
                       ? 'bg-primary text-primary-foreground border-primary'
                       : completedSteps.has(index)
-                      ? 'bg-green-100 text-green-700 border-green-300'
-                      : index < currentStep
-                      ? 'bg-muted text-muted-foreground border-muted'
-                      : 'bg-background text-muted-foreground border-border hover:bg-muted'
+                        ? 'bg-green-100 text-green-700 border-green-300'
+                        : index < currentStep
+                          ? 'bg-muted text-muted-foreground border-muted'
+                          : 'bg-background text-muted-foreground border-border hover:bg-muted'
                   }`}
                 >
-                  {completedSteps.has(index) && (
-                    <Check className="w-3 h-3 inline mr-1" />
-                  )}
+                  {completedSteps.has(index) && <Check className='w-3 h-3 inline mr-1' />}
                   {step.title}
                 </button>
               ))}
@@ -256,33 +254,26 @@ export function ATSCVWizard() {
 
       {/* Current Step */}
       <Card>
-        <CardContent className="pt-6">
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold">{currentStepData.title}</h2>
-            <p className="text-muted-foreground">{currentStepData.description}</p>
+        <CardContent className='pt-6'>
+          <div className='mb-6'>
+            <h2 className='text-xl font-semibold'>{currentStepData.title}</h2>
+            <p className='text-muted-foreground'>{currentStepData.description}</p>
           </div>
 
-          <StepComponent form={form} />
+          {/* <StepComponent form={form} /> */}
         </CardContent>
       </Card>
 
       {/* Navigation Buttons */}
-      <div className="flex justify-between">
-        <Button
-          variant="outline"
-          onClick={goToPrevious}
-          disabled={isFirstStep}
-        >
-          <ChevronLeft className="w-4 h-4 mr-2" />
+      <div className='flex justify-between'>
+        <Button variant='outline' onClick={goToPrevious} disabled={isFirstStep}>
+          <ChevronLeft className='w-4 h-4 mr-2' />
           Önceki
         </Button>
 
-        <Button
-          onClick={goToNext}
-          disabled={isLastStep}
-        >
+        <Button onClick={goToNext} disabled={isLastStep}>
           {isLastStep ? 'CV Oluştur' : 'Sonraki'}
-          {!isLastStep && <ChevronRight className="w-4 h-4 ml-2" />}
+          {!isLastStep && <ChevronRight className='w-4 h-4 ml-2' />}
         </Button>
       </div>
     </div>

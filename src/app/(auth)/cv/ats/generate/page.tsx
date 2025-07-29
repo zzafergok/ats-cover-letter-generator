@@ -1,8 +1,8 @@
 'use client'
 
 import React from 'react'
-import { ATSCVWizard } from '@/components/ui/cv/ATSCVWizard'
+import { CVTemplateGenerator } from '@/components/ui/cv/CVTemplateGenerator'
 
 export default function CVGeneratePage() {
-  return <ATSCVWizard />
+  return <CVTemplateGenerator />
 }

@@ -10,25 +10,27 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/core/label'
 import { Alert, AlertDescription } from '@/components/core/alert'
 import { LoadingSpinner } from '@/components/core/loading-spinner'
-import { docxTemplatePdfApi } from '@/lib/api/api'
-import type { DOCXTemplate } from '@/types/api.types'
+// import { docxTemplatePdfApi } from '@/lib/api/api' // REMOVED: Service no longer available
+// import type { DOCXTemplate } from '@/types/api.types' // REMOVED: Type no longer used
 
 export function TemplatesTab() {
-  const [templates, setTemplates] = useState<DOCXTemplate[]>([])
+  // REMOVED: DOCX Template functionality is no longer available
+  // const [templates, setTemplates] = useState<DOCXTemplate[]>([])
+  const [templates, setTemplates] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [uploadingTemplate, setUploadingTemplate] = useState<string | null>(null)
   const [newTemplateId, setNewTemplateId] = useState('')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
-  // Template listesini getir
+  // REMOVED: Template listesini getir - Service no longer available
   const fetchTemplates = async () => {
     setIsLoading(true)
     try {
-      const response = await docxTemplatePdfApi.getTemplates()
-      if (response.success) {
-        setTemplates(response.data.templates)
-      }
+      // const response = await docxTemplatePdfApi.getTemplates()
+      // Service removed - returning empty templates
+      setTemplates([])
+      setError('DOCX Template service is no longer available')
     } catch (err) {
       setError("Template'ler yüklenirken hata oluştu")
       console.error('Templates fetch error:', err)
@@ -41,7 +43,7 @@ export function TemplatesTab() {
     fetchTemplates()
   }, [])
 
-  // Template yükle
+  // REMOVED: Template yükle - Service no longer available
   const handleUploadTemplate = async () => {
     if (!selectedFile || !newTemplateId.trim()) {
       setError('Lütfen template ID ve dosya seçin')
@@ -49,20 +51,12 @@ export function TemplatesTab() {
     }
 
     setUploadingTemplate(newTemplateId)
-    setError(null)
+    setError('DOCX Template upload service is no longer available')
 
     try {
-      const response = await docxTemplatePdfApi.uploadAndAnalyze(newTemplateId.trim(), selectedFile)
-
-      if (response.success) {
-        console.log('Template yüklendi ve analiz edildi:', response.data.analysis)
-        await fetchTemplates() // Listeyi yenile
-        setNewTemplateId('')
-        setSelectedFile(null)
-
-        // Success mesajı
-        setError(null)
-      }
+      // const response = await docxTemplatePdfApi.uploadAndAnalyze(newTemplateId.trim(), selectedFile)
+      // Service removed
+      console.log('Template upload service is no longer available')
     } catch (err) {
       setError('Template yüklenirken hata oluştu')
       console.error('Template upload error:', err)
@@ -71,13 +65,13 @@ export function TemplatesTab() {
     }
   }
 
-  // Template önizleme
+  // REMOVED: Template önizleme - Service no longer available
   const handlePreview = async (templateId: string) => {
     try {
-      const blob = await docxTemplatePdfApi.preview(templateId)
-      const url = window.URL.createObjectURL(blob)
-      window.open(url, '_blank')
-      setTimeout(() => window.URL.revokeObjectURL(url), 100)
+      // const blob = await docxTemplatePdfApi.preview(templateId)
+      // Service removed
+      setError('Template preview service is no longer available')
+      console.log('Template preview service is no longer available for template:', templateId)
     } catch (err) {
       setError('Template önizlemesi yüklenirken hata oluştu')
       console.error('Template preview error:', err)

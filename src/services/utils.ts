@@ -16,17 +16,35 @@ export const API_ENDPOINTS = {
     CHANGE_PASSWORD: '/auth/change-password',
     LOGOUT: '/auth/logout',
   },
+  // CV Upload Services - API dokumentasyonuna göre güncellenmiş
+  CV_UPLOAD: {
+    UPLOAD: '/cv-upload/upload',
+    UPLOADS: '/cv-upload/uploads',
+    STATUS: (id: string) => `/cv-upload/upload/status/${id}`,
+    DELETE: (id: string) => `/cv-upload/uploads/${id}`,
+  },
+  // CV Generator Services - Yeni CV template generator
+  CV_GENERATOR: {
+    TEMPLATES: '/cv-generator/templates',
+    GENERATE: '/cv-generator/generate',
+    LIST: '/cv-generator',
+    GET: (id: string) => `/cv-generator/${id}`,
+    DOWNLOAD: (id: string) => `/cv-generator/${id}/download`,
+    REGENERATE: (id: string) => `/cv-generator/${id}/regenerate`,
+    DELETE: (id: string) => `/cv-generator/${id}`,
+  },
+  // Legacy CV endpoints - Geriye dönük uyumluluk için
   CV: {
-    UPLOAD: '/cv/upload',
-    UPLOADS: '/cv/uploads',
-    DELETE_UPLOAD: (id: string) => `/cv/uploads/${id}`,
-    GENERATE: '/cv/generate',
-    SAVE: '/cv/save',
-    SAVED: '/cv/saved',
-    DELETE_SAVED: (id: string) => `/cv/saved/${id}`,
-    DOWNLOAD: (id: string) => `/cv/download/${id}`,
-    DOWNLOAD_PDF: '/cv/download/pdf',
-    DOWNLOAD_DOCX: '/cv/download/docx',
+    UPLOAD: '/cv-upload/upload', // Redirect to new endpoint
+    UPLOADS: '/cv-upload/uploads', // Redirect to new endpoint
+    DELETE_UPLOAD: (id: string) => `/cv-upload/uploads/${id}`, // Redirect to new endpoint
+    GENERATE: '/cv-generator/generate', // Redirect to new endpoint
+    SAVE: '/cv/save', // Eski endpoint korunuyor
+    SAVED: '/cv/saved', // Eski endpoint korunuyor
+    DELETE_SAVED: (id: string) => `/cv/saved/${id}`, // Eski endpoint korunuyor
+    DOWNLOAD: (id: string) => `/cv-generator/${id}/download`, // Redirect to new endpoint
+    DOWNLOAD_PDF: '/cv/download/pdf', // Eski endpoint korunuyor
+    DOWNLOAD_DOCX: '/cv/download/docx', // Eski endpoint korunuyor
   },
   COVER_LETTER: {
     CATEGORIES: '/cover-letter/categories',
@@ -37,14 +55,23 @@ export const API_ENDPOINTS = {
     DOWNLOAD_PDF: '/cover-letter/download/pdf',
     DOWNLOAD_DOCX: '/cover-letter/download/docx',
   },
-  // Yeni Template API Endpoints
+  // Template API Endpoints - API dokumentasyonuna göre güncellenmiş
+  TEMPLATES: {
+    ALL: '/templates',
+    CATEGORIES: '/templates/categories',
+    BY_INDUSTRY: (industry: string) => `/templates/industry/${industry}`,
+    BY_ID: (templateId: string) => `/templates/${templateId}`,
+    CREATE_COVER_LETTER: '/templates/create-cover-letter',
+    INITIALIZE: '/templates/initialize',
+  },
+  // Legacy Template Endpoints - Geriye dönük uyumluluk için
   COVER_LETTER_TEMPLATES: {
-    CATEGORIES: '/cover-letter-templates/categories',
-    TEMPLATES: '/cover-letter-templates/templates',
-    TEMPLATES_BY_CATEGORY: (category: string) => `/cover-letter-templates/templates/category/${category}`,
-    TEMPLATE_DETAIL: (templateId: string) => `/cover-letter-templates/templates/${templateId}`,
-    GENERATE: '/cover-letter-templates/generate',
-    STATISTICS: '/cover-letter-templates/statistics',
+    CATEGORIES: '/templates/categories', // Redirect to new endpoint
+    TEMPLATES: '/templates', // Redirect to new endpoint
+    TEMPLATES_BY_CATEGORY: (category: string) => `/templates?category=${category}`, // Redirect to new endpoint
+    TEMPLATE_DETAIL: (templateId: string) => `/templates/${templateId}`, // Redirect to new endpoint
+    GENERATE: '/templates/create-cover-letter', // Redirect to new endpoint
+    STATISTICS: '/templates/stats', // Eski endpoint korunuyor
   },
   CONTACT: {
     SEND: '/contact/send',

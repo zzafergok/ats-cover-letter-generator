@@ -20,7 +20,6 @@ import { WorkExperienceSection } from '@/components/ui/cv/sections/WorkExperienc
 import { EducationSection } from '@/components/ui/cv/sections/EducationSection'
 import { SkillsSection } from '@/components/ui/cv/sections/SkillsSection'
 import { ProfileRedirectAlert } from '@/components/ui/cv/ProfileRedirectAlert'
-import { atsCvMicrosoftApi } from '@/lib/api/api'
 import { useUserProfileStore } from '@/store/userProfileStore'
 import { atsFormSchema, ATSFormData } from '@/types/form.types'
 
@@ -175,14 +174,14 @@ export function ATSCVForm() {
     const fetchMicrosoftTemplates = async () => {
       setIsLoadingMicrosoftTemplates(true)
       try {
-        const response = await atsCvMicrosoftApi.getTemplates()
-        if (response.success) {
-          setMicrosoftTemplates(response.data.templates)
-          // İlk template'i varsayılan olarak seç
-          if (response.data.templates.length > 0) {
-            setSelectedMicrosoftTemplate(response.data.templates[0].id)
-          }
-        }
+        // const response = await atsCvMicrosoftApi.getTemplates()
+        // if (response.success) {
+        //   setMicrosoftTemplates(response.data.templates)
+        //   // İlk template'i varsayılan olarak seç
+        //   if (response.data.templates.length > 0) {
+        //     setSelectedMicrosoftTemplate(response.data.templates[0].id)
+        //   }
+        // }
       } catch (err) {
         console.error('Microsoft Templates yüklenirken hata:', err)
         setError("Microsoft ATS template'leri yüklenirken hata oluştu")
@@ -294,31 +293,29 @@ export function ATSCVForm() {
 
     setIsAnalyzingJob(true)
     try {
-      // İş tanımının dilini otomatik tespit et
-      const isEnglish =
-        /[a-zA-Z]/.test(jobDescription) &&
-        jobDescription
-          .split(' ')
-          .some((word) =>
-            ['the', 'and', 'or', 'you', 'will', 'have', 'experience', 'with', 'skills', 'requirements'].includes(
-              word.toLowerCase(),
-            ),
-          )
-
-      const response = await atsCvMicrosoftApi.analyzeJob({
-        jobDescription,
-        targetPosition: targetPositionForAnalysis.trim(),
-        language: selectedLanguage === 'AUTO' ? (isEnglish ? 'ENGLISH' : 'TURKISH') : selectedLanguage,
-        industryType: selectedIndustryType.trim() || undefined, // Opsiyonal
-      })
-
-      if (response.success) {
-        setJobAnalysis(response.data)
-        // Önerilen template'i seç (ilk template'i seç)
-        if (response.data.recommendedTemplates?.length > 0) {
-          setSelectedMicrosoftTemplate(response.data.recommendedTemplates[0].id)
-        }
-      }
+      // // İş tanımının dilini otomatik tespit et
+      // const isEnglish =
+      //   /[a-zA-Z]/.test(jobDescription) &&
+      //   jobDescription
+      //     .split(' ')
+      //     .some((word) =>
+      //       ['the', 'and', 'or', 'you', 'will', 'have', 'experience', 'with', 'skills', 'requirements'].includes(
+      //         word.toLowerCase(),
+      //       ),
+      //     )
+      // const response = await atsCvMicrosoftApi.analyzeJob({
+      //   jobDescription,
+      //   targetPosition: targetPositionForAnalysis.trim(),
+      //   language: selectedLanguage === 'AUTO' ? (isEnglish ? 'ENGLISH' : 'TURKISH') : selectedLanguage,
+      //   industryType: selectedIndustryType.trim() || undefined, // Opsiyonal
+      // })
+      // if (response.success) {
+      //   setJobAnalysis(response.data)
+      //   // Önerilen template'i seç (ilk template'i seç)
+      //   if (response.data.recommendedTemplates?.length > 0) {
+      //     setSelectedMicrosoftTemplate(response.data.recommendedTemplates[0].id)
+      //   }
+      // }
     } catch (err) {
       console.error('İş tanımı analiz hatası:', err)
       setError('İş tanımı analiz edilirken hata oluştu')
@@ -532,121 +529,117 @@ export function ATSCVForm() {
     setError(null)
 
     try {
-      // Microsoft ATS API formatına dönüştür - tam detaylı parametreler
-      const microsoftData = {
-        personalInfo: {
-          firstName: data.personalInfo.firstName,
-          lastName: data.personalInfo.lastName,
-          email: data.personalInfo.email,
-          phone: data.personalInfo.phone,
-          address: {
-            city: data.personalInfo.address.city,
-            country: data.personalInfo.address.country,
-          },
-          linkedIn: data.personalInfo.linkedIn || undefined,
-          github: data.personalInfo.github || undefined,
-          portfolio: data.personalInfo.portfolio || undefined,
-        },
-        professionalSummary: {
-          summary: data.professionalSummary.summary,
-          targetPosition: data.professionalSummary.targetPosition,
-          yearsOfExperience: data.professionalSummary.yearsOfExperience,
-          keySkills: data.professionalSummary.keySkills.filter((skill) => skill.trim()),
-        },
-        workExperience: data.workExperience
-          .filter((exp) => exp.companyName && exp.position)
-          .map((exp) => ({
-            id: exp.id || crypto.randomUUID(),
-            companyName: exp.companyName,
-            position: exp.position,
-            location: exp.location,
-            startDate: exp.startDate,
-            endDate: exp.isCurrentRole ? undefined : exp.endDate,
-            isCurrentRole: exp.isCurrentRole,
-            achievements: exp.achievements.filter((achievement) => achievement.trim()),
-          })),
-        education: data.education
-          .filter((edu) => edu.institution && edu.degree)
-          .map((edu) => ({
-            id: edu.id || crypto.randomUUID(),
-            institution: edu.institution,
-            degree: edu.degree,
-            fieldOfStudy: edu.fieldOfStudy,
-            location: edu.location,
-            startDate: edu.startDate,
-            endDate: edu.endDate,
-          })),
-        skills: {
-          technical: data.skills.technical
-            .filter((techGroup) => techGroup.category && techGroup.items.some((item) => item.name.trim()))
-            .map((techGroup) => ({
-              category: techGroup.category,
-              items: techGroup.items
-                .filter((item) => item.name.trim())
-                .map((item) => ({
-                  name: item.name,
-                  proficiencyLevel: item.proficiencyLevel,
-                })),
-            })),
-          languages: (data.skills.languages || [])
-            .filter((lang) => lang.language.trim())
-            .map((lang) => ({
-              language: lang.language,
-              proficiency: lang.proficiency,
-            })),
-          soft: data.skills.soft.filter((skill) => skill.trim()),
-        },
-        certifications: (data.certifications || []).map((cert) => ({
-          id: cert.id || crypto.randomUUID(),
-          name: cert.name,
-          issuingOrganization: cert.issuingOrganization,
-          issueDate: cert.issueDate || '',
-          expirationDate: cert.expirationDate,
-          credentialId: cert.credentialId,
-          verificationUrl: cert.verificationUrl,
-        })),
-        projects: (data.projects || []).map((project) => ({
-          id: project.id || crypto.randomUUID(),
-          name: project.name,
-          description: project.description,
-          technologies: project.technologies,
-          startDate: project.startDate,
-          endDate: project.endDate,
-          url: project.url,
-          achievements: project.achievements,
-        })),
-        configuration: {
-          language: data.configuration.language,
-          microsoftTemplateId: selectedMicrosoftTemplate,
-          useAIOptimization: useAI,
-          jobDescription: useAI ? jobDescription : undefined,
-          targetCompany: data.configuration.targetCompany || undefined,
-        },
-      }
-
-      // Microsoft ATS API'den PDF blob'u al
-      const pdfBlob = await atsCvMicrosoftApi.generate(microsoftData)
-
-      // PDF'i otomatik indir
-      const fileName = `${data.personalInfo.firstName}_${data.personalInfo.lastName}_${selectedMicrosoftTemplate}_CV.pdf`
-      const url = window.URL.createObjectURL(pdfBlob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = fileName
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      window.URL.revokeObjectURL(url)
-
-      // Başarı durumunu işaretle
-      setGeneratedCV({
-        template: selectedMicrosoftTemplate,
-        downloadedAt: new Date().toISOString(),
-        fileName: fileName,
-        success: true,
-      })
-
-      console.log('Microsoft ATS CV başarıyla oluşturuldu ve indirildi:', fileName)
+      // // Microsoft ATS API formatına dönüştür - tam detaylı parametreler
+      // const microsoftData = {
+      //   personalInfo: {
+      //     firstName: data.personalInfo.firstName,
+      //     lastName: data.personalInfo.lastName,
+      //     email: data.personalInfo.email,
+      //     phone: data.personalInfo.phone,
+      //     address: {
+      //       city: data.personalInfo.address.city,
+      //       country: data.personalInfo.address.country,
+      //     },
+      //     linkedIn: data.personalInfo.linkedIn || undefined,
+      //     github: data.personalInfo.github || undefined,
+      //     portfolio: data.personalInfo.portfolio || undefined,
+      //   },
+      //   professionalSummary: {
+      //     summary: data.professionalSummary.summary,
+      //     targetPosition: data.professionalSummary.targetPosition,
+      //     yearsOfExperience: data.professionalSummary.yearsOfExperience,
+      //     keySkills: data.professionalSummary.keySkills.filter((skill) => skill.trim()),
+      //   },
+      //   workExperience: data.workExperience
+      //     .filter((exp) => exp.companyName && exp.position)
+      //     .map((exp) => ({
+      //       id: exp.id || crypto.randomUUID(),
+      //       companyName: exp.companyName,
+      //       position: exp.position,
+      //       location: exp.location,
+      //       startDate: exp.startDate,
+      //       endDate: exp.isCurrentRole ? undefined : exp.endDate,
+      //       isCurrentRole: exp.isCurrentRole,
+      //       achievements: exp.achievements.filter((achievement) => achievement.trim()),
+      //     })),
+      //   education: data.education
+      //     .filter((edu) => edu.institution && edu.degree)
+      //     .map((edu) => ({
+      //       id: edu.id || crypto.randomUUID(),
+      //       institution: edu.institution,
+      //       degree: edu.degree,
+      //       fieldOfStudy: edu.fieldOfStudy,
+      //       location: edu.location,
+      //       startDate: edu.startDate,
+      //       endDate: edu.endDate,
+      //     })),
+      //   skills: {
+      //     technical: data.skills.technical
+      //       .filter((techGroup) => techGroup.category && techGroup.items.some((item) => item.name.trim()))
+      //       .map((techGroup) => ({
+      //         category: techGroup.category,
+      //         items: techGroup.items
+      //           .filter((item) => item.name.trim())
+      //           .map((item) => ({
+      //             name: item.name,
+      //             proficiencyLevel: item.proficiencyLevel,
+      //           })),
+      //       })),
+      //     languages: (data.skills.languages || [])
+      //       .filter((lang) => lang.language.trim())
+      //       .map((lang) => ({
+      //         language: lang.language,
+      //         proficiency: lang.proficiency,
+      //       })),
+      //     soft: data.skills.soft.filter((skill) => skill.trim()),
+      //   },
+      //   certifications: (data.certifications || []).map((cert) => ({
+      //     id: cert.id || crypto.randomUUID(),
+      //     name: cert.name,
+      //     issuingOrganization: cert.issuingOrganization,
+      //     issueDate: cert.issueDate || '',
+      //     expirationDate: cert.expirationDate,
+      //     credentialId: cert.credentialId,
+      //     verificationUrl: cert.verificationUrl,
+      //   })),
+      //   projects: (data.projects || []).map((project) => ({
+      //     id: project.id || crypto.randomUUID(),
+      //     name: project.name,
+      //     description: project.description,
+      //     technologies: project.technologies,
+      //     startDate: project.startDate,
+      //     endDate: project.endDate,
+      //     url: project.url,
+      //     achievements: project.achievements,
+      //   })),
+      //   configuration: {
+      //     language: data.configuration.language,
+      //     microsoftTemplateId: selectedMicrosoftTemplate,
+      //     useAIOptimization: useAI,
+      //     jobDescription: useAI ? jobDescription : undefined,
+      //     targetCompany: data.configuration.targetCompany || undefined,
+      //   },
+      // }
+      // // Microsoft ATS API'den PDF blob'u al
+      // const pdfBlob = await atsCvMicrosoftApi.generate(microsoftData)
+      // // PDF'i otomatik indir
+      // const fileName = `${data.personalInfo.firstName}_${data.personalInfo.lastName}_${selectedMicrosoftTemplate}_CV.pdf`
+      // const url = window.URL.createObjectURL(pdfBlob)
+      // const a = document.createElement('a')
+      // a.href = url
+      // a.download = fileName
+      // document.body.appendChild(a)
+      // a.click()
+      // document.body.removeChild(a)
+      // window.URL.revokeObjectURL(url)
+      // // Başarı durumunu işaretle
+      // setGeneratedCV({
+      //   template: selectedMicrosoftTemplate,
+      //   downloadedAt: new Date().toISOString(),
+      //   fileName: fileName,
+      //   success: true,
+      // })
+      // console.log('Microsoft ATS CV başarıyla oluşturuldu ve indirildi:', fileName)
     } catch (err) {
       console.error('CV oluşturma hatası:', err)
 

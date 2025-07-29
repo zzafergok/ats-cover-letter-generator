@@ -142,6 +142,7 @@ export function ContentViewer({
   const [isDownloading, setIsDownloading] = useState(false)
   const [downloadFormat] = useState<DownloadFormat>('pdf')
   const [downloadDialogOpen, setDownloadDialogOpen] = useState(false)
+  const [editedDownloadDialogOpen, setEditedDownloadDialogOpen] = useState(false)
 
   // Custom hooks
   const { isCopied, copyToClipboard } = useClipboard()
@@ -206,6 +207,7 @@ export function ContentViewer({
           await onDownload(downloadFormat, downloadType)
         }
         setDownloadDialogOpen(false)
+        setEditedDownloadDialogOpen(false)
       } catch (error) {
         console.error('Download error:', error)
         // Handle error (could add toast notification here)
@@ -370,7 +372,7 @@ export function ContentViewer({
                           <FileText className='h-4 w-4 mr-2' />
                           Orijinal Ön Yazıyı İndir
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={handleEditedDownload}>
+                        <DropdownMenuItem onClick={() => setEditedDownloadDialogOpen(true)}>
                           <Edit className='h-4 w-4 mr-2' />
                           Düzenlenmiş Ön Yazıyı İndir
                         </DropdownMenuItem>
@@ -424,6 +426,48 @@ export function ContentViewer({
                       </AlertDialogContent>
                     </AlertDialog>
                   )}
+
+                  {/* Edited Content Download Dialog */}
+                  <AlertDialog open={editedDownloadDialogOpen} onOpenChange={setEditedDownloadDialogOpen}>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle className='flex items-center gap-2'>
+                          <Edit className='h-5 w-5 text-primary' />
+                          Düzenlenmiş İçeriği PDF Olarak İndir
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Düzenlenmiş "{title}" içeriğini PDF olarak indirmek istediğinizden emin misiniz?
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <div className='flex items-center gap-3 p-4 bg-muted/50 rounded-lg my-4'>
+                        <div className='w-10 h-10 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center'>
+                          <Edit className='h-5 w-5 text-blue-600 dark:text-blue-400' />
+                        </div>
+                        <div className='flex-1'>
+                          <p className='font-medium text-sm'>Düzenlenmiş İçerik PDF Formatında İndirilecek</p>
+                          <p className='text-xs text-muted-foreground'>
+                            Yaptığınız değişiklikler ile PDF dosyası oluşturulacak ve indirme klasörünüze kaydedilecektir
+                          </p>
+                        </div>
+                      </div>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>İptal</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleEditedDownload} disabled={isDownloading}>
+                          {isDownloading ? (
+                            <>
+                              <div className='w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2' />
+                              İndiriliyor...
+                            </>
+                          ) : (
+                            <>
+                              <Download className='h-4 w-4 mr-2' />
+                              İndir
+                            </>
+                          )}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </>
               )}
             </div>

@@ -362,13 +362,15 @@ export function CVTemplateGenerator() {
       steps = steps.filter((step) => step.id !== 'objective')
     }
 
-    if (selectedTemplate === 'basic_hr' && selectedVersion === 'turkey') {
+    // All templates now have version/language support
+    if (selectedVersion === 'turkey') {
+      // Turkey version: all templates use the same extended structure
       steps.push(...TURKEY_STEPS)
     } else if (selectedTemplate === 'office_manager') {
-      // Office Manager has simple skills step
+      // Office Manager has simple skills step for global version
       steps.push(...OFFICE_MANAGER_STEPS)
     } else {
-      // For global version or other templates
+      // Global version: all templates use the same simplified structure
       steps.push(...GLOBAL_STEPS)
     }
 
@@ -546,45 +548,39 @@ export function CVTemplateGenerator() {
         },
       }
 
-      // Handle different template types
-      if (data.templateType === 'basic_hr') {
-        apiPayload.version = data.version
-        if (data.version === 'turkey') {
-          apiPayload.language = data.language
-          // Turkey-specific fields
-          apiPayload.data.technicalSkills = data.technicalSkills
-          apiPayload.data.projects = data.projects
-          apiPayload.data.certificates = data.certificates
-          apiPayload.data.languages = data.languages
-          apiPayload.data.references = data.references
-        } else {
-          // Global version fields
-          apiPayload.data.communication = data.communication
-          apiPayload.data.leadership = data.leadership
-        }
-      } else if (data.templateType === 'office_manager') {
-        // Office Manager specific payload structure
-        apiPayload.data = {
-          personalInfo: {
-            firstName: data.personalInfo.firstName || data.personalInfo.fullName?.split(' ')[0] || '',
-            lastName: data.personalInfo.lastName || data.personalInfo.fullName?.split(' ').slice(1).join(' ') || '',
-            jobTitle: data.personalInfo.jobTitle || '',
-            email: data.personalInfo.email,
-            phone: data.personalInfo.phone || '',
-            linkedin: data.personalInfo.linkedin || '',
-          },
-          experience: data.experience,
-          education: data.education,
-          skills: data.skills || [],
-        }
-      } else {
-        // For other templates, include all fields
-        apiPayload.data.communication = data.communication
-        apiPayload.data.leadership = data.leadership
+      // All templates now support version and language
+      apiPayload.version = data.version
+
+      if (data.version === 'turkey') {
+        apiPayload.language = data.language
+        // Turkey version: all templates have extended fields
         apiPayload.data.technicalSkills = data.technicalSkills
         apiPayload.data.projects = data.projects
         apiPayload.data.certificates = data.certificates
         apiPayload.data.languages = data.languages
+        apiPayload.data.references = data.references
+      } else {
+        // Global version: simplified structure
+        if (data.templateType === 'office_manager') {
+          // Office Manager specific payload structure for global version
+          apiPayload.data = {
+            personalInfo: {
+              firstName: data.personalInfo.firstName || data.personalInfo.fullName?.split(' ')[0] || '',
+              lastName: data.personalInfo.lastName || data.personalInfo.fullName?.split(' ').slice(1).join(' ') || '',
+              jobTitle: data.personalInfo.jobTitle || '',
+              email: data.personalInfo.email,
+              phone: data.personalInfo.phone || '',
+              linkedin: data.personalInfo.linkedin || '',
+            },
+            experience: data.experience,
+            education: data.education,
+            skills: data.skills || [],
+          }
+        } else {
+          // Global version fields for other templates
+          apiPayload.data.communication = data.communication
+          apiPayload.data.leadership = data.leadership
+        }
       }
 
       const response = await cvGeneratorApi.generate(apiPayload as any)
@@ -651,15 +647,28 @@ export function CVTemplateGenerator() {
   const fillDemoData = () => {
     console.log('🎯 Filling demo data, overriding any profile auto-fill')
 
+    // Common personal info based on template type
     if (selectedTemplate === 'office_manager') {
-      // Office Manager optimized demo data
+      // Office Manager personal info
       setValue('personalInfo.firstName', 'Ahmet')
       setValue('personalInfo.lastName', 'Yılmaz')
       setValue('personalInfo.jobTitle', 'Office Manager')
       setValue('personalInfo.email', 'ahmet.yilmaz@email.com')
       setValue('personalInfo.phone', '+90 555 123 4567')
       setValue('personalInfo.linkedin', 'linkedin.com/in/ahmetyilmaz')
+    } else {
+      // Other templates personal info
+      setValue('personalInfo.fullName', 'Ahmet Yılmaz')
+      setValue('personalInfo.email', 'ahmet.yilmaz@email.com')
+      setValue('personalInfo.phone', '+90 555 123 4567')
+      setValue('personalInfo.address', 'Beşiktaş Mah. Teknoloji Cad. No:42/8')
+      setValue('personalInfo.city', 'İstanbul')
+      setValue('personalInfo.state', 'İstanbul')
+      setValue('personalInfo.zipCode', '34353')
+    }
 
+    // Experience and education - same for all
+    if (selectedTemplate === 'office_manager') {
       setValue('experience', [
         {
           jobTitle: 'Senior Office Manager',
@@ -692,36 +701,7 @@ export function CVTemplateGenerator() {
           isCurrent: false,
         },
       ])
-
-      setValue('skills', [
-        'Project Management',
-        'Team Leadership',
-        'Microsoft Office',
-        'Budget Planning',
-        'Customer Relations',
-        'Office Administration',
-        'Scheduling & Coordination',
-        'Problem Solving',
-      ])
-
-      // Clear references and objective for office_manager
-      setValue('references', [])
-      setValue('objective', '')
     } else {
-      // Basic HR and other templates demo data
-      setValue('personalInfo.fullName', 'Ahmet Yılmaz')
-      setValue('personalInfo.email', 'ahmet.yilmaz@email.com')
-      setValue('personalInfo.phone', '+90 555 123 4567')
-      setValue('personalInfo.address', 'Beşiktaş Mah. Teknoloji Cad. No:42/8')
-      setValue('personalInfo.city', 'İstanbul')
-      setValue('personalInfo.state', 'İstanbul')
-      setValue('personalInfo.zipCode', '34353')
-
-      setValue(
-        'objective',
-        '5+ yıl deneyimli Full Stack Developer. Modern web teknolojileri ile kullanıcı odaklı çözümler geliştirme konusunda uzman.',
-      )
-
       setValue('experience', [
         {
           jobTitle: 'Senior Full Stack Developer',
@@ -754,7 +734,11 @@ export function CVTemplateGenerator() {
           isCurrent: false,
         },
       ])
+    }
 
+    // Version-specific demo data
+    if (selectedVersion === 'turkey') {
+      // Turkey version: extended fields for all templates
       setValue('technicalSkills', {
         frontend: ['React', 'Vue.js', 'TypeScript'],
         backend: ['Node.js', 'Python', 'Express.js'],
@@ -799,15 +783,6 @@ export function CVTemplateGenerator() {
         },
       ])
 
-      setValue(
-        'communication',
-        'Excellent written and verbal communication skills in Turkish and English. Experience in client presentations and technical documentation.',
-      )
-      setValue(
-        'leadership',
-        'Led cross-functional teams of 5+ developers. Mentored junior developers and implemented agile development processes.',
-      )
-
       setValue('references', [
         {
           name: 'Mehmet Demir',
@@ -815,6 +790,39 @@ export function CVTemplateGenerator() {
           contact: 'mehmet.demir@techsolutions.com | +90 555 987 6543',
         },
       ])
+    } else {
+      // Global version: simplified fields
+      if (selectedTemplate === 'office_manager') {
+        // Office Manager global version - simple skills
+        setValue('skills', [
+          'Project Management',
+          'Team Leadership',
+          'Microsoft Office',
+          'Budget Planning',
+          'Customer Relations',
+          'Office Administration',
+          'Scheduling & Coordination',
+          'Problem Solving',
+        ])
+      } else {
+        // Other templates global version - communication & leadership
+        setValue(
+          'communication',
+          'Excellent written and verbal communication skills in Turkish and English. Experience in client presentations and technical documentation.',
+        )
+        setValue(
+          'leadership',
+          'Led cross-functional teams of 5+ developers. Mentored junior developers and implemented agile development processes.',
+        )
+      }
+    }
+
+    // Objective - only for non-office_manager templates
+    if (selectedTemplate !== 'office_manager') {
+      setValue(
+        'objective',
+        '5+ yıl deneyimli Full Stack Developer. Modern web teknolojileri ile kullanıcı odaklı çözümler geliştirme konusunda uzman.',
+      )
     }
   }
 
@@ -912,9 +920,10 @@ export function CVTemplateGenerator() {
               )}
             </div>
 
-            {selectedTemplate === 'basic_hr' && (
+            {/* All templates now support version and language selection */}
+            {selectedTemplate && (
               <div className='space-y-4 p-4 bg-primary/5 dark:bg-primary/10 rounded-lg border border-primary/20 dark:border-primary/30'>
-                <h4 className='font-medium text-primary'>Basic HR Template Ayarları</h4>
+                <h4 className='font-medium text-primary'>Template Ayarları</h4>
 
                 <div className='space-y-3'>
                   <div>

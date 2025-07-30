@@ -27,16 +27,6 @@ export function CertificatesStep({ form }: CertificatesStepProps) {
 
   return (
     <div className='space-y-6'>
-      <div>
-        <h3 className='text-lg font-semibold mb-2 flex items-center gap-2'>
-          <Award className='h-5 w-5 text-primary' />
-          Sertifikalar
-        </h3>
-        <p className='text-muted-foreground'>
-          Sahip olduğunuz sertifikaları listeleyin. Bu bölüm teknik yetkinliğinizi kanıtlar.
-        </p>
-      </div>
-
       <div className='space-y-4'>
         <Label>Sertifikalar</Label>
         <div className='space-y-4'>

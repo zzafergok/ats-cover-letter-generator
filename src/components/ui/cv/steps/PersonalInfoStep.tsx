@@ -38,16 +38,6 @@ export function PersonalInfoStep({ form, selectedTemplate }: PersonalInfoStepPro
 
   return (
     <div className='space-y-6'>
-      <div>
-        <h3 className='text-lg font-semibold mb-2 flex items-center gap-2'>
-          <User className='h-5 w-5 text-primary' />
-          Kişisel Bilgiler
-        </h3>
-        <p className='text-muted-foreground'>
-          İletişim bilgilerinizi girin. Bu bilgiler otomatik olarak profilinizden doldurulmuştur.
-        </p>
-      </div>
-
       <div className='space-y-4'>
         {selectedTemplate === 'office_manager' ? (
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>

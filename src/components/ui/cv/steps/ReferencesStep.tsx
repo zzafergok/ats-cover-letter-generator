@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { UseFormReturn } from 'react-hook-form'
-import { Users } from 'lucide-react'
+import { Users, X } from 'lucide-react'
 
 import { Label } from '@/components/core/label'
 import { Input } from '@/components/core/input'
@@ -27,21 +27,29 @@ export function ReferencesStep({ form }: ReferencesStepProps) {
 
   return (
     <div className='space-y-6'>
-      <div>
-        <h3 className='text-lg font-semibold mb-2 flex items-center gap-2'>
-          <Users className='h-5 w-5 text-primary' />
-          Referanslar
-        </h3>
-        <p className='text-muted-foreground'>
-          İş referanslarınızı ekleyin. Bu bölüm isteğe bağlıdır ancak güvenilirliğinizi artırır.
-        </p>
-      </div>
-
       <div className='space-y-4'>
         <Label>Referanslar</Label>
         <div className='space-y-4'>
           {watch('references')?.map((_, index) => (
             <Card key={index} className='p-4'>
+              <div className='flex justify-between items-center mb-3'>
+                <h4 className='font-medium text-sm text-muted-foreground'>Referans {index + 1}</h4>
+                {(watch('references')?.length || 0) > 1 && (
+                  <Button
+                    type='button'
+                    variant='ghost'
+                    size='sm'
+                    onClick={() => {
+                      const current = getValues('references') || []
+                      const updated = current.filter((_, i) => i !== index)
+                      setValue('references', updated)
+                    }}
+                    className='h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50'
+                  >
+                    <X className='h-4 w-4' />
+                  </Button>
+                )}
+              </div>
               <div className='space-y-3'>
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
                   <div>

@@ -28,16 +28,6 @@ export function TemplateSelectionStep({ form, isLoadingTemplates }: TemplateSele
 
   return (
     <div className='space-y-6'>
-      <div>
-        <h3 className='text-lg font-semibold mb-2 flex items-center gap-2'>
-          <Settings className='h-5 w-5 text-primary' />
-          Template Seçimi
-        </h3>
-        <p className='text-muted-foreground'>
-          CV template'inizi ve ayarlarını seçin. Her template farklı sektörler için optimize edilmiştir.
-        </p>
-      </div>
-
       <div className='space-y-3'>
         <Label className='text-sm font-medium'>CV Template Seçimi</Label>
         {isLoadingTemplates ? (

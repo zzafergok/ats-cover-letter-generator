@@ -21,16 +21,6 @@ export function ObjectiveStep({ form }: ObjectiveStepProps) {
 
   return (
     <div className='space-y-6'>
-      <div>
-        <h3 className='text-lg font-semibold mb-2 flex items-center gap-2'>
-          <FileText className='h-5 w-5 text-primary' />
-          Kariyer Hedefi
-        </h3>
-        <p className='text-muted-foreground'>
-          Kariyer hedefinizi ve profesyonel özetinizi yazın. Bu bölüm isteğe bağlıdır.
-        </p>
-      </div>
-
       <div className='space-y-4'>
         <div>
           <Label htmlFor='objective'>Kariyer Hedefi</Label>

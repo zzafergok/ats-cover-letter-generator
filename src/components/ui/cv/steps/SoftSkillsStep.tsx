@@ -22,16 +22,6 @@ export function SoftSkillsStep({ form }: SoftSkillsStepProps) {
 
   return (
     <div className='space-y-6'>
-      <div>
-        <h3 className='text-lg font-semibold mb-2 flex items-center gap-2'>
-          <Users className='h-5 w-5 text-primary' />
-          İletişim & Liderlik
-        </h3>
-        <p className='text-muted-foreground'>
-          Soft skill becerilerinizi açıklayın. Bu bölüm global template'ler için kullanılır.
-        </p>
-      </div>
-
       <div className='space-y-4'>
         <div>
           <Label htmlFor='communication'>İletişim Becerileri</Label>

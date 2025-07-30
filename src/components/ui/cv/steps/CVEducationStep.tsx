@@ -33,16 +33,6 @@ export function CVEducationStep({ form }: CVEducationStepProps) {
 
   return (
     <div className='space-y-6'>
-      <div>
-        <h3 className='text-lg font-semibold mb-2 flex items-center gap-2'>
-          <GraduationCap className='h-5 w-5 text-primary' />
-          Eğitim
-        </h3>
-        <p className='text-muted-foreground'>
-          Eğitim bilgilerinizi girin. En güncel eğitiminizden başlayarak sıralayın.
-        </p>
-      </div>
-
       <div className='space-y-4'>
         <Label>Eğitim</Label>
         <div className='space-y-4'>

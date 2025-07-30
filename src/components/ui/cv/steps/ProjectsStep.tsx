@@ -28,16 +28,6 @@ export function ProjectsStep({ form }: ProjectsStepProps) {
 
   return (
     <div className='space-y-6'>
-      <div>
-        <h3 className='text-lg font-semibold mb-2 flex items-center gap-2'>
-          <FolderOpen className='h-5 w-5 text-primary' />
-          Projeler
-        </h3>
-        <p className='text-muted-foreground'>
-          Önemli projelerinizi ekleyin. Bu bölüm işverenler için değerli bilgiler içerir.
-        </p>
-      </div>
-
       <div className='space-y-4'>
         <Label>Projeler</Label>
         <div className='space-y-4'>

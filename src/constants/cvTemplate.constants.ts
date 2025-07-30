@@ -25,31 +25,31 @@ export const BASE_STEPS: StepItem[] = [
   {
     id: 'template',
     title: 'Template Seçimi',
-    description: 'CV template ve ayarlarını seçin',
+    description: "CV template'inizi ve ayarlarını seçin. Her template farklı sektörler için optimize edilmiştir",
     icon: Settings,
   },
   {
     id: 'personal',
     title: 'Kişisel Bilgiler',
-    description: 'İletişim bilgilerinizi girin',
+    description: 'İletişim bilgilerinizi girin. Bu bilgiler otomatik olarak profilinizden doldurulmuştur',
     icon: User,
   },
   {
     id: 'objective',
     title: 'Kariyer Hedefi',
-    description: 'Profesyonel özetinizi yazın',
+    description: 'Kariyer hedefinizi ve profesyonel özetinizi yazın. Bu bölüm isteğe bağlıdır',
     icon: FileText,
   },
   {
     id: 'experience',
     title: 'İş Deneyimi',
-    description: 'Çalışma geçmişinizi ekleyin',
+    description: 'Çalışma geçmişinizi ekleyin. En güncel pozisyonunuzdan başlayarak sıralayın',
     icon: Briefcase,
   },
   {
     id: 'education',
     title: 'Eğitim',
-    description: 'Eğitim bilgilerinizi girin',
+    description: 'Eğitim bilgilerinizi girin. En güncel eğitiminizden başlayarak sıralayın',
     icon: GraduationCap,
   },
 ]
@@ -59,31 +59,32 @@ export const TURKEY_STEPS: StepItem[] = [
   {
     id: 'skills',
     title: 'Teknik Yetenekler',
-    description: 'Teknik becerilerinizi listeleyin',
+    description:
+      "Teknik becerilerinizi kategoriler halinde listeleyin. Turkey template'leri için detaylı yetenek bölümü",
     icon: Code,
   },
   {
     id: 'projects',
     title: 'Projeler',
-    description: 'Önemli projelerinizi ekleyin',
+    description: 'Önemli projelerinizi ekleyin. Bu bölüm işverenler için değerli bilgiler içerir',
     icon: FolderOpen,
   },
   {
     id: 'certificates',
     title: 'Sertifikalar',
-    description: 'Sertifikalarınızı listeleyin',
+    description: 'Sahip olduğunuz sertifikaları listeleyin. Bu bölüm teknik yetkinliğinizi kanıtlar',
     icon: Award,
   },
   {
     id: 'languages',
     title: 'Diller',
-    description: 'Yabancı dil bilginizi ekleyin',
+    description: 'Yabancı dil bilginizi ekleyin. Çok uluslu şirketler için önemli bir avantajdır',
     icon: Languages,
   },
   {
     id: 'references',
     title: 'Referanslar',
-    description: 'İş referanslarınızı ekleyin',
+    description: 'İş referanslarınızı ekleyin. Bu bölüm isteğe bağlıdır ancak güvenilirliğinizi artırır',
     icon: Users,
   },
 ]
@@ -92,7 +93,7 @@ export const GLOBAL_STEPS: StepItem[] = [
   {
     id: 'soft_skills',
     title: 'İletişim & Liderlik',
-    description: 'Soft skills becerilerinizi yazın',
+    description: "Soft skill becerilerinizi açıklayın. Bu bölüm global template'ler için kullanılır",
     icon: Users,
   },
 ]

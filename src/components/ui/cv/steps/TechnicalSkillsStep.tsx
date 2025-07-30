@@ -27,16 +27,6 @@ export function TechnicalSkillsStep({ form }: TechnicalSkillsStepProps) {
 
   return (
     <div className='space-y-6'>
-      <div>
-        <h3 className='text-lg font-semibold mb-2 flex items-center gap-2'>
-          <Code className='h-5 w-5 text-primary' />
-          Teknik Yetenekler
-        </h3>
-        <p className='text-muted-foreground'>
-          Teknik becerilerinizi kategoriler halinde listeleyin. Turkey template'leri için detaylı yetenek bölümü.
-        </p>
-      </div>
-
       <div className='space-y-6'>
         {/* Frontend Skills */}
         <div>

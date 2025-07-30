@@ -1,10 +1,13 @@
 'use client'
 
-import React from 'react'
 import { useRouter } from 'next/navigation'
+
+import React from 'react'
+
 import { ExternalLink, AlertTriangle } from 'lucide-react'
-import { Alert, AlertDescription } from '@/components/core/alert'
+
 import { Button } from '@/components/core/button'
+import { Alert, AlertDescription } from '@/components/core/alert'
 
 interface ProfileRedirectAlertProps {
   sectionName: string

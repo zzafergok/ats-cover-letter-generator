@@ -1,66 +1,137 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import { User } from 'lucide-react'
 
-import { PersonalInfoSection } from '@/components/ui/cv/sections/PersonalInfoSection'
-import { useUserProfileStore } from '@/store/userProfileStore'
-import { ATSFormData } from '@/types/form.types'
+import { Label } from '@/components/core/label'
+import { Input } from '@/components/core/input'
 
-interface PersonalInfoStepProps {
-  form: UseFormReturn<ATSFormData>
+interface CVTemplateFormData {
+  personalInfo: {
+    fullName?: string
+    firstName?: string
+    lastName?: string
+    jobTitle?: string
+    linkedin?: string
+    address?: string
+    city?: string
+    state?: string
+    zipCode?: string
+    phone?: string
+    email: string
+  }
+  templateType?: string
+  [key: string]: any
 }
 
-export function PersonalInfoStep({ form }: PersonalInfoStepProps) {
-  const { profile, isLoading: profileLoading, getProfile } = useUserProfileStore()
+interface PersonalInfoStepProps {
+  form: UseFormReturn<CVTemplateFormData>
+  selectedTemplate?: string
+}
+
+export function PersonalInfoStep({ form, selectedTemplate }: PersonalInfoStepProps) {
   const {
     register,
     formState: { errors },
-    setValue,
   } = form
-
-  // Auto-populate from user profile
-  useEffect(() => {
-    if (!profile) {
-      getProfile()
-      return
-    }
-
-    // Fill personal information from profile
-    if (profile.firstName) setValue('personalInfo.firstName', profile.firstName)
-    if (profile.lastName) setValue('personalInfo.lastName', profile.lastName)
-    if (profile.email) setValue('personalInfo.email', profile.email)
-    if (profile.phone) setValue('personalInfo.phone', profile.phone)
-    if (profile.address) setValue('personalInfo.address.street', profile.address)
-    if (profile.city) setValue('personalInfo.address.city', profile.city)
-    if (profile.country) setValue('personalInfo.address.country', profile.country)
-    if (profile.linkedin) setValue('personalInfo.linkedIn', profile.linkedin)
-    if (profile.github) setValue('personalInfo.github', profile.github)
-    if (profile.portfolioWebsite) setValue('personalInfo.portfolio', profile.portfolioWebsite)
-  }, [profile, setValue, getProfile])
-
-  if (profileLoading) {
-    return (
-      <div className='flex items-center justify-center p-12'>
-        <div className='text-center space-y-4'>
-          <User className='h-8 w-8 animate-pulse text-primary mx-auto' />
-          <p className='text-muted-foreground'>Profil bilgileriniz yükleniyor...</p>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className='space-y-6'>
       <div>
-        <h3 className='text-lg font-semibold mb-2'>Kişisel Bilgiler</h3>
+        <h3 className='text-lg font-semibold mb-2 flex items-center gap-2'>
+          <User className='h-5 w-5 text-primary' />
+          Kişisel Bilgiler
+        </h3>
         <p className='text-muted-foreground'>
           İletişim bilgilerinizi girin. Bu bilgiler otomatik olarak profilinizden doldurulmuştur.
         </p>
       </div>
 
-      <PersonalInfoSection register={register} errors={errors} />
+      <div className='space-y-4'>
+        {selectedTemplate === 'office_manager' ? (
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+            <div>
+              <Label htmlFor='firstName'>Ad *</Label>
+              <Input
+                id='firstName'
+                {...register('personalInfo.firstName', {
+                  required: 'Ad gereklidir',
+                })}
+                placeholder='Ahmet'
+              />
+              {errors.personalInfo?.firstName && (
+                <p className='text-sm text-red-600 mt-1'>{errors.personalInfo.firstName.message}</p>
+              )}
+            </div>
+            <div>
+              <Label htmlFor='lastName'>Soyad *</Label>
+              <Input
+                id='lastName'
+                {...register('personalInfo.lastName', {
+                  required: 'Soyad gereklidir',
+                })}
+                placeholder='Yılmaz'
+              />
+              {errors.personalInfo?.lastName && (
+                <p className='text-sm text-red-600 mt-1'>{errors.personalInfo.lastName.message}</p>
+              )}
+            </div>
+            <div>
+              <Label htmlFor='jobTitle'>İş Unvanı</Label>
+              <Input id='jobTitle' {...register('personalInfo.jobTitle')} placeholder='Office Manager' />
+            </div>
+            <div>
+              <Label htmlFor='email'>Email *</Label>
+              <Input id='email' type='email' {...register('personalInfo.email')} placeholder='ahmet@email.com' />
+              {errors.personalInfo?.email && (
+                <p className='text-sm text-red-600 mt-1'>{errors.personalInfo.email.message}</p>
+              )}
+            </div>
+            <div>
+              <Label htmlFor='phone'>Telefon</Label>
+              <Input id='phone' {...register('personalInfo.phone')} placeholder='+90 555 123 4567' />
+            </div>
+            <div>
+              <Label htmlFor='linkedin'>LinkedIn</Label>
+              <Input id='linkedin' {...register('personalInfo.linkedin')} placeholder='linkedin.com/in/ahmetyilmaz' />
+            </div>
+          </div>
+        ) : (
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+            <div>
+              <Label htmlFor='fullName'>Ad Soyad *</Label>
+              <Input id='fullName' {...register('personalInfo.fullName')} placeholder='Ahmet Yılmaz' />
+              {errors.personalInfo?.fullName && (
+                <p className='text-sm text-red-600 mt-1'>{errors.personalInfo.fullName.message}</p>
+              )}
+            </div>
+            <div>
+              <Label htmlFor='email'>Email *</Label>
+              <Input id='email' type='email' {...register('personalInfo.email')} placeholder='ahmet@email.com' />
+              {errors.personalInfo?.email && (
+                <p className='text-sm text-red-600 mt-1'>{errors.personalInfo.email.message}</p>
+              )}
+            </div>
+            <div>
+              <Label htmlFor='phone'>Telefon</Label>
+              <Input id='phone' {...register('personalInfo.phone')} placeholder='+90 555 123 4567' />
+            </div>
+            <div>
+              <Label htmlFor='city'>Şehir</Label>
+              <Input id='city' {...register('personalInfo.city')} placeholder='İstanbul' />
+            </div>
+            <div>
+              <Label htmlFor='address'>Adres</Label>
+              <Input id='address' {...register('personalInfo.address')} placeholder='Mahalle, Sokak, No' />
+            </div>
+            <div>
+              <Label htmlFor='state'>Eyalet/İl</Label>
+              <Input id='state' {...register('personalInfo.state')} placeholder='İstanbul' />
+            </div>
+          </div>
+        )}
+      </div>
 
       <div className='bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800'>
         <div className='flex items-start gap-3'>
@@ -70,11 +141,13 @@ export function PersonalInfoStep({ form }: PersonalInfoStepProps) {
             </div>
           </div>
           <div className='space-y-1'>
-            <h4 className='font-medium text-sm text-blue-800 dark:text-blue-200'>Profil Senkronizasyonu</h4>
-            <p className='text-xs text-blue-700 dark:text-blue-300'>
-              Bu bilgiler otomatik olarak profil sayfanızdan alınmıştır. Değişiklik yapmak için profil sayfanızı
-              güncelleyebilirsiniz.
-            </p>
+            <h4 className='font-medium text-sm text-blue-800 dark:text-blue-200'>Kişisel Bilgi İpuçları</h4>
+            <ul className='text-xs text-blue-700 dark:text-blue-300 space-y-1'>
+              <li>• Bu bilgiler otomatik olarak profil sayfanızdan alınmıştır</li>
+              <li>• Email adresi zorunludur ve doğru formatta olmalıdır</li>
+              <li>• Telefon numarasını uluslararası formatta yazın</li>
+              <li>• LinkedIn profilinizi ekleyerek profesyonellik katın</li>
+            </ul>
           </div>
         </div>
       </div>

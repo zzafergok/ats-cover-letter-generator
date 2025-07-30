@@ -69,13 +69,22 @@ const LoginContent: React.FC = () => {
     try {
       // Login fonksiyonuna remember me durumunu da gönder
       await login(email, password, rememberMe)
-      console.log('✅ Login successful, redirecting to dashboard')
+      console.log('✅ Login successful, checking redirect URL')
 
       if (process.env.NODE_ENV === 'development') {
         SessionTokenManager.debugInfo()
       }
 
-      router.replace('/dashboard')
+      // Check for saved redirect URL
+      const redirectUrl = sessionStorage.getItem('auth_redirect_url')
+      if (redirectUrl) {
+        console.log('🔄 Redirecting to saved URL:', redirectUrl)
+        sessionStorage.removeItem('auth_redirect_url')
+        router.replace(redirectUrl)
+      } else {
+        console.log('🔄 No redirect URL, going to dashboard')
+        router.replace('/dashboard')
+      }
     } catch (err: any) {
       console.error('❌ Login error:', err)
       const errorMessage = err.message || t('auth.login.validation.loginError')

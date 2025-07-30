@@ -121,8 +121,29 @@ const processRequestQueue = (error: any, token: string | null): void => {
 const handleAuthFailure = (): void => {
   console.log('🚫 Authentication failure - clearing tokens and redirecting')
   SessionTokenManager.clearTokens()
-  if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
-    window.location.href = '/login'
+
+  // Show authentication expired notification
+  if (globalToast) {
+    globalToast.error('Oturum süreniz doldu. Lütfen tekrar giriş yapın.')
+  }
+
+  if (typeof window !== 'undefined') {
+    const currentPath = window.location.pathname
+    const isAlreadyOnAuthPage = currentPath === '/login' || currentPath === '/register' || currentPath === '/auth'
+
+    // Auth sayfasında değilse, current path'i kaydet ve login'e yönlendir
+    if (!isAlreadyOnAuthPage) {
+      // Return URL'i kaydet (login sonrası geri dönüş için)
+      const returnUrl = currentPath + window.location.search
+      if (returnUrl !== '/') {
+        sessionStorage.setItem('auth_redirect_url', returnUrl)
+        console.log('💾 Saved redirect URL for after login:', returnUrl)
+      }
+
+      // Login sayfasına yönlendir
+      console.log('🔄 Redirecting to login page')
+      window.location.href = '/login'
+    }
   }
 }
 
@@ -156,6 +177,11 @@ const setupResponseInterceptor = (instance: AxiosInstance): void => {
 
       if (status === 401 && !originalRequest._retry) {
         console.log('🔄 401 error detected - attempting token refresh to keep user logged in')
+        console.log('🔍 Request details:', {
+          url: originalRequest.url,
+          method: originalRequest.method,
+          skipAuth: originalRequest.skipAuth,
+        })
 
         if (isRefreshing) {
           console.log('⏳ Token refresh already in progress, queuing request')
@@ -183,6 +209,7 @@ const setupResponseInterceptor = (instance: AxiosInstance): void => {
           return instance(originalRequest)
         } catch (refreshError) {
           console.error('❌ Token refresh failed - redirecting to login')
+          console.log('🔍 Auth failure triggered for URL:', originalRequest.url)
           processRequestQueue(refreshError, null)
           handleAuthFailure()
           return Promise.reject(refreshError)
@@ -220,4 +247,24 @@ export const apiRequest = {
   delete: <T = any>(url: string, config?: ExtendedRequestConfig): Promise<T> => apiClient.delete(url, config),
   patch: <T = any>(url: string, data?: any, config?: ExtendedRequestConfig): Promise<T> =>
     apiClient.patch(url, data, config),
+}
+
+// Utility function to manually trigger auth failure (for testing or edge cases)
+export const triggerAuthFailure = (): void => {
+  handleAuthFailure()
+}
+
+// Utility function to get saved redirect URL
+export const getSavedRedirectUrl = (): string | null => {
+  if (typeof window !== 'undefined') {
+    return sessionStorage.getItem('auth_redirect_url')
+  }
+  return null
+}
+
+// Utility function to clear saved redirect URL
+export const clearSavedRedirectUrl = (): void => {
+  if (typeof window !== 'undefined') {
+    sessionStorage.removeItem('auth_redirect_url')
+  }
 }

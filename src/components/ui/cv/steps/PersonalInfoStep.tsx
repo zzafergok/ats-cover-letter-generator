@@ -9,15 +9,12 @@ import { Input } from '@/components/core/input'
 
 interface CVTemplateFormData {
   personalInfo: {
-    fullName?: string
-    firstName?: string
-    lastName?: string
+    firstName: string
+    lastName: string
     jobTitle?: string
     linkedin?: string
     address?: string
     city?: string
-    state?: string
-    zipCode?: string
     phone?: string
     email: string
   }
@@ -30,7 +27,7 @@ interface PersonalInfoStepProps {
   selectedTemplate?: string
 }
 
-export function PersonalInfoStep({ form, selectedTemplate }: PersonalInfoStepProps) {
+export function PersonalInfoStep({ form }: PersonalInfoStepProps) {
   const {
     register,
     formState: { errors },
@@ -39,88 +36,57 @@ export function PersonalInfoStep({ form, selectedTemplate }: PersonalInfoStepPro
   return (
     <div className='space-y-6'>
       <div className='space-y-4'>
-        {selectedTemplate === 'office_manager' ? (
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            <div>
-              <Label htmlFor='firstName'>Ad *</Label>
-              <Input
-                id='firstName'
-                {...register('personalInfo.firstName', {
-                  required: 'Ad gereklidir',
-                })}
-                placeholder='Ahmet'
-              />
-              {errors.personalInfo?.firstName && (
-                <p className='text-sm text-red-600 mt-1'>{errors.personalInfo.firstName.message}</p>
-              )}
-            </div>
-            <div>
-              <Label htmlFor='lastName'>Soyad *</Label>
-              <Input
-                id='lastName'
-                {...register('personalInfo.lastName', {
-                  required: 'Soyad gereklidir',
-                })}
-                placeholder='Yılmaz'
-              />
-              {errors.personalInfo?.lastName && (
-                <p className='text-sm text-red-600 mt-1'>{errors.personalInfo.lastName.message}</p>
-              )}
-            </div>
-            <div>
-              <Label htmlFor='jobTitle'>İş Unvanı</Label>
-              <Input id='jobTitle' {...register('personalInfo.jobTitle')} placeholder='Office Manager' />
-            </div>
-            <div>
-              <Label htmlFor='email'>Email *</Label>
-              <Input id='email' type='email' {...register('personalInfo.email')} placeholder='ahmet@email.com' />
-              {errors.personalInfo?.email && (
-                <p className='text-sm text-red-600 mt-1'>{errors.personalInfo.email.message}</p>
-              )}
-            </div>
-            <div>
-              <Label htmlFor='phone'>Telefon</Label>
-              <Input id='phone' {...register('personalInfo.phone')} placeholder='+90 555 123 4567' />
-            </div>
-            <div>
-              <Label htmlFor='linkedin'>LinkedIn</Label>
-              <Input id='linkedin' {...register('personalInfo.linkedin')} placeholder='linkedin.com/in/ahmetyilmaz' />
-            </div>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          <div>
+            <Label htmlFor='firstName'>Ad *</Label>
+            <Input
+              id='firstName'
+              {...register('personalInfo.firstName')}
+              placeholder='Ahmet'
+            />
+            {errors.personalInfo?.firstName && (
+              <p className='text-sm text-red-600 mt-1'>{errors.personalInfo.firstName.message}</p>
+            )}
           </div>
-        ) : (
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-            <div>
-              <Label htmlFor='fullName'>Ad Soyad *</Label>
-              <Input id='fullName' {...register('personalInfo.fullName')} placeholder='Ahmet Yılmaz' />
-              {errors.personalInfo?.fullName && (
-                <p className='text-sm text-red-600 mt-1'>{errors.personalInfo.fullName.message}</p>
-              )}
-            </div>
-            <div>
-              <Label htmlFor='email'>Email *</Label>
-              <Input id='email' type='email' {...register('personalInfo.email')} placeholder='ahmet@email.com' />
-              {errors.personalInfo?.email && (
-                <p className='text-sm text-red-600 mt-1'>{errors.personalInfo.email.message}</p>
-              )}
-            </div>
-            <div>
-              <Label htmlFor='phone'>Telefon</Label>
-              <Input id='phone' {...register('personalInfo.phone')} placeholder='+90 555 123 4567' />
-            </div>
-            <div>
-              <Label htmlFor='city'>Şehir</Label>
-              <Input id='city' {...register('personalInfo.city')} placeholder='İstanbul' />
-            </div>
-            <div>
-              <Label htmlFor='address'>Adres</Label>
-              <Input id='address' {...register('personalInfo.address')} placeholder='Mahalle, Sokak, No' />
-            </div>
-            <div>
-              <Label htmlFor='state'>Eyalet/İl</Label>
-              <Input id='state' {...register('personalInfo.state')} placeholder='İstanbul' />
-            </div>
+          <div>
+            <Label htmlFor='lastName'>Soyad *</Label>
+            <Input
+              id='lastName'
+              {...register('personalInfo.lastName')}
+              placeholder='Yılmaz'
+            />
+            {errors.personalInfo?.lastName && (
+              <p className='text-sm text-red-600 mt-1'>{errors.personalInfo.lastName.message}</p>
+            )}
           </div>
-        )}
+          <div>
+            <Label htmlFor='jobTitle'>İş Unvanı</Label>
+            <Input id='jobTitle' {...register('personalInfo.jobTitle')} placeholder='Yazılım Geliştirici' />
+          </div>
+          <div>
+            <Label htmlFor='email'>Email *</Label>
+            <Input id='email' type='email' {...register('personalInfo.email')} placeholder='ahmet@email.com' />
+            {errors.personalInfo?.email && (
+              <p className='text-sm text-red-600 mt-1'>{errors.personalInfo.email.message}</p>
+            )}
+          </div>
+          <div>
+            <Label htmlFor='phone'>Telefon</Label>
+            <Input id='phone' {...register('personalInfo.phone')} placeholder='+90 555 123 4567' />
+          </div>
+          <div>
+            <Label htmlFor='linkedin'>LinkedIn</Label>
+            <Input id='linkedin' {...register('personalInfo.linkedin')} placeholder='linkedin.com/in/ahmetyilmaz' />
+          </div>
+          <div>
+            <Label htmlFor='city'>Şehir</Label>
+            <Input id='city' {...register('personalInfo.city')} placeholder='İstanbul' />
+          </div>
+          <div>
+            <Label htmlFor='address'>Adres</Label>
+            <Input id='address' {...register('personalInfo.address')} placeholder='Mahalle, Sokak, No' />
+          </div>
+        </div>
       </div>
 
       <div className='bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800'>

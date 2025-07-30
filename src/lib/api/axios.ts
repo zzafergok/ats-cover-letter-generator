@@ -175,6 +175,7 @@ const setupResponseInterceptor = (instance: AxiosInstance): void => {
         globalToast.error(errorMessage)
       }
 
+      console.log('🚀 ~ setupResponseInterceptor ~ status === 401:', status === 401)
       if (status === 401 && !originalRequest._retry) {
         console.log('🔄 401 error detected - attempting token refresh to keep user logged in')
         console.log('🔍 Request details:', {

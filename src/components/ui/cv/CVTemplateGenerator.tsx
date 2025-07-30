@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 'use client'
 
 import React, { useState, useEffect } from 'react'
@@ -12,7 +13,7 @@ import { useUserProfileStore } from '@/store/userProfileStore'
 import { cvTemplateSchema, CVTemplateFormData } from '@/schemas/cvTemplate.schema'
 
 // Constants
-import { BASE_STEPS, TURKEY_STEPS, GLOBAL_STEPS, OFFICE_MANAGER_STEPS } from '@/constants/cvTemplate.constants'
+import { BASE_STEPS, TURKEY_STEPS, GLOBAL_STEPS } from '@/constants/cvTemplate.constants'
 
 // Utils
 import { fillDemoData as fillDemoDataUtil } from '@/utils/cvDemoData'
@@ -64,7 +65,6 @@ export function CVTemplateGenerator() {
       version: 'global',
       language: 'english',
       personalInfo: {
-        fullName: '',
         firstName: '',
         lastName: '',
         jobTitle: '',
@@ -73,8 +73,6 @@ export function CVTemplateGenerator() {
         phone: '',
         address: '',
         city: '',
-        state: '',
-        zipCode: '',
       },
       objective: '',
       experience: [
@@ -139,18 +137,10 @@ export function CVTemplateGenerator() {
   const getSteps = () => {
     let steps = [...BASE_STEPS]
 
-    // Remove objective step for office_manager template
-    if (selectedTemplate === 'office_manager') {
-      steps = steps.filter((step) => step.id !== 'objective')
-    }
-
     // All templates now have version/language support
     if (selectedVersion === 'turkey') {
       // Turkey version: all templates use the same extended structure
       steps.push(...TURKEY_STEPS)
-    } else if (selectedTemplate === 'office_manager') {
-      // Office Manager has simple skills step for global version
-      steps.push(...OFFICE_MANAGER_STEPS)
     } else {
       // Global version: all templates use the same simplified structure
       steps.push(...GLOBAL_STEPS)
@@ -203,9 +193,8 @@ export function CVTemplateGenerator() {
       console.log('🔄 Auto-filling form from user profile (one-time only)')
 
       // Auto-fill from profile
-      if (profile.firstName && profile.lastName) {
-        setValue('personalInfo.fullName', `${profile.firstName} ${profile.lastName}`)
-      }
+      if (profile.firstName) setValue('personalInfo.firstName', profile.firstName)
+      if (profile.lastName) setValue('personalInfo.lastName', profile.lastName)
       if (profile.email) setValue('personalInfo.email', profile.email)
       if (profile.phone) setValue('personalInfo.phone', profile.phone)
       if (profile.address) setValue('personalInfo.address', profile.address)
@@ -308,26 +297,8 @@ export function CVTemplateGenerator() {
         apiPayload.data.references = data.references
       } else {
         // Global version: simplified structure
-        if (data.templateType === 'office_manager') {
-          // Office Manager specific payload structure for global version
-          apiPayload.data = {
-            personalInfo: {
-              firstName: data.personalInfo.firstName || data.personalInfo.fullName?.split(' ')[0] || '',
-              lastName: data.personalInfo.lastName || data.personalInfo.fullName?.split(' ').slice(1).join(' ') || '',
-              jobTitle: data.personalInfo.jobTitle || '',
-              email: data.personalInfo.email,
-              phone: data.personalInfo.phone || '',
-              linkedin: data.personalInfo.linkedin || '',
-            },
-            experience: data.experience,
-            education: data.education,
-            skills: data.skills || [],
-          }
-        } else {
-          // Global version fields for other templates
-          apiPayload.data.communication = data.communication
-          apiPayload.data.leadership = data.leadership
-        }
+        apiPayload.data.communication = data.communication
+        apiPayload.data.leadership = data.leadership
       }
 
       const response = await cvGeneratorApi.generate(apiPayload)
@@ -405,11 +376,7 @@ export function CVTemplateGenerator() {
         isValid = !!selectedTemplate
         break
       case 'personal':
-        if (selectedTemplate === 'office_manager') {
-          isValid = await form.trigger(['personalInfo.firstName', 'personalInfo.lastName', 'personalInfo.email'])
-        } else {
-          isValid = await form.trigger(['personalInfo.fullName', 'personalInfo.email'])
-        }
+        isValid = await form.trigger(['personalInfo.firstName', 'personalInfo.lastName', 'personalInfo.email'])
         break
       case 'objective':
         isValid = true // Optional step
@@ -483,7 +450,7 @@ export function CVTemplateGenerator() {
         return <SimpleSkillsStep form={form as any} />
 
       case 'personal':
-        return <PersonalInfoStep form={form as any} selectedTemplate={selectedTemplate} />
+        return <PersonalInfoStep form={form as any} />
 
       case 'objective':
         return <ObjectiveStep form={form as any} />

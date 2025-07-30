@@ -96,6 +96,12 @@ export const GLOBAL_STEPS: StepItem[] = [
     description: "Soft skill becerilerinizi açıklayın. Bu bölüm global template'ler için kullanılır",
     icon: Users,
   },
+  {
+    id: 'references',
+    title: 'Referanslar',
+    description: 'İş referanslarınızı ekleyin. Bu bölüm isteğe bağlıdır ancak güvenilirliğinizi artırır',
+    icon: Users,
+  },
 ]
 
 export const OFFICE_MANAGER_STEPS: StepItem[] = [

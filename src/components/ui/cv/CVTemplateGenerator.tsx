@@ -297,6 +297,7 @@ export function CVTemplateGenerator() {
         apiPayload.data.references = data.references
       } else {
         // Global version: simplified structure
+        apiPayload.data.skills = data.skills
         apiPayload.data.communication = data.communication
         apiPayload.data.leadership = data.leadership
       }

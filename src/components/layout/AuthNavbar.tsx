@@ -22,6 +22,7 @@ import {
   Bot,
   BarChart3,
   Zap,
+  Calculator,
 } from 'lucide-react'
 
 import {
@@ -129,6 +130,12 @@ export function AuthHeader() {
           description: t('navigation.coverLetterListDescription'),
         },
       ],
+    },
+    {
+      name: 'Maaş Hesaplama',
+      href: '/salary-calculator',
+      icon: Calculator,
+      description: 'Güncel vergi oranları ile brüt-net maaş hesaplama',
     },
     {
       name: t('navigation.users'),

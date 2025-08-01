@@ -91,6 +91,12 @@ export const TURKEY_STEPS: StepItem[] = [
 
 export const GLOBAL_STEPS: StepItem[] = [
   {
+    id: 'simple_skills',
+    title: 'Yetenekler',
+    description: "Beceri ve yeteneklerinizi listeleyin. Bu bölüm global template'ler için kullanılır",
+    icon: Code,
+  },
+  {
     id: 'soft_skills',
     title: 'İletişim & Liderlik',
     description: "Soft skill becerilerinizi açıklayın. Bu bölüm global template'ler için kullanılır",

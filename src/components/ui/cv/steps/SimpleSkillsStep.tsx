@@ -22,16 +22,6 @@ export function SimpleSkillsStep({ form }: SimpleSkillsStepProps) {
 
   return (
     <div className='space-y-6'>
-      <div>
-        <h3 className='text-lg font-semibold mb-2 flex items-center gap-2'>
-          <Code className='h-5 w-5 text-primary' />
-          Yetenekler
-        </h3>
-        <p className='text-muted-foreground'>
-          Beceri ve yeteneklerinizi listeleyin. Office Manager global template için basit yetenek listesi.
-        </p>
-      </div>
-
       <div className='space-y-4'>
         <Label>Yetenekler</Label>
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2'>

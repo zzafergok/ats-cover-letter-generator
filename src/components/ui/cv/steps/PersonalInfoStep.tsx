@@ -39,22 +39,14 @@ export function PersonalInfoStep({ form }: PersonalInfoStepProps) {
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <div>
             <Label htmlFor='firstName'>Ad *</Label>
-            <Input
-              id='firstName'
-              {...register('personalInfo.firstName')}
-              placeholder='Ahmet'
-            />
+            <Input id='firstName' {...register('personalInfo.firstName')} placeholder='Ahmet' />
             {errors.personalInfo?.firstName && (
               <p className='text-sm text-red-600 mt-1'>{errors.personalInfo.firstName.message}</p>
             )}
           </div>
           <div>
             <Label htmlFor='lastName'>Soyad *</Label>
-            <Input
-              id='lastName'
-              {...register('personalInfo.lastName')}
-              placeholder='Yılmaz'
-            />
+            <Input id='lastName' {...register('personalInfo.lastName')} placeholder='Yılmaz' />
             {errors.personalInfo?.lastName && (
               <p className='text-sm text-red-600 mt-1'>{errors.personalInfo.lastName.message}</p>
             )}

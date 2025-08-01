@@ -20,13 +20,10 @@ export const fillDemoData = (
     setValue('personalInfo.phone', '+90 555 123 4567')
     setValue('personalInfo.linkedin', 'linkedin.com/in/ahmetyilmaz')
   } else {
-    setValue('personalInfo.fullName', 'Ahmet Yılmaz')
     setValue('personalInfo.email', 'ahmet.yilmaz@email.com')
     setValue('personalInfo.phone', '+90 555 123 4567')
     setValue('personalInfo.address', 'Beşiktaş Mah. Teknoloji Cad. No:42/8')
     setValue('personalInfo.city', 'İstanbul')
-    setValue('personalInfo.state', 'İstanbul')
-    setValue('personalInfo.zipCode', '34353')
   }
 
   // Experience and education
@@ -124,7 +121,7 @@ export const fillDemoData = (
       },
     ])
   } else {
-    // Global version: simplified fields
+    // Global version: simplified fields - all templates have skills array
     if (selectedTemplate === 'office_manager') {
       setValue('skills', [
         'Project Management',
@@ -135,15 +132,26 @@ export const fillDemoData = (
         'Office Administration',
       ])
     } else {
-      setValue(
-        'communication',
-        'Excellent written and verbal communication skills in Turkish and English. Experience in client presentations and technical documentation.',
-      )
-      setValue(
-        'leadership',
-        'Led cross-functional teams of 5+ developers. Mentored junior developers and implemented agile development processes.',
-      )
+      setValue('skills', [
+        'JavaScript',
+        'React',
+        'Node.js',
+        'TypeScript',
+        'AWS',
+        'Docker',
+        'MongoDB',
+        'PostgreSQL',
+      ])
     }
+    
+    setValue(
+      'communication',
+      'Excellent written and verbal communication skills in Turkish and English. Experience in client presentations and technical documentation.',
+    )
+    setValue(
+      'leadership',
+      'Led cross-functional teams of 5+ developers. Mentored junior developers and implemented agile development processes.',
+    )
   }
 
   // Objective - only for non-office_manager templates

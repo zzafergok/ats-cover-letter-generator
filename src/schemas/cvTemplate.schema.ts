@@ -34,10 +34,11 @@ export const cvTemplateSchema = z.object({
       z.object({
         degree: z.string().min(1, 'Derece gereklidir'),
         university: z.string().min(1, 'Üniversite adı gereklidir'),
+        field: z.string().min(1, 'Bölüm gereklidir'),
         location: z.string().optional(),
-        graduationDate: z.string().optional(),
+        startDate: z.string().min(1, 'Başlangıç tarihi gereklidir'),
+        graduationDate: z.string().min(1, 'Mezuniyet tarihi gereklidir'),
         details: z.string().optional(),
-        isCurrent: z.boolean().optional(),
       }),
     )
     .optional(),

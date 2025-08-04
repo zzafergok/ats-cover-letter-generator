@@ -90,10 +90,11 @@ export function CVTemplateGenerator() {
         {
           degree: '',
           university: '',
+          field: '',
           location: '',
+          startDate: '',
           graduationDate: '',
           details: '',
-          isCurrent: false,
         },
       ],
       technicalSkills: {
@@ -219,16 +220,11 @@ export function CVTemplateGenerator() {
         const formattedEducations = profile.educations.slice(0, 2).map((edu) => ({
           degree: edu.degree || '',
           university: edu.schoolName,
+          field: edu.fieldOfStudy || '',
           location: '',
-          graduationDate: edu.isCurrent
-            ? ''
-            : edu.endYear
-              ? `${edu.endYear}-06`
-              : edu.startYear
-                ? `${edu.startYear}-06`
-                : '',
-          details: edu.fieldOfStudy ? `Field: ${edu.fieldOfStudy}` : '',
-          isCurrent: edu.isCurrent || false,
+          startDate: edu.startYear ? `${edu.startYear}-09` : '',
+          graduationDate: edu.endYear ? `${edu.endYear}-06` : edu.startYear ? `${edu.startYear + 4}-06` : '',
+          details: edu.description || '',
         }))
         setValue('education', formattedEducations)
       }

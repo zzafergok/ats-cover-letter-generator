@@ -43,12 +43,13 @@ export const fillDemoData = (
 
     setValue('education', [
       {
-        degree: 'Bachelor in Business Administration',
+        degree: 'Lisans',
         university: 'İstanbul Üniversitesi',
+        field: 'İşletme',
         location: 'İstanbul',
+        startDate: '2016-09',
         graduationDate: '2020-06',
         details: 'GPA: 3.5/4.0 - Management and Organization focus',
-        isCurrent: false,
       },
     ])
   } else {
@@ -67,12 +68,13 @@ export const fillDemoData = (
 
     setValue('education', [
       {
-        degree: 'Computer Engineering',
+        degree: 'Lisans',
         university: 'İstanbul Teknik Üniversitesi',
+        field: 'Bilgisayar Mühendisliği',
         location: 'İstanbul',
+        startDate: '2016-09',
         graduationDate: '2020-06',
         details: 'GPA: 3.7/4.0 - Software Engineering focus',
-        isCurrent: false,
       },
     ])
   }

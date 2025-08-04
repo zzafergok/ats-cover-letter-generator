@@ -10,16 +10,17 @@ import { Textarea } from '@/components/core/textarea'
 import { Button } from '@/components/core/button'
 import { Card } from '@/components/core/card'
 import { MonthYearPicker } from '@/components/core/month-year-picker'
-import { Checkbox } from '@/components/core/checkbox'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/core/select'
 
 interface CVTemplateFormData {
   education?: Array<{
     degree: string
     university: string
+    field: string
     location?: string
-    graduationDate?: string
+    startDate: string
+    graduationDate: string
     details?: string
-    isCurrent?: boolean
   }>
   [key: string]: any
 }
@@ -27,6 +28,13 @@ interface CVTemplateFormData {
 interface CVEducationStepProps {
   form: UseFormReturn<CVTemplateFormData>
 }
+
+const degreeOptions = [
+  { value: 'Lise Diploması', label: 'Lise Diploması' },
+  { value: 'Ön Lisans', label: 'Ön Lisans' },
+  { value: 'Lisans', label: 'Lisans' },
+  { value: 'Yüksek Lisans', label: 'Yüksek Lisans' },
+]
 
 export function CVEducationStep({ form }: CVEducationStepProps) {
   const { register, watch, setValue, getValues } = form
@@ -60,24 +68,59 @@ export function CVEducationStep({ form }: CVEducationStepProps) {
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
                   <div>
                     <Label>Derece</Label>
-                    <Input {...register(`education.${index}.degree`)} placeholder='Lisans, Yüksek Lisans, vb.' />
+                    <Select
+                      value={watch(`education.${index}.degree`) || ''}
+                      onValueChange={(value) => setValue(`education.${index}.degree`, value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder='Derece seçin' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {degreeOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
                     <Label>Üniversite</Label>
                     <Input {...register(`education.${index}.university`)} placeholder='Üniversite adı' />
                   </div>
+                </div>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
+                  <div>
+                    <Label>Bölüm</Label>
+                    <Input {...register(`education.${index}.field`)} placeholder='Bilgisayar Mühendisliği' />
+                  </div>
                   <div>
                     <Label>Lokasyon</Label>
                     <Input {...register(`education.${index}.location`)} placeholder='İstanbul, Türkiye' />
                   </div>
-                  <div className='space-y-3'>
+                </div>
+                <div className='space-y-3'>
+                  <div className='grid grid-cols-2 gap-2'>
+                    <div>
+                      <Label className='text-xs text-muted-foreground'>Başlangıç Tarihi</Label>
+                      <MonthYearPicker
+                        value={(() => {
+                          const dateValue = watch(`education.${index}.startDate`)
+                          if (dateValue && dateValue !== '' && dateValue.includes('-') && dateValue.length >= 7) {
+                            return dateValue
+                          }
+                          return undefined
+                        })()}
+                        onChange={(value) => setValue(`education.${index}.startDate`, value || '')}
+                        placeholder='Başlangıç tarihi'
+                        clearable={false}
+                      />
+                    </div>
                     <div>
                       <Label className='text-xs text-muted-foreground'>Mezuniyet Tarihi</Label>
                       <MonthYearPicker
                         value={(() => {
                           const dateValue = watch(`education.${index}.graduationDate`)
-                          const isCurrent = watch(`education.${index}.isCurrent`)
-                          if (isCurrent) return undefined
                           if (dateValue && dateValue !== '' && dateValue.includes('-') && dateValue.length >= 7) {
                             return dateValue
                           }
@@ -85,25 +128,8 @@ export function CVEducationStep({ form }: CVEducationStepProps) {
                         })()}
                         onChange={(value) => setValue(`education.${index}.graduationDate`, value || '')}
                         placeholder='Mezuniyet tarihi'
-                        clearable={true}
-                        disabled={watch(`education.${index}.isCurrent`)}
+                        clearable={false}
                       />
-                    </div>
-
-                    <div className='flex items-center space-x-2'>
-                      <Checkbox
-                        id={`education-${index}-current`}
-                        checked={watch(`education.${index}.isCurrent`) || false}
-                        onCheckedChange={(checked) => {
-                          setValue(`education.${index}.isCurrent`, !!checked)
-                          if (checked) {
-                            setValue(`education.${index}.graduationDate`, '')
-                          }
-                        }}
-                      />
-                      <Label htmlFor={`education-${index}-current`} className='text-sm font-normal cursor-pointer'>
-                        Halen burada okuyorum
-                      </Label>
                     </div>
                   </div>
                 </div>
@@ -126,7 +152,15 @@ export function CVEducationStep({ form }: CVEducationStepProps) {
               const current = getValues('education') || []
               setValue('education', [
                 ...current,
-                { degree: '', university: '', location: '', graduationDate: '', details: '', isCurrent: false },
+                {
+                  degree: '',
+                  university: '',
+                  field: '',
+                  location: '',
+                  startDate: '',
+                  graduationDate: '',
+                  details: '',
+                },
               ])
             }}
           >

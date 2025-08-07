@@ -40,7 +40,7 @@ import {
 import { Badge } from '@/components/core/badge'
 import { Input } from '@/components/core/input'
 import { Button } from '@/components/core/button'
-import { Separator } from '@/components/core/seperator'
+import { Separator } from '@/components/core/separator'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/core/select'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/core/dialog'
 

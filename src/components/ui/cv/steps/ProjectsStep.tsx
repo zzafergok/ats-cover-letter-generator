@@ -30,7 +30,9 @@ export function ProjectsStep({ form }: ProjectsStepProps) {
     <div className='space-y-6'>
       <div className='space-y-4'>
         <Label>Projeler</Label>
-        <div className='space-y-4'>
+        <div
+          className={`grid ${(watch('projects')?.length || 0) > 1 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'} gap-4`}
+        >
           {watch('projects')?.map((_, index) => (
             <Card key={index} className='p-4'>
               <div className='space-y-3'>
@@ -44,7 +46,7 @@ export function ProjectsStep({ form }: ProjectsStepProps) {
                 </div>
                 <div className='space-y-2'>
                   <Label className='text-sm'>Teknolojiler</Label>
-                  <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2'>
+                  <div className='grid grid-cols-1 sm:grid-cols-2 gap-2'>
                     {watch(`projects.${index}.technologies`)?.map((_, techIndex) => (
                       <div key={techIndex} className='relative'>
                         <Input {...register(`projects.${index}.technologies.${techIndex}`)} placeholder='Teknoloji' />
@@ -81,18 +83,18 @@ export function ProjectsStep({ form }: ProjectsStepProps) {
               </div>
             </Card>
           )) || []}
-          <Button
-            type='button'
-            variant='outline'
-            size='sm'
-            onClick={() => {
-              const current = getValues('projects') || []
-              setValue('projects', [...current, { name: '', description: '', technologies: [''] }])
-            }}
-          >
-            + Proje Ekle
-          </Button>
         </div>
+        <Button
+          type='button'
+          variant='outline'
+          size='sm'
+          onClick={() => {
+            const current = getValues('projects') || []
+            setValue('projects', [...current, { name: '', description: '', technologies: [''] }])
+          }}
+        >
+          + Proje Ekle
+        </Button>
       </div>
 
       <div className='bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg border border-orange-200 dark:border-orange-800'>

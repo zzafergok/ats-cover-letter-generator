@@ -29,7 +29,9 @@ export function ReferencesStep({ form }: ReferencesStepProps) {
     <div className='space-y-6'>
       <div className='space-y-4'>
         <Label>Referanslar</Label>
-        <div className='space-y-4'>
+        <div
+          className={`grid ${(watch('references')?.length || 0) > 1 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'} gap-4`}
+        >
           {watch('references')?.map((_, index) => (
             <Card key={index} className='p-4'>
               <div className='flex justify-between items-center mb-3'>
@@ -51,7 +53,7 @@ export function ReferencesStep({ form }: ReferencesStepProps) {
                 )}
               </div>
               <div className='space-y-3'>
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
+                <div className='grid grid-cols-1 gap-3'>
                   <div>
                     <Label>İsim</Label>
                     <Input {...register(`references.${index}.name`)} placeholder='Referans kişi adı' />
@@ -60,26 +62,26 @@ export function ReferencesStep({ form }: ReferencesStepProps) {
                     <Label>Şirket</Label>
                     <Input {...register(`references.${index}.company`)} placeholder='Şirket adı' />
                   </div>
-                </div>
-                <div>
-                  <Label>İletişim</Label>
-                  <Input {...register(`references.${index}.contact`)} placeholder='Email | Telefon' />
+                  <div>
+                    <Label>İletişim</Label>
+                    <Input {...register(`references.${index}.contact`)} placeholder='Email | Telefon' />
+                  </div>
                 </div>
               </div>
             </Card>
           )) || []}
-          <Button
-            type='button'
-            variant='outline'
-            size='sm'
-            onClick={() => {
-              const current = getValues('references') || []
-              setValue('references', [...current, { name: '', company: '', contact: '' }])
-            }}
-          >
-            + Referans Ekle
-          </Button>
         </div>
+        <Button
+          type='button'
+          variant='outline'
+          size='sm'
+          onClick={() => {
+            const current = getValues('references') || []
+            setValue('references', [...current, { name: '', company: '', contact: '' }])
+          }}
+        >
+          + Referans Ekle
+        </Button>
       </div>
 
       <div className='bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-lg border border-indigo-200 dark:border-indigo-800'>

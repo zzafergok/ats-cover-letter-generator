@@ -36,7 +36,9 @@ export function CVWorkExperienceStep({ form }: CVWorkExperienceStepProps) {
     <div className='space-y-6'>
       <div className='space-y-4'>
         <Label>İş Deneyimi</Label>
-        <div className='space-y-4'>
+        <div
+          className={`grid ${(watch('experience')?.length || 0) > 1 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'} gap-4`}
+        >
           {watch('experience')?.map((_, index) => (
             <Card key={index} className='p-4'>
               <div className='flex justify-between items-center mb-3'>
@@ -136,29 +138,29 @@ export function CVWorkExperienceStep({ form }: CVWorkExperienceStepProps) {
               </div>
             </Card>
           )) || []}
-          <Button
-            type='button'
-            variant='outline'
-            size='sm'
-            onClick={() => {
-              const current = getValues('experience') || []
-              setValue('experience', [
-                ...current,
-                {
-                  jobTitle: '',
-                  company: '',
-                  location: '',
-                  startDate: '',
-                  endDate: '',
-                  description: '',
-                  isCurrent: false,
-                },
-              ])
-            }}
-          >
-            + Deneyim Ekle
-          </Button>
         </div>
+        <Button
+          type='button'
+          variant='outline'
+          size='sm'
+          onClick={() => {
+            const current = getValues('experience') || []
+            setValue('experience', [
+              ...current,
+              {
+                jobTitle: '',
+                company: '',
+                location: '',
+                startDate: '',
+                endDate: '',
+                description: '',
+                isCurrent: false,
+              },
+            ])
+          }}
+        >
+          + Deneyim Ekle
+        </Button>
       </div>
 
       <div className='bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800'>

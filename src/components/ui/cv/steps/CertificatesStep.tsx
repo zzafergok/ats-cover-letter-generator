@@ -29,7 +29,9 @@ export function CertificatesStep({ form }: CertificatesStepProps) {
     <div className='space-y-6'>
       <div className='space-y-4'>
         <Label>Sertifikalar</Label>
-        <div className='space-y-4'>
+        <div
+          className={`grid ${(watch('certificates')?.length || 0) > 1 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'} gap-4`}
+        >
           {watch('certificates')?.map((_, index) => (
             <Card key={index} className='p-4'>
               <div className='space-y-3'>
@@ -48,18 +50,18 @@ export function CertificatesStep({ form }: CertificatesStepProps) {
               </div>
             </Card>
           )) || []}
-          <Button
-            type='button'
-            variant='outline'
-            size='sm'
-            onClick={() => {
-              const current = getValues('certificates') || []
-              setValue('certificates', [...current, { name: '', issuer: '', date: '' }])
-            }}
-          >
-            + Sertifika Ekle
-          </Button>
         </div>
+        <Button
+          type='button'
+          variant='outline'
+          size='sm'
+          onClick={() => {
+            const current = getValues('certificates') || []
+            setValue('certificates', [...current, { name: '', issuer: '', date: '' }])
+          }}
+        >
+          + Sertifika Ekle
+        </Button>
       </div>
 
       <div className='bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200 dark:border-green-800'>

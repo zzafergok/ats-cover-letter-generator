@@ -11,81 +11,79 @@ export const fillDemoData = (
 ) => {
   console.log('🎯 Filling demo data, overriding any profile auto-fill')
 
-  // Common personal info based on template type
-  if (selectedTemplate === 'office_manager') {
-    setValue('personalInfo.firstName', 'Ahmet')
-    setValue('personalInfo.lastName', 'Yılmaz')
-    setValue('personalInfo.jobTitle', 'Office Manager')
-    setValue('personalInfo.email', 'ahmet.yilmaz@email.com')
-    setValue('personalInfo.phone', '+90 555 123 4567')
-    setValue('personalInfo.linkedin', 'linkedin.com/in/ahmetyilmaz')
-  } else {
-    setValue('personalInfo.email', 'ahmet.yilmaz@email.com')
-    setValue('personalInfo.phone', '+90 555 123 4567')
-    setValue('personalInfo.address', 'Beşiktaş Mah. Teknoloji Cad. No:42/8')
-    setValue('personalInfo.city', 'İstanbul')
-  }
+  // Common personal info - same for all templates (based on simple_classic)
+  setValue('personalInfo.firstName', 'Mehmet')
+  setValue('personalInfo.lastName', 'Yıldırım')
+  setValue('personalInfo.jobTitle', 'Senior Software Developer')
+  setValue('personalInfo.email', 'mehmet.yildirim@email.com')
+  setValue('personalInfo.phone', '+90 555 123 4567')
+  setValue('personalInfo.address', 'Beşiktaş Mah. Teknoloji Cad. No:42/8')
+  setValue('personalInfo.city', 'İstanbul')
+  setValue('personalInfo.linkedin', 'linkedin.com/in/mehmetyildirim')
+  setValue('personalInfo.website', 'mehmetyildirim.dev')
+  setValue('personalInfo.github', 'github.com/mehmetyildirim')
+  setValue('personalInfo.medium', 'medium.com/@mehmetyildirim')
 
-  // Experience and education
-  if (selectedTemplate === 'office_manager') {
-    setValue('experience', [
-      {
-        jobTitle: 'Senior Office Manager',
-        company: 'Tech Solutions Inc.',
-        location: 'İstanbul',
-        startDate: '2022-01',
-        endDate: '',
-        description:
-          'Ofis operasyonlarını yönetme ve takım koordinasyonu. Bütçe planlama ve satın alma süreçlerinin yönetimi.',
-        isCurrent: true,
-      },
-    ])
+  // Experience - same for all templates (2 entries)
+  setValue('experience', [
+    {
+      jobTitle: 'Senior Full Stack Developer',
+      company: 'Tech Solutions Inc.',
+      location: 'İstanbul',
+      startDate: '2022-01',
+      endDate: '',
+      description:
+        'React, Node.js ve AWS ile modern web uygulamaları geliştirme. Mikroservis mimarisi tasarımı ve implementasyonu.',
+      isCurrent: true,
+    },
+    {
+      jobTitle: 'Full Stack Developer',
+      company: 'Digital Agency Co.',
+      location: 'İstanbul',
+      startDate: '2020-06',
+      endDate: '2021-12',
+      description:
+        'E-commerce ve kurumsal web uygulamaları geliştirme. RESTful API tasarımı ve frontend optimizasyonu.',
+      isCurrent: false,
+    },
+  ])
 
-    setValue('education', [
-      {
-        degree: 'Lisans',
-        university: 'İstanbul Üniversitesi',
-        field: 'İşletme',
-        location: 'İstanbul',
-        startDate: '2016-09',
-        graduationDate: '2020-06',
-        details: 'GPA: 3.5/4.0 - Management and Organization focus',
-      },
-    ])
-  } else {
-    setValue('experience', [
-      {
-        jobTitle: 'Senior Full Stack Developer',
-        company: 'Tech Solutions Inc.',
-        location: 'İstanbul',
-        startDate: '2022-01',
-        endDate: '',
-        description:
-          'React, Node.js ve AWS ile modern web uygulamaları geliştirme. Mikroservis mimarisi tasarımı ve implementasyonu.',
-        isCurrent: true,
-      },
-    ])
+  // Education - same for all templates (2 entries)
+  setValue('education', [
+    {
+      degree: 'Lisans',
+      university: 'İstanbul Teknik Üniversitesi',
+      field: 'Bilgisayar Mühendisliği',
+      location: 'İstanbul',
+      startDate: '2016-09',
+      graduationDate: '2020-06',
+      details: 'GPA: 3.7/4.0 - Software Engineering focus',
+    },
+    {
+      degree: 'Lise',
+      university: 'İstanbul Anadolu Lisesi',
+      field: 'Fen Bilimleri',
+      location: 'İstanbul',
+      startDate: '2012-09',
+      graduationDate: '2016-06',
+      details: 'Matematik ve Fen Bilimleri ağırlıklı eğitim',
+    },
+  ])
 
-    setValue('education', [
-      {
-        degree: 'Lisans',
-        university: 'İstanbul Teknik Üniversitesi',
-        field: 'Bilgisayar Mühendisliği',
-        location: 'İstanbul',
-        startDate: '2016-09',
-        graduationDate: '2020-06',
-        details: 'GPA: 3.7/4.0 - Software Engineering focus',
-      },
-    ])
-  }
+  // Objective - same for all templates
+  setValue(
+    'objective',
+    '5+ yıl deneyimli Full Stack Developer. Modern web teknolojileri ile kullanıcı odaklı çözümler geliştirme konusunda uzman.',
+  )
 
-  // Version-specific demo data
+  // Version-specific demo data - same parameters for all templates
   if (selectedVersion === 'turkey') {
+    // Turkey version: detailed fields
     setValue('technicalSkills', {
-      frontend: ['React', 'Vue.js', 'TypeScript'],
-      backend: ['Node.js', 'Python', 'Express.js'],
-      database: ['MongoDB', 'PostgreSQL', 'MySQL'],
-      tools: ['AWS', 'Docker', 'Git'],
+      frontend: ['React', 'Vue.js', 'TypeScript', 'JavaScript'],
+      backend: ['Node.js', 'Python', 'Express.js', 'Django'],
+      database: ['MongoDB', 'PostgreSQL', 'MySQL', 'Redis'],
+      tools: ['AWS', 'Docker', 'Git', 'Jenkins'],
     })
 
     setValue('projects', [
@@ -94,6 +92,11 @@ export const fillDemoData = (
         description: 'Full-stack e-commerce solution with payment integration',
         technologies: ['React', 'Node.js', 'Stripe', 'MongoDB'],
       },
+      {
+        name: 'Task Management System',
+        description: 'Real-time collaboration tool for project management',
+        technologies: ['Vue.js', 'Express.js', 'Socket.io', 'PostgreSQL'],
+      },
     ])
 
     setValue('certificates', [
@@ -101,6 +104,11 @@ export const fillDemoData = (
         name: 'AWS Certified Solutions Architect',
         issuer: 'Amazon Web Services',
         date: '2023',
+      },
+      {
+        name: 'React Developer Certificate',
+        issuer: 'Meta',
+        date: '2022',
       },
     ])
 
@@ -113,38 +121,36 @@ export const fillDemoData = (
         language: 'English',
         level: 'Advanced',
       },
+      {
+        language: 'German',
+        level: 'Intermediate',
+      },
     ])
 
     setValue('references', [
       {
-        name: 'Mehmet Demir',
+        name: 'Ahmet Demir',
         company: 'Tech Solutions Inc.',
-        contact: 'mehmet.demir@techsolutions.com | +90 555 987 6543',
+        contact: 'ahmet.demir@techsolutions.com | +90 555 987 6543',
+      },
+      {
+        name: 'Fatma Kaya',
+        company: 'Digital Agency Co.',
+        contact: 'fatma.kaya@digitalagency.com | +90 555 456 7890',
       },
     ])
   } else {
-    // Global version: simplified fields - all templates have skills array
-    if (selectedTemplate === 'office_manager') {
-      setValue('skills', [
-        'Project Management',
-        'Team Leadership',
-        'Microsoft Office',
-        'Budget Planning',
-        'Customer Relations',
-        'Office Administration',
-      ])
-    } else {
-      setValue('skills', [
-        'JavaScript',
-        'React',
-        'Node.js',
-        'TypeScript',
-        'AWS',
-        'Docker',
-        'MongoDB',
-        'PostgreSQL',
-      ])
-    }
+    // Global version: simplified fields - same for all templates
+    setValue('skills', [
+      'JavaScript',
+      'React',
+      'Node.js',
+      'TypeScript',
+      'AWS',
+      'Docker',
+      'MongoDB',
+      'PostgreSQL',
+    ])
     
     setValue(
       'communication',
@@ -154,13 +160,19 @@ export const fillDemoData = (
       'leadership',
       'Led cross-functional teams of 5+ developers. Mentored junior developers and implemented agile development processes.',
     )
-  }
 
-  // Objective - only for non-office_manager templates
-  if (selectedTemplate !== 'office_manager') {
-    setValue(
-      'objective',
-      '5+ yıl deneyimli Full Stack Developer. Modern web teknolojileri ile kullanıcı odaklı çözümler geliştirme konusunda uzman.',
-    )
+    // References for Global version too
+    setValue('references', [
+      {
+        name: 'Ahmet Demir',
+        company: 'Tech Solutions Inc.',
+        contact: 'ahmet.demir@techsolutions.com | +90 555 987 6543',
+      },
+      {
+        name: 'Fatma Kaya',
+        company: 'Digital Agency Co.',
+        contact: 'fatma.kaya@digitalagency.com | +90 555 456 7890',
+      },
+    ])
   }
 }

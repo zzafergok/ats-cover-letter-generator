@@ -43,7 +43,9 @@ export function CVEducationStep({ form }: CVEducationStepProps) {
     <div className='space-y-6'>
       <div className='space-y-4'>
         <Label>Eğitim</Label>
-        <div className='space-y-4'>
+        <div
+          className={`grid ${(watch('education')?.length || 0) > 1 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'} gap-4`}
+        >
           {watch('education')?.map((_, index) => (
             <Card key={index} className='p-4'>
               <div className='flex justify-between items-center mb-3'>
@@ -144,29 +146,29 @@ export function CVEducationStep({ form }: CVEducationStepProps) {
               </div>
             </Card>
           )) || []}
-          <Button
-            type='button'
-            variant='outline'
-            size='sm'
-            onClick={() => {
-              const current = getValues('education') || []
-              setValue('education', [
-                ...current,
-                {
-                  degree: '',
-                  university: '',
-                  field: '',
-                  location: '',
-                  startDate: '',
-                  graduationDate: '',
-                  details: '',
-                },
-              ])
-            }}
-          >
-            + Eğitim Ekle
-          </Button>
         </div>
+        <Button
+          type='button'
+          variant='outline'
+          size='sm'
+          onClick={() => {
+            const current = getValues('education') || []
+            setValue('education', [
+              ...current,
+              {
+                degree: '',
+                university: '',
+                field: '',
+                location: '',
+                startDate: '',
+                graduationDate: '',
+                details: '',
+              },
+            ])
+          }}
+        >
+          + Eğitim Ekle
+        </Button>
       </div>
 
       <div className='bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-lg border border-indigo-200 dark:border-indigo-800'>

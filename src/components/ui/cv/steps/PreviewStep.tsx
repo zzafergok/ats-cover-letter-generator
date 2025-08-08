@@ -78,6 +78,11 @@ interface CVTemplateFormData {
   skills?: string[]
   communication?: string
   leadership?: string
+  references?: Array<{
+    name?: string
+    company?: string
+    contact?: string
+  }>
   templateType?: string
   version?: string
   [key: string]: any
@@ -110,7 +115,8 @@ export function PreviewStep({ form, onGoToStep }: PreviewStepProps) {
       projects: 6, // Projeler (sadece Turkey)
       certificates: 7, // Sertifikalar (sadece Turkey)
       languages: 8, // Diller (sadece Turkey)
-      soft_skills: isGlobalVersion ? 6 : -1, // İletişim & Liderlik (sadece Global)
+      references: isGlobalVersion ? 6 : 9, // Referanslar (her iki version)
+      soft_skills: isGlobalVersion ? 7 : -1, // İletişim & Liderlik (sadece Global)
     }
     return stepMappings[stepId as keyof typeof stepMappings] || 0
   }
@@ -215,7 +221,7 @@ export function PreviewStep({ form, onGoToStep }: PreviewStepProps) {
           </Button>
         </div>
 
-        <div className='space-y-4'>
+        <div className={`grid ${data.experience?.length > 1 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'} gap-4`}>
           {data.experience?.map((exp, index) => (
             <div key={index} className='border-l-2 border-green-200 dark:border-green-700 pl-4'>
               <div className='flex justify-between items-start mb-2'>
@@ -259,7 +265,7 @@ export function PreviewStep({ form, onGoToStep }: PreviewStepProps) {
           </Button>
         </div>
 
-        <div className='space-y-4'>
+        <div className={`grid ${data.education?.length > 1 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'} gap-4`}>
           {data.education?.map((edu, index) => (
             <div key={index} className='border-l-2 border-purple-200 dark:border-purple-700 pl-4'>
               <div className='flex justify-between items-start mb-2'>
@@ -404,7 +410,7 @@ export function PreviewStep({ form, onGoToStep }: PreviewStepProps) {
           </Button>
         </div>
 
-        <div className='space-y-4'>
+        <div className={`grid ${data.projects?.length > 1 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'} gap-4`}>
           {data.projects?.map((project, index) => (
             <div key={index} className='border-l-2 border-blue-200 dark:border-blue-700 pl-4'>
               <h4 className='font-semibold text-gray-900 dark:text-gray-100'>{project.name}</h4>
@@ -456,7 +462,7 @@ export function PreviewStep({ form, onGoToStep }: PreviewStepProps) {
           </Button>
         </div>
 
-        <div className='space-y-3'>
+        <div className={`grid ${data.certificates?.length > 1 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'} gap-4`}>
           {data.certificates?.map((cert, index) => (
             <div key={index} className='border-l-2 border-yellow-200 dark:border-yellow-700 pl-4'>
               <h4 className='font-semibold text-gray-900 dark:text-gray-100'>{cert.name}</h4>
@@ -509,16 +515,53 @@ export function PreviewStep({ form, onGoToStep }: PreviewStepProps) {
     )
   }
 
+  const renderReferences = () => {
+    // Show references for both versions
+    if (!data.references?.length) return null
+
+    return (
+      <div className='bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border'>
+        <div className='flex items-center justify-between mb-4'>
+          <div className='flex items-center gap-3'>
+            <div className='w-10 h-10 bg-pink-100 dark:bg-pink-900 rounded-lg flex items-center justify-center'>
+              <Users className='h-5 w-5 text-pink-600 dark:text-pink-400' />
+            </div>
+            <h3 className='text-lg font-semibold text-gray-900 dark:text-gray-100'>Referanslar</h3>
+          </div>
+          <Button
+            variant='outline'
+            size='sm'
+            onClick={() => handleEditClick('references')}
+            className='flex items-center gap-2'
+          >
+            <Edit2 className='h-4 w-4' />
+            Düzenle
+          </Button>
+        </div>
+
+        <div className={`grid ${data.references?.length > 1 ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'} gap-4`}>
+          {data.references?.map((ref, index) => (
+            <div key={index} className='border-l-2 border-pink-200 dark:border-pink-700 pl-4'>
+              {ref.name && <h4 className='font-semibold text-gray-900 dark:text-gray-100'>{ref.name}</h4>}
+              {ref.company && <p className='text-sm text-gray-600 dark:text-gray-400'>{ref.company}</p>}
+              {ref.contact && <p className='text-sm text-gray-700 dark:text-gray-300 mt-1'>{ref.contact}</p>}
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className='space-y-6'>
-      <div className='text-center mb-6'>
-        <h2 className='text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2'>
+    <div className='space-y-4'>
+      <div className='text-center mb-4'>
+        <h2 className='text-xl font-bold text-gray-900 dark:text-gray-100 mb-1'>
           CV Önizleme - {isTurkeyVersion ? 'Turkey Version' : 'Global Version'}
         </h2>
-        <p className='text-gray-600 dark:text-gray-400'>
+        <p className='text-sm text-gray-600 dark:text-gray-400'>
           {isTurkeyVersion
-            ? 'Detaylı CV formatınızın son hali aşağıda görüntülenmektedir. Herhangi bir değişiklik yapmak için önceki adımlara dönebilirsiniz.'
-            : 'Basit CV formatınızın son hali aşağıda görüntülenmektedir. Herhangi bir değişiklik yapmak için önceki adımlara dönebilirsiniz.'}
+            ? 'Detaylı CV formatınızın son hali. Herhangi bir bölümü düzenlemek için düzenle butonunu kullanabilirsiniz.'
+            : 'Basit CV formatınızın son hali. Herhangi bir bölümü düzenlemek için düzenle butonunu kullanabilirsiniz.'}
         </p>
       </div>
 
@@ -542,49 +585,63 @@ export function PreviewStep({ form, onGoToStep }: PreviewStepProps) {
         </div>
       )}
 
-      {renderExperience()}
-      {renderEducation()}
-      {renderSkills()}
-      {renderProjects()}
-      {renderCertificates()}
-      {renderLanguages()}
+      <div className='space-y-4'>
+        {/* Ana içerik sıralı şekilde */}
+        {renderExperience()}
+        {renderEducation()}
 
-      {/* Global version - Communication & Leadership */}
-      {isGlobalVersion && (data.communication || data.leadership) && (
-        <div className='bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border'>
-          <div className='flex items-center justify-between mb-4'>
-            <div className='flex items-center gap-3'>
-              <div className='w-10 h-10 bg-teal-100 dark:bg-teal-900 rounded-lg flex items-center justify-center'>
-                <Users className='h-5 w-5 text-teal-600 dark:text-teal-400' />
+        {/* İkincil içerik yan yana - Yetenekler ve İletişim/Liderlik */}
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+          {renderSkills()}
+          {isGlobalVersion && (data.communication || data.leadership) && (
+            <div className='bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border'>
+              <div className='flex items-center justify-between mb-3'>
+                <div className='flex items-center gap-2'>
+                  <div className='w-8 h-8 bg-teal-100 dark:bg-teal-900 rounded-lg flex items-center justify-center'>
+                    <Users className='h-4 w-4 text-teal-600 dark:text-teal-400' />
+                  </div>
+                  <h3 className='text-base font-semibold text-gray-900 dark:text-gray-100'>İletişim ve Liderlik</h3>
+                </div>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  onClick={() => handleEditClick('soft_skills')}
+                  className='flex items-center gap-1'
+                >
+                  <Edit2 className='h-4 w-4' />
+                  Düzenle
+                </Button>
               </div>
-              <h3 className='text-lg font-semibold text-gray-900 dark:text-gray-100'>İletişim ve Liderlik</h3>
+              <div className='space-y-2'>
+                {data.communication && (
+                  <div>
+                    <h4 className='font-medium text-gray-900 dark:text-gray-100 mb-1 text-sm'>İletişim</h4>
+                    <p className='text-sm text-gray-700 dark:text-gray-300'>{data.communication}</p>
+                  </div>
+                )}
+                {data.leadership && (
+                  <div>
+                    <h4 className='font-medium text-gray-900 dark:text-gray-100 mb-1 text-sm'>Liderlik</h4>
+                    <p className='text-sm text-gray-700 dark:text-gray-300'>{data.leadership}</p>
+                  </div>
+                )}
+              </div>
             </div>
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() => handleEditClick('soft_skills')}
-              className='flex items-center gap-2'
-            >
-              <Edit2 className='h-4 w-4' />
-              Düzenle
-            </Button>
-          </div>
-          <div className='space-y-3'>
-            {data.communication && (
-              <div>
-                <h4 className='font-medium text-gray-900 dark:text-gray-100 mb-1'>İletişim</h4>
-                <p className='text-sm text-gray-700 dark:text-gray-300'>{data.communication}</p>
-              </div>
-            )}
-            {data.leadership && (
-              <div>
-                <h4 className='font-medium text-gray-900 dark:text-gray-100 mb-1'>Liderlik</h4>
-                <p className='text-sm text-gray-700 dark:text-gray-300'>{data.leadership}</p>
-              </div>
-            )}
-          </div>
+          )}
+          {isTurkeyVersion && renderProjects()}
         </div>
-      )}
+
+        {/* Üçüncü seviye içerik yan yana - sadece Turkey version */}
+        {isTurkeyVersion && (
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+            {renderCertificates()}
+            {renderLanguages()}
+          </div>
+        )}
+      </div>
+
+      {/* References - Full width at bottom */}
+      {renderReferences()}
 
       <div className='bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800'>
         <div className='flex items-start gap-3'>

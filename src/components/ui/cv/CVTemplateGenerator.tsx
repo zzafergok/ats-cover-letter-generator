@@ -37,6 +37,7 @@ import { SimpleSkillsStep } from './steps/SimpleSkillsStep'
 import { TechnicalSkillsStep } from './steps/TechnicalSkillsStep'
 import { CVWorkExperienceStep } from './steps/CVWorkExperienceStep'
 import { TemplateSelectionStep } from './steps/TemplateSelectionStep'
+import { PreviewStep } from './steps/PreviewStep'
 
 export function CVTemplateGenerator() {
   const { profile, getProfile } = useUserProfileStore()
@@ -391,6 +392,7 @@ export function CVTemplateGenerator() {
       case 'languages':
       case 'references':
       case 'soft_skills':
+      case 'preview':
         isValid = true // Optional steps
         break
       default:
@@ -457,6 +459,9 @@ export function CVTemplateGenerator() {
 
       case 'education':
         return <CVEducationStep form={form as any} />
+
+      case 'preview':
+        return <PreviewStep form={form as any} onGoToStep={goToStep} />
 
       default:
         return <div>Bu adım henüz tanımlanmamış</div>

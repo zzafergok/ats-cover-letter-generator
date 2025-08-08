@@ -1,5 +1,16 @@
 import { z } from 'zod'
 
+// URL validation helper
+const urlSchema = z.string().refine((val) => {
+  if (!val) return true; // Optional field
+  try {
+    new URL(val.startsWith('http') ? val : `https://${val}`);
+    return true;
+  } catch {
+    return false;
+  }
+}, 'Geçerli URL formatında olmalıdır')
+
 // CV Template Form Schema
 export const cvTemplateSchema = z.object({
   templateType: z.enum(['basic_hr', 'office_manager', 'simple_classic', 'stylish_accounting', 'minimalist_turkish']),
@@ -14,6 +25,9 @@ export const cvTemplateSchema = z.object({
     city: z.string().optional(),
     phone: z.string().optional(),
     email: z.string().email('Geçerli email adresi gereklidir'),
+    website: urlSchema.optional(),
+    github: urlSchema.optional(),
+    medium: urlSchema.optional(),
   }),
   objective: z.string().optional(),
   experience: z

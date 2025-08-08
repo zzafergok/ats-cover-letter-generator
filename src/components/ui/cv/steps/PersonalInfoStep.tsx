@@ -17,6 +17,9 @@ interface CVTemplateFormData {
     city?: string
     phone?: string
     email: string
+    website?: string
+    github?: string
+    medium?: string
   }
   templateType?: string
   [key: string]: any
@@ -78,6 +81,27 @@ export function PersonalInfoStep({ form }: PersonalInfoStepProps) {
             <Label htmlFor='address'>Adres</Label>
             <Input id='address' {...register('personalInfo.address')} placeholder='Mahalle, Sokak, No' />
           </div>
+          <div>
+            <Label htmlFor='website'>Website</Label>
+            <Input id='website' {...register('personalInfo.website')} placeholder='https://website.com' />
+            {errors.personalInfo?.website && (
+              <p className='text-sm text-red-600 mt-1'>{errors.personalInfo.website.message}</p>
+            )}
+          </div>
+          <div>
+            <Label htmlFor='github'>GitHub</Label>
+            <Input id='github' {...register('personalInfo.github')} placeholder='https://github.com/kullanici-adi' />
+            {errors.personalInfo?.github && (
+              <p className='text-sm text-red-600 mt-1'>{errors.personalInfo.github.message}</p>
+            )}
+          </div>
+          <div>
+            <Label htmlFor='medium'>Medium</Label>
+            <Input id='medium' {...register('personalInfo.medium')} placeholder='https://medium.com/@kullanici-adi' />
+            {errors.personalInfo?.medium && (
+              <p className='text-sm text-red-600 mt-1'>{errors.personalInfo.medium.message}</p>
+            )}
+          </div>
         </div>
       </div>
 
@@ -95,6 +119,7 @@ export function PersonalInfoStep({ form }: PersonalInfoStepProps) {
               <li>• Email adresi zorunludur ve doğru formatta olmalıdır</li>
               <li>• Telefon numarasını uluslararası formatta yazın</li>
               <li>• LinkedIn profilinizi ekleyerek profesyonellik katın</li>
+              <li>• Website, GitHub ve Medium linkleriniz geçerli URL formatında olmalıdır</li>
             </ul>
           </div>
         </div>

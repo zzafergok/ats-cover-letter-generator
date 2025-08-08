@@ -10,6 +10,7 @@ import {
   Award,
   Languages,
   Users,
+  Eye,
 } from 'lucide-react'
 
 // Step type definition
@@ -87,6 +88,12 @@ export const TURKEY_STEPS: StepItem[] = [
     description: 'İş referanslarınızı ekleyin. Bu bölüm isteğe bağlıdır ancak güvenilirliğinizi artırır',
     icon: Users,
   },
+  {
+    id: 'preview',
+    title: 'Önizleme',
+    description: 'CV\'nizin son halini kontrol edin ve gerekli düzenlemeleri yapın',
+    icon: Eye,
+  },
 ]
 
 export const GLOBAL_STEPS: StepItem[] = [
@@ -107,6 +114,12 @@ export const GLOBAL_STEPS: StepItem[] = [
     title: 'Referanslar',
     description: 'İş referanslarınızı ekleyin. Bu bölüm isteğe bağlıdır ancak güvenilirliğinizi artırır',
     icon: Users,
+  },
+  {
+    id: 'preview',
+    title: 'Önizleme',
+    description: 'CV\'nizin son halini kontrol edin ve gerekli düzenlemeleri yapın',
+    icon: Eye,
   },
 ]
 

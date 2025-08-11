@@ -141,17 +141,8 @@ export const fillDemoData = (
     ])
   } else {
     // Global version: simplified fields - same for all templates
-    setValue('skills', [
-      'JavaScript',
-      'React',
-      'Node.js',
-      'TypeScript',
-      'AWS',
-      'Docker',
-      'MongoDB',
-      'PostgreSQL',
-    ])
-    
+    setValue('skills', ['JavaScript', 'React', 'Node.js', 'TypeScript', 'AWS', 'Docker', 'MongoDB', 'PostgreSQL'])
+
     setValue(
       'communication',
       'Excellent written and verbal communication skills in Turkish and English. Experience in client presentations and technical documentation.',

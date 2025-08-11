@@ -2,12 +2,12 @@ import { z } from 'zod'
 
 // URL validation helper
 const urlSchema = z.string().refine((val) => {
-  if (!val) return true; // Optional field
+  if (!val) return true // Optional field
   try {
-    new URL(val.startsWith('http') ? val : `https://${val}`);
-    return true;
+    new URL(val.startsWith('http') ? val : `https://${val}`)
+    return true
   } catch {
-    return false;
+    return false
   }
 }, 'Geçerli URL formatında olmalıdır')
 

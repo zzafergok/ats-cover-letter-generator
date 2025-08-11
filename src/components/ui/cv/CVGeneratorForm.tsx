@@ -87,6 +87,9 @@ export function CVGeneratorForm({ onGenerate, className }: CVGeneratorFormProps)
       const content = await generateCV(cvData)
       setGeneratedContent(content)
       onGenerate?.(content, data)
+
+      // Scroll to top after CV generation
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (error) {
       console.error('CV oluşturma hatası:', error)
     }

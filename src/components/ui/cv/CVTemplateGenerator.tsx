@@ -308,6 +308,9 @@ export function CVTemplateGenerator() {
           fileName: `CV_${data.templateType}_${Date.now()}.pdf`,
           generatedAt: response.data.createdAt,
         })
+
+        // Scroll to top after CV generation
+        window.scrollTo({ top: 0, behavior: 'smooth' })
       }
     } catch (err: any) {
       console.error('CV generation error:', err)

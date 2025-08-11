@@ -91,7 +91,7 @@ export const TURKEY_STEPS: StepItem[] = [
   {
     id: 'preview',
     title: 'Önizleme',
-    description: 'CV\'nizin son halini kontrol edin ve gerekli düzenlemeleri yapın',
+    description: "CV'nizin son halini kontrol edin ve gerekli düzenlemeleri yapın",
     icon: Eye,
   },
 ]
@@ -118,7 +118,7 @@ export const GLOBAL_STEPS: StepItem[] = [
   {
     id: 'preview',
     title: 'Önizleme',
-    description: 'CV\'nizin son halini kontrol edin ve gerekli düzenlemeleri yapın',
+    description: "CV'nizin son halini kontrol edin ve gerekli düzenlemeleri yapın",
     icon: Eye,
   },
 ]

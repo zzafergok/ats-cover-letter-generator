@@ -7,18 +7,53 @@ import type {
   CVUpload,
   SavedCV,
   DetailedCV,
-  CVGenerateData,
   CVSaveData,
   CVDetailedGenerateData,
   CVUploadResponse,
   CVUploadsResponse,
-  CVGenerateResponse,
   SavedCVsResponse,
   DetailedCVsResponse,
   DetailedCVResponse,
 } from '@/types/api.types'
 
 // Using types from API instead of local interfaces
+type CVGeneratorData = {
+  templateType: 'basic_hr' | 'office_manager' | 'simple_classic' | 'stylish_accounting' | 'minimalist_turkish'
+  data: {
+    personalInfo: {
+      fullName: string
+      address?: string
+      city?: string
+      state?: string
+      zipCode?: string
+      phone?: string
+      email: string
+    }
+    objective?: string
+    experience?: Array<{
+      jobTitle: string
+      company: string
+      location?: string
+      startDate: string
+      endDate?: string
+      description?: string
+    }>
+    education?: Array<{
+      degree: string
+      university: string
+      location?: string
+      graduationDate?: string
+      details?: string
+    }>
+    communication?: string
+    leadership?: string
+    references?: Array<{
+      name: string
+      company: string
+      contact: string
+    }>
+  }
+}
 
 interface CVState {
   uploadedCVs: CVUpload[]
@@ -38,7 +73,7 @@ interface CVActions {
   deleteUploadedCV: (id: string) => Promise<void>
 
   // Generate CV Actions
-  generateCV: (data: CVGenerateData) => Promise<string>
+  generateCV: (data: CVGeneratorData) => Promise<string>
 
   // Save CV Actions
   saveCV: (data: CVSaveData) => Promise<void>
@@ -128,9 +163,9 @@ export const useCVStore = create<CVStore>()(
       generateCV: async (data) => {
         set({ isGenerating: true, error: null })
         try {
-          const response: CVGenerateResponse = await cvApi.generate(data)
+          const response = await cvApi.generate(data)
           set({ isGenerating: false })
-          return response.data.content
+          return response.data.id
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || 'CV oluşturulurken hata oluştu'
           set({ isGenerating: false, error: errorMessage })

@@ -16,7 +16,7 @@ interface AIOptimizationStepProps {
   onPrevious: () => void
 }
 
-export function AIOptimizationStep({ form, onNext, onPrevious }: AIOptimizationStepProps) {
+export function AIOptimizationStep({ onNext, onPrevious }: AIOptimizationStepProps) {
   // Component disabled due to removed atsCvMicrosoftApi service
   return (
     <div className='space-y-6'>

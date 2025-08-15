@@ -75,13 +75,13 @@ export function formatDate(date: Date | string, locale: string = 'en-US'): strin
 export function formatNumberInput(value: string): string {
   // Remove all non-numeric characters except decimal point
   const numericValue = value.replace(/[^0-9.]/g, '')
-  
+
   // Convert to number and back to remove leading zeros
   const number = parseFloat(numericValue)
-  
+
   // If it's not a valid number, return empty string
   if (isNaN(number)) return ''
-  
+
   // Format with Turkish locale (uses dots for thousands separator)
   return new Intl.NumberFormat('tr-TR', {
     maximumFractionDigits: 0,

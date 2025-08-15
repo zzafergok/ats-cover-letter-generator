@@ -23,6 +23,7 @@ import {
   BarChart3,
   Zap,
   Calculator,
+  Building2,
 } from 'lucide-react'
 
 import {
@@ -132,10 +133,24 @@ export function AuthHeader() {
       ],
     },
     {
-      name: 'Maaş Hesaplama',
-      href: '/salary-calculator',
+      name: 'Hesaplama Araçları',
+      href: '/calculators',
       icon: Calculator,
-      description: 'Güncel vergi oranları ile brüt-net maaş hesaplama',
+      description: 'Maaş ve tazminat hesaplama araçları',
+      submenu: [
+        {
+          name: 'Maaş Hesaplama',
+          href: '/salary-calculator',
+          icon: Calculator,
+          description: 'Güncel vergi oranları ile brüt-net maaş hesaplama',
+        },
+        {
+          name: 'Kıdem ve İhbar Tazminatı',
+          href: '/severance-calculator',
+          icon: Building2,
+          description: 'Kıdem ve ihbar tazminatı hesaplama',
+        },
+      ],
     },
     {
       name: t('navigation.users'),

@@ -34,6 +34,10 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# Claude
+.claude/
+CLAUDE.md
+
 # Local env files
 .env
 .env*.local
@@ -54,6 +58,7 @@ next-env.d.ts
 # Package lock files
 yarn.lock
 pnpm-lock.yaml
+package-lock.json
 
 # OS generated files
 .DS_Store

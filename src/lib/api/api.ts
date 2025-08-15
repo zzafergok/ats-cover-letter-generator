@@ -598,3 +598,176 @@ export const templateApi = {
   // Template'leri başlat (Admin)
   initialize: (): Promise<{ success: boolean; message: string }> => apiRequest.post('/templates/initialize'),
 }
+
+// Salary Calculator API Servisleri - SALARY_API.md'ye göre
+export const salaryApi = {
+  // Genel maaş hesaplama
+  calculate: (data: {
+    grossSalary?: number
+    netSalary?: number
+    year?: number
+    month?: number
+    isMarried?: boolean
+    dependentCount?: number
+    isDisabled?: boolean
+    disabilityDegree?: 1 | 2 | 3
+  }): Promise<{
+    success: boolean
+    data: {
+      grossSalary: number
+      netSalary: number
+      sgkEmployeeShare: number
+      unemploymentInsurance: number
+      incomeTax: number
+      stampTax: number
+      totalDeductions: number
+      employerCost: number
+      employerSgkShare: number
+      employerUnemploymentInsurance: number
+      breakdown: {
+        taxableIncome: number
+        appliedTaxBracket: {
+          minAmount: number
+          maxAmount: number
+          rate: number
+          cumulativeTax: number
+        }
+        minimumWageExemption: number
+        minimumLivingAllowance: number
+        effectiveTaxRate: number
+      }
+    }
+    message?: string
+  }> => apiRequest.post('/salary/calculate', data, { skipAuth: true }),
+
+  // Brüt'ten net'e hesaplama
+  grossToNet: (data: {
+    grossSalary: number
+    year?: number
+    month?: number
+    isMarried?: boolean
+    dependentCount?: number
+    isDisabled?: boolean
+    disabilityDegree?: 1 | 2 | 3
+  }): Promise<{
+    success: boolean
+    data: {
+      grossSalary: number
+      netSalary: number
+      sgkEmployeeShare: number
+      unemploymentInsurance: number
+      incomeTax: number
+      stampTax: number
+      totalDeductions: number
+      employerCost: number
+      employerSgkShare: number
+      employerUnemploymentInsurance: number
+      breakdown: {
+        taxableIncome: number
+        appliedTaxBracket: {
+          minAmount: number
+          maxAmount: number
+          rate: number
+          cumulativeTax: number
+        }
+        minimumWageExemption: number
+        minimumLivingAllowance: number
+        effectiveTaxRate: number
+      }
+    }
+    message?: string
+  }> => apiRequest.post('/salary/gross-to-net', data, { skipAuth: true }),
+
+  // Net'ten brüt'e hesaplama
+  netToGross: (data: {
+    netSalary: number
+    year?: number
+    month?: number
+    maxIterations?: number
+    precision?: number
+    isMarried?: boolean
+    dependentCount?: number
+    isDisabled?: boolean
+    disabilityDegree?: 1 | 2 | 3
+  }): Promise<{
+    success: boolean
+    data: {
+      grossSalary: number
+      netSalary: number
+      sgkEmployeeShare: number
+      unemploymentInsurance: number
+      incomeTax: number
+      stampTax: number
+      totalDeductions: number
+      employerCost: number
+      employerSgkShare: number
+      employerUnemploymentInsurance: number
+      breakdown: {
+        taxableIncome: number
+        appliedTaxBracket: {
+          minAmount: number
+          maxAmount: number
+          rate: number
+          cumulativeTax: number
+        }
+        minimumWageExemption: number
+        minimumLivingAllowance: number
+        effectiveTaxRate: number
+      }
+    }
+    message?: string
+  }> => apiRequest.post('/salary/net-to-gross', data, { skipAuth: true }),
+
+  // Maaş limitleri
+  getLimits: (
+    year?: number,
+  ): Promise<{
+    success: boolean
+    data: {
+      minGrossSalary: number
+      maxGrossSalary: number
+      minNetSalary: number
+      maxNetSalary: number
+    }
+    message?: string
+  }> => {
+    const queryParams = year ? `?year=${year}` : ''
+    return apiRequest.get(`/salary/limits${queryParams}`, { skipAuth: true })
+  },
+
+  // Vergi konfigürasyonu
+  getTaxConfiguration: (
+    year?: number,
+  ): Promise<{
+    success: boolean
+    data: {
+      year: number
+      brackets: Array<{
+        minAmount: number
+        maxAmount: number
+        rate: number
+        cumulativeTax: number
+      }>
+      sgkRates: {
+        employeeRate: number
+        employerRate: number
+        employerDiscountedRate: number
+        unemploymentEmployeeRate: number
+        unemploymentEmployerRate: number
+        lowerLimit: number
+        upperLimit: number
+      }
+      stampTaxRate: number
+      minimumWage: {
+        gross: number
+        net: number
+        daily: number
+        hourly: number
+      }
+    }
+    message?: string
+  }> => {
+    const queryParams = year ? `?year=${year}` : ''
+    return apiRequest.get(`/salary/tax-configuration${queryParams}`, { skipAuth: true })
+  },
+}

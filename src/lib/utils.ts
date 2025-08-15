@@ -68,6 +68,37 @@ export function formatDate(date: Date | string, locale: string = 'en-US'): strin
 }
 
 /**
+ * Formats a number with thousands separator for Turkish locale
+ * @param value - The number value to format
+ * @returns Formatted string with dots as thousands separator
+ */
+export function formatNumberInput(value: string): string {
+  // Remove all non-numeric characters except decimal point
+  const numericValue = value.replace(/[^0-9.]/g, '')
+  
+  // Convert to number and back to remove leading zeros
+  const number = parseFloat(numericValue)
+  
+  // If it's not a valid number, return empty string
+  if (isNaN(number)) return ''
+  
+  // Format with Turkish locale (uses dots for thousands separator)
+  return new Intl.NumberFormat('tr-TR', {
+    maximumFractionDigits: 0,
+    useGrouping: true,
+  }).format(number)
+}
+
+/**
+ * Removes formatting from a formatted number string to get raw numeric value
+ * @param formattedValue - The formatted string (e.g., "40.000")
+ * @returns Raw numeric string (e.g., "40000")
+ */
+export function parseFormattedNumber(formattedValue: string): string {
+  return formattedValue.replace(/\./g, '')
+}
+
+/**
  * Type-safe LocalStorage access
  */
 export const storage = {

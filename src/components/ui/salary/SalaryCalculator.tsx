@@ -24,258 +24,229 @@ import { Switch } from '@/components/core/switch'
 import { LoadingSpinner } from '@/components/core/loading-spinner'
 import { Alert } from '@/components/core/alert'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/core/tabs'
+import { salaryApi } from '@/lib/api/api'
+import { SalaryCalculationData, SalaryLimitsData, TaxConfigurationData } from '@/types/salary.types'
+import { formatNumberInput, parseFormattedNumber } from '@/lib/utils'
 
-// Types
-interface SalaryConstants {
-  minimumWage: {
-    gross: number
-    net: number
-    daily: number
-  }
-  sgkFloor: number
-  sgkCeiling: number
-  sgkRates: {
-    employee: number
-    unemploymentEmployee: number
-    employer: number
-    employerWithIncentive: number
-    unemploymentEmployer: number
-  }
-  incomeTaxBrackets: Array<{
-    min: number
-    max: number
-    rate: number
-  }>
-  stampTaxRate: number
-  minimumWageSupportAmount: number
+// Form Data Interface
+interface SalaryFormData {
+  calculationType: 'gross-to-net' | 'net-to-gross'
+  amount: string
+  year: number
+  month: number
+  isMarried: boolean
+  dependentCount: number
+  isDisabled: boolean
+  disabilityDegree: 1 | 2 | 3
 }
 
-interface ExchangeRates {
-  USD: { buying: number; selling: number }
-  EUR: { buying: number; selling: number }
-}
-
-interface SalaryCalculationResult {
-  gross: number
-  net: number
-  deductions: {
-    sgkEmployee: number
-    unemploymentEmployee: number
-    incomeTax: number
-    stampTax: number
-    totalDeduction: number
-  }
-  employerCosts: {
-    sgkEmployer: number
-    unemploymentEmployer: number
-    minimumWageSupport: number
-    totalCost: number
-  }
-}
-
-interface CalculationMode {
-  mode: 'gross-to-net' | 'net-to-gross'
-  grossAmount: string
-  netAmount: string
-  useSgkIncentive: boolean
-  useMinimumWageSupport: boolean
+// Chart Data Interface
+interface ChartDataItem {
+  name: string
+  amount: number
+  percentage: number
+  color: string
 }
 
 export function SalaryCalculator() {
   // State
-  const [calculationMode, setCalculationMode] = useState<CalculationMode>({
-    mode: 'gross-to-net',
-    grossAmount: '',
-    netAmount: '',
-    useSgkIncentive: true,
-    useMinimumWageSupport: true,
+  const [formData, setFormData] = useState<SalaryFormData>({
+    calculationType: 'gross-to-net',
+    amount: '',
+    year: 2025,
+    month: new Date().getMonth() + 1,
+    isMarried: false,
+    dependentCount: 0,
+    isDisabled: false,
+    disabilityDegree: 1,
   })
 
-  const [result, setResult] = useState<SalaryCalculationResult | null>(null)
-  const [exchangeRates, setExchangeRates] = useState<ExchangeRates | null>(null)
+  const [displayAmount, setDisplayAmount] = useState('')
+
+  const [result, setResult] = useState<SalaryCalculationData | null>(null)
+  const [limits, setLimits] = useState<SalaryLimitsData | null>(null)
+  const [_taxConfig, setTaxConfig] = useState<TaxConfigurationData | null>(null)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [showInfo, setShowInfo] = useState(false)
   const [showPaymentCalendar, setShowPaymentCalendar] = useState(false)
   const [showTaxBracketInfo, setShowTaxBracketInfo] = useState(false)
 
-  // 2025 Constants
-  const constants: SalaryConstants = {
-    minimumWage: {
-      gross: 26005.5,
-      net: 22104.68,
-      daily: 866.85,
-    },
-    sgkFloor: 26005.5,
-    sgkCeiling: 195041.4,
-    sgkRates: {
-      employee: 0.14,
-      unemploymentEmployee: 0.01,
-      employer: 0.2075, // 5 points incentive
-      employerWithIncentive: 0.1575, // Normal rate
-      unemploymentEmployer: 0.02,
-    },
-    incomeTaxBrackets: [
-      { min: 0, max: 158000, rate: 0.15 },
-      { min: 158000, max: 330000, rate: 0.2 },
-      { min: 330000, max: 870000, rate: 0.27 },
-      { min: 870000, max: 3400000, rate: 0.35 },
-      { min: 3400000, max: Infinity, rate: 0.4 },
-    ],
-    stampTaxRate: 0.00948,
-    minimumWageSupportAmount: 800,
+  // Load initial data
+  useEffect(() => {
+    const loadInitialData = async () => {
+      try {
+        setLoading(true)
+        const [limitsResponse, taxConfigResponse] = await Promise.all([
+          salaryApi.getLimits(formData.year),
+          salaryApi.getTaxConfiguration(formData.year),
+        ])
+
+        if (limitsResponse.success) {
+          setLimits(limitsResponse.data)
+        }
+
+        if (taxConfigResponse.success) {
+          setTaxConfig(taxConfigResponse.data)
+        }
+      } catch (error) {
+        console.error('Failed to load initial data:', error)
+        setError('Veriler yüklenirken hata oluştu')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadInitialData()
+  }, [formData.year])
+
+  // Handle form field changes
+  const _handleFormChange = (field: keyof SalaryFormData, value: string | number | boolean) => {
+    setFormData((prev) => ({ ...prev, [field]: value }))
+    setError(null)
   }
 
-  // Fetch TCMB exchange rates
-  const fetchExchangeRates = async () => {
-    setLoading(true)
+  // Handle amount input change
+  const handleAmountChange = (value: string) => {
+    // Remove any non-numeric characters for storage
+    const rawValue = parseFormattedNumber(value)
+
+    // Update form data with raw numeric value
+    setFormData((prev) => ({ ...prev, amount: rawValue }))
+
+    // Update display with formatted value
+    if (rawValue) {
+      setDisplayAmount(formatNumberInput(rawValue))
+    } else {
+      setDisplayAmount('')
+    }
+  }
+
+  // Handle calculation type change (clear everything when switching tabs)
+  const handleCalculationTypeChange = (newType: 'gross-to-net' | 'net-to-gross') => {
+    setFormData((prev) => ({
+      ...prev,
+      calculationType: newType,
+      amount: '', // Clear amount
+    }))
+    setDisplayAmount('') // Clear display amount
+    setResult(null) // Clear results
+    setError(null) // Clear any errors
+  }
+
+  // Handle calculation
+  const handleCalculate = async () => {
+    if (!formData.amount || parseFloat(formData.amount) <= 0) {
+      setError('Lütfen geçerli bir maaş tutarı girin')
+      return
+    }
+
     try {
-      // Using allorigins as CORS proxy for TCMB XML
-      const proxyUrl = 'https://api.allorigins.win/raw?url='
-      const tcmbUrl = 'https://www.tcmb.gov.tr/kurlar/today.xml'
+      setLoading(true)
+      setError(null)
 
-      const response = await fetch(proxyUrl + encodeURIComponent(tcmbUrl))
-      const xmlText = await response.text()
+      const amount = parseFloat(formData.amount)
 
-      // Parse XML
-      const parser = new DOMParser()
-      const xmlDoc = parser.parseFromString(xmlText, 'text/xml')
-
-      // Extract USD and EUR rates
-      const currencies = xmlDoc.getElementsByTagName('Currency')
-      const rates: Record<string, { buying: number; selling: number }> = {}
-
-      for (const currency of currencies) {
-        const code = currency.getAttribute('CurrencyCode')
-        if (code === 'USD' || code === 'EUR') {
-          const forexBuying = currency.getElementsByTagName('ForexBuying')[0]?.textContent
-          const forexSelling = currency.getElementsByTagName('ForexSelling')[0]?.textContent
-
-          rates[code] = {
-            buying: parseFloat(forexBuying || '0'),
-            selling: parseFloat(forexSelling || '0'),
-          }
-        }
+      let response
+      if (formData.calculationType === 'gross-to-net') {
+        response = await salaryApi.grossToNet({
+          grossSalary: amount,
+          year: formData.year,
+          month: formData.month,
+          isMarried: formData.isMarried,
+          dependentCount: formData.dependentCount,
+          isDisabled: formData.isDisabled,
+          disabilityDegree: formData.disabilityDegree,
+        })
+      } else {
+        response = await salaryApi.netToGross({
+          netSalary: amount,
+          year: formData.year,
+          month: formData.month,
+          isMarried: formData.isMarried,
+          dependentCount: formData.dependentCount,
+          isDisabled: formData.isDisabled,
+          disabilityDegree: formData.disabilityDegree,
+        })
       }
 
-      setExchangeRates({
-        USD: rates.USD || { buying: 0, selling: 0 },
-        EUR: rates.EUR || { buying: 0, selling: 0 },
-      })
+      if (response.success) {
+        setResult(response.data)
+        // Scroll to results after successful calculation
+        setTimeout(() => {
+          const resultsSection = document.getElementById('salary-results')
+          if (resultsSection) {
+            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+          }
+        }, 300)
+      } else {
+        setError('Hesaplama sırasında hata oluştu')
+      }
     } catch (error) {
-      console.error('Failed to fetch exchange rates:', error)
+      console.error('Calculation error:', error)
+      setError('Hesaplama sırasında hata oluştu')
     } finally {
       setLoading(false)
     }
   }
 
-  // Calculate income tax
-  const calculateIncomeTax = (annualTaxBase: number): number => {
-    let totalTax = 0
-    let remainingBase = annualTaxBase
+  // Generate chart data for deductions
+  const _getDeductionsChartData = (): ChartDataItem[] => {
+    if (!result) return []
 
-    for (const bracket of constants.incomeTaxBrackets) {
-      if (remainingBase <= 0) break
+    const total = result.totalDeductions
 
-      const bracketBase = Math.min(remainingBase, bracket.max - bracket.min)
-      totalTax += bracketBase * bracket.rate
-      remainingBase -= bracketBase
-    }
-
-    return totalTax
-  }
-
-  // Calculate gross to net
-  const calculateGrossToNet = (gross: number): SalaryCalculationResult => {
-    const sgkBase = Math.min(Math.max(gross, constants.sgkFloor), constants.sgkCeiling)
-
-    // Deductions
-    const sgkEmployee = sgkBase * constants.sgkRates.employee
-    const unemploymentEmployee = sgkBase * constants.sgkRates.unemploymentEmployee
-    const totalSgkDeduction = sgkEmployee + unemploymentEmployee
-
-    // Income tax base
-    const incomeTaxBase = gross - totalSgkDeduction
-
-    // Annual income tax calculation (simplified)
-    const monthlyIncomeTax = calculateIncomeTax(incomeTaxBase * 12) / 12
-
-    // Stamp tax
-    const stampTax =
-      gross <= constants.minimumWage.gross ? 0 : (gross - constants.minimumWage.gross) * constants.stampTaxRate
-
-    // Employer costs
-    const sgkEmployer =
-      sgkBase *
-      (calculationMode.useSgkIncentive ? constants.sgkRates.employer : constants.sgkRates.employerWithIncentive)
-    const unemploymentEmployer = sgkBase * constants.sgkRates.unemploymentEmployer
-
-    // Minimum wage support
-    const supportAmount =
-      calculationMode.useMinimumWageSupport && gross === constants.minimumWage.gross
-        ? constants.minimumWageSupportAmount
-        : 0
-
-    const net = gross - totalSgkDeduction - monthlyIncomeTax - stampTax
-    const employerTotalCost = gross + sgkEmployer + unemploymentEmployer - supportAmount
-
-    return {
-      gross,
-      net,
-      deductions: {
-        sgkEmployee,
-        unemploymentEmployee,
-        incomeTax: monthlyIncomeTax,
-        stampTax,
-        totalDeduction: totalSgkDeduction + monthlyIncomeTax + stampTax,
+    return [
+      {
+        name: 'SGK İşçi Payı',
+        amount: result.sgkEmployeeShare,
+        percentage: (result.sgkEmployeeShare / total) * 100,
+        color: '#3b82f6',
       },
-      employerCosts: {
-        sgkEmployer,
-        unemploymentEmployer,
-        minimumWageSupport: supportAmount,
-        totalCost: employerTotalCost,
+      {
+        name: 'İşsizlik Sigortası',
+        amount: result.unemploymentInsurance,
+        percentage: (result.unemploymentInsurance / total) * 100,
+        color: '#10b981',
       },
-    }
+      {
+        name: 'Gelir Vergisi',
+        amount: result.incomeTax,
+        percentage: (result.incomeTax / total) * 100,
+        color: '#f59e0b',
+      },
+      {
+        name: 'Damga Vergisi',
+        amount: result.stampTax,
+        percentage: (result.stampTax / total) * 100,
+        color: '#ef4444',
+      },
+    ]
   }
 
-  // Calculate net to gross (approximation)
-  const calculateNetToGross = (targetNet: number): SalaryCalculationResult => {
-    let estimatedGross = targetNet * 1.25 // Initial estimate
-    let iteration = 0
-    const maxIterations = 50
-    const precision = 0.01
+  // Get salary distribution chart data
+  const _getSalaryDistributionData = (): ChartDataItem[] => {
+    if (!result) return []
 
-    while (iteration < maxIterations) {
-      const calculation = calculateGrossToNet(estimatedGross)
-      const difference = calculation.net - targetNet
+    const gross = result.grossSalary
 
-      if (Math.abs(difference) < precision) {
-        return calculation
-      }
-
-      // Adjustment factor
-      estimatedGross = estimatedGross - difference * 0.8
-      iteration++
-    }
-
-    return calculateGrossToNet(estimatedGross)
+    return [
+      {
+        name: 'Net Maaş',
+        amount: result.netSalary,
+        percentage: (result.netSalary / gross) * 100,
+        color: '#10b981',
+      },
+      {
+        name: 'Toplam Kesinti',
+        amount: result.totalDeductions,
+        percentage: (result.totalDeductions / gross) * 100,
+        color: '#ef4444',
+      },
+    ]
   }
 
-  const handleCalculate = () => {
-    if (calculationMode.mode === 'gross-to-net') {
-      const gross = parseFloat(calculationMode.grossAmount)
-      if (isNaN(gross) || gross <= 0) {
-        return
-      }
-      setResult(calculateGrossToNet(gross))
-    } else {
-      const net = parseFloat(calculationMode.netAmount)
-      if (isNaN(net) || net <= 0) {
-        return
-      }
-      setResult(calculateNetToGross(net))
-    }
-  }
-
+  // Format currency
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('tr-TR', {
       style: 'currency',
@@ -285,16 +256,13 @@ export function SalaryCalculator() {
     }).format(amount)
   }
 
-  const formatPercentage = (rate: number) => {
+  // Format percentage
+  const _formatPercentage = (rate: number) => {
     return `%${(rate * 100).toFixed(1)}`
   }
 
-  useEffect(() => {
-    fetchExchangeRates()
-  }, [])
-
   return (
-    <div className='max-w-6xl mx-auto space-y-8'>
+    <div className='max-w-7xl mx-auto space-y-8'>
       {/* Header */}
       <div className='text-center space-y-4'>
         <div className='flex items-center justify-center gap-3'>
@@ -304,17 +272,11 @@ export function SalaryCalculator() {
         <p className='text-muted-foreground text-lg'>2025 Yılı Güncel Vergi Oranları ve SGK Primleri</p>
       </div>
 
-      {/* Exchange Rates Info */}
-      {exchangeRates && (
-        <Alert className='bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800'>
-          <Info className='h-4 w-4 text-yellow-600 dark:text-yellow-400' />
-          <div className='flex-1'>
-            <p className='font-medium mb-2 text-yellow-800 dark:text-yellow-200'>Güncel Döviz Kurları (TCMB)</p>
-            <div className='grid grid-cols-2 gap-4 text-sm text-yellow-700 dark:text-yellow-300'>
-              <div>USD: {exchangeRates.USD?.selling?.toFixed(4)} TL</div>
-              <div>EUR: {exchangeRates.EUR?.selling?.toFixed(4)} TL</div>
-            </div>
-          </div>
+      {/* Error Alert */}
+      {error && (
+        <Alert className='bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'>
+          <AlertCircle className='h-4 w-4 text-red-600 dark:text-red-400' />
+          <div className='text-red-800 dark:text-red-200'>{error}</div>
         </Alert>
       )}
 
@@ -330,310 +292,552 @@ export function SalaryCalculator() {
         <CardContent className='space-y-6'>
           {/* Calculation Mode Toggle */}
           <Tabs
-            value={calculationMode.mode}
-            onValueChange={(value) =>
-              setCalculationMode((prev) => ({
-                ...prev,
-                mode: value as 'gross-to-net' | 'net-to-gross',
-              }))
-            }
+            value={formData.calculationType}
+            onValueChange={(value) => handleCalculationTypeChange(value as 'gross-to-net' | 'net-to-gross')}
           >
-            <TabsList className='grid w-full grid-cols-2'>
-              <TabsTrigger value='gross-to-net' className='flex items-center gap-2'>
-                <TrendingDown className='h-4 w-4' />
+            <TabsList className='grid w-full grid-cols-2 h-14'>
+              <TabsTrigger value='gross-to-net' className='flex items-center gap-2 h-12 text-base font-medium'>
+                <TrendingDown className='h-5 w-5' />
                 Brütten Nete
               </TabsTrigger>
-              <TabsTrigger value='net-to-gross' className='flex items-center gap-2'>
-                <TrendingUp className='h-4 w-4' />
+              <TabsTrigger value='net-to-gross' className='flex items-center gap-2 h-12 text-base font-medium'>
+                <TrendingUp className='h-5 w-5' />
                 Netten Brüte
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value='gross-to-net' className='space-y-4'>
-              <div className='space-y-2'>
-                <Label htmlFor='gross-amount'>Brüt Maaş</Label>
+            <TabsContent value='gross-to-net' className='space-y-6 pt-6'>
+              <div className='space-y-3'>
+                <Label htmlFor='gross-amount' className='text-base font-medium'>
+                  Brüt Maaş (TL)
+                </Label>
                 <Input
                   id='gross-amount'
-                  type='number'
-                  value={calculationMode.grossAmount}
-                  onChange={(e) =>
-                    setCalculationMode((prev) => ({
-                      ...prev,
-                      grossAmount: e.target.value,
-                    }))
-                  }
-                  placeholder='Örn: 30000'
+                  type='text'
+                  value={displayAmount}
+                  onChange={(e) => handleAmountChange(e.target.value)}
+                  placeholder='Örn: 50.000'
+                  className='h-12 text-lg'
                 />
-                <p className='text-xs text-muted-foreground'>
-                  Asgari Ücret: {formatCurrency(constants.minimumWage.gross)}
-                </p>
+                {limits && (
+                  <p className='text-sm text-muted-foreground'>Asgari Ücret: {formatCurrency(limits.minGrossSalary)}</p>
+                )}
               </div>
             </TabsContent>
 
-            <TabsContent value='net-to-gross' className='space-y-4'>
-              <div className='space-y-2'>
-                <Label htmlFor='net-amount'>Net Maaş</Label>
+            <TabsContent value='net-to-gross' className='space-y-6 pt-6'>
+              <div className='space-y-3'>
+                <Label htmlFor='net-amount' className='text-base font-medium'>
+                  Net Maaş (TL)
+                </Label>
                 <Input
                   id='net-amount'
-                  type='number'
-                  value={calculationMode.netAmount}
-                  onChange={(e) =>
-                    setCalculationMode((prev) => ({
-                      ...prev,
-                      netAmount: e.target.value,
-                    }))
-                  }
-                  placeholder='Örn: 25000'
+                  type='text'
+                  value={displayAmount}
+                  onChange={(e) => handleAmountChange(e.target.value)}
+                  placeholder='Örn: 40.000'
+                  className='h-12 text-lg'
                 />
-                <p className='text-xs text-muted-foreground'>
-                  Asgari Ücret: {formatCurrency(constants.minimumWage.net)}
-                </p>
+                {limits && (
+                  <p className='text-sm text-muted-foreground'>Asgari Ücret: {formatCurrency(limits.minNetSalary)}</p>
+                )}
               </div>
             </TabsContent>
           </Tabs>
 
-          {/* Options */}
-          <div className='grid md:grid-cols-2 gap-4'>
-            <div className='flex items-center space-x-2'>
-              <Switch
-                id='sgk-incentive'
-                checked={calculationMode.useSgkIncentive}
-                onCheckedChange={(checked) =>
-                  setCalculationMode((prev) => ({
-                    ...prev,
-                    useSgkIncentive: checked,
-                  }))
-                }
-              />
-              <div className='space-y-1'>
-                <Label htmlFor='sgk-incentive' className='text-sm font-medium'>
-                  5 Puanlık SGK İşveren Teşviki
-                </Label>
-                <p className='text-xs text-muted-foreground'>İşveren payında %5 indirim</p>
-              </div>
+          {/* Personal Information */}
+          <div className='bg-gray-50 dark:bg-gray-800/50 p-6 rounded-xl border border-gray-200 dark:border-gray-700 space-y-6'>
+            <div className='flex items-center gap-2 mb-4'>
+              <Users className='h-5 w-5 text-gray-600 dark:text-gray-400' />
+              <h3 className='font-semibold text-gray-900 dark:text-gray-100'>Kişisel Bilgiler</h3>
+              <span className='text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded-full'>
+                Vergi hesaplamasını etkiler
+              </span>
             </div>
 
-            <div className='flex items-center space-x-2'>
-              <Switch
-                id='min-wage-support'
-                checked={calculationMode.useMinimumWageSupport}
-                onCheckedChange={(checked) =>
-                  setCalculationMode((prev) => ({
-                    ...prev,
-                    useMinimumWageSupport: checked,
-                  }))
-                }
-              />
-              <div className='space-y-1'>
-                <Label htmlFor='min-wage-support' className='text-sm font-medium'>
-                  Asgari Ücret Desteği (800 TL)
+            <div className='grid md:grid-cols-2 gap-6'>
+              <div className='space-y-3'>
+                <div className='space-y-3'>
+                  <Label htmlFor='married' className='text-base font-medium text-gray-900 dark:text-gray-100'>
+                    Medeni Durum
+                  </Label>
+                  <div className='flex items-center justify-start gap-3'>
+                    <span
+                      className={`text-sm ${formData.isMarried ? 'text-gray-400' : 'font-medium text-gray-900 dark:text-gray-100'}`}
+                    >
+                      Bekar
+                    </span>
+                    <Switch
+                      id='married'
+                      checked={formData.isMarried}
+                      onCheckedChange={(checked) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          isMarried: checked,
+                        }))
+                      }
+                    />
+                    <span
+                      className={`text-sm ${formData.isMarried ? 'font-medium text-gray-900 dark:text-gray-100' : 'text-gray-400'}`}
+                    >
+                      Evli
+                    </span>
+                  </div>
+                  <p className='text-sm text-gray-600 dark:text-gray-400 text-start'>
+                    Evli işçiler için vergi avantajı
+                  </p>
+                </div>
+              </div>
+
+              <div className='space-y-3'>
+                <Label htmlFor='dependents' className='text-base font-medium text-gray-900 dark:text-gray-100'>
+                  Bakmakla Yükümlü Kişi Sayısı
                 </Label>
-                <p className='text-xs text-muted-foreground'>Sadece asgari ücret için geçerli</p>
+                <div className='space-y-2'>
+                  <Input
+                    id='dependents'
+                    type='text'
+                    inputMode='numeric'
+                    pattern='[0-9]*'
+                    value={formData.dependentCount === 0 ? '' : formData.dependentCount.toString()}
+                    onChange={(e) => {
+                      const value = e.target.value
+                      // Only allow numbers and empty string
+                      if (value === '' || /^\d+$/.test(value)) {
+                        const numValue = value === '' ? 0 : parseInt(value)
+                        // Limit between 0-10
+                        if (numValue >= 0 && numValue <= 10) {
+                          setFormData((prev) => ({
+                            ...prev,
+                            dependentCount: numValue,
+                          }))
+                        }
+                      }
+                    }}
+                    placeholder='0'
+                    className='h-11'
+                  />
+                  <p className='text-sm text-gray-600 dark:text-gray-400'>
+                    Her bakmakla yükümlü kişi için ek vergi indirimi
+                  </p>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Calculate Button */}
-          <Button onClick={handleCalculate} disabled={loading} className='w-full' size='lg'>
-            {loading ? (
-              <>
-                <LoadingSpinner className='mr-2 h-4 w-4' />
-                Hesaplanıyor...
-              </>
-            ) : (
-              'Hesapla'
-            )}
-          </Button>
+          <div className='pt-4'>
+            <Button
+              onClick={handleCalculate}
+              disabled={loading || !formData.amount}
+              className='w-full h-14 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200'
+              size='lg'
+            >
+              {loading ? (
+                <>
+                  <LoadingSpinner className='mr-3 h-5 w-5' />
+                  Hesaplanıyor...
+                </>
+              ) : (
+                <>
+                  <Calculator className='mr-3 h-5 w-5' />
+                  Maaşı Hesapla
+                </>
+              )}
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
       {/* Results */}
       {result && (
-        <div className='space-y-6'>
-          {/* Summary Cards */}
-          <div className='grid md:grid-cols-3 gap-6'>
-            <Card className='border-t-4 border-t-green-500 dark:border-t-green-400'>
-              <CardContent className='pt-6'>
-                <div className='flex items-center justify-between mb-2'>
-                  <span className='text-sm text-muted-foreground'>Net Maaş</span>
-                  <CreditCard className='h-5 w-5 text-green-500 dark:text-green-400' />
-                </div>
-                <p className='text-2xl font-bold text-foreground'>{formatCurrency(result.net)}</p>
-              </CardContent>
-            </Card>
+        <div id='salary-results' className='grid lg:grid-cols-3 gap-8'>
+          {/* Main Results Area */}
+          <div className='lg:col-span-2 space-y-6'>
+            {/* Summary Cards */}
+            <div className='grid md:grid-cols-2 gap-4'>
+              <Card className='border-t-4 border-t-green-500 dark:border-t-green-400'>
+                <CardContent className='pt-6'>
+                  <div className='flex items-center justify-between mb-2'>
+                    <span className='text-sm text-muted-foreground'>Net Maaş</span>
+                    <CreditCard className='h-5 w-5 text-green-500 dark:text-green-400' />
+                  </div>
+                  <p className='text-2xl font-bold text-foreground'>{formatCurrency(result.netSalary)}</p>
+                  <p className='text-xs text-muted-foreground mt-1'>
+                    {((result.netSalary / result.grossSalary) * 100).toFixed(1)}% brütün
+                  </p>
+                </CardContent>
+              </Card>
 
-            <Card className='border-t-4 border-t-blue-500 dark:border-t-blue-400'>
-              <CardContent className='pt-6'>
-                <div className='flex items-center justify-between mb-2'>
-                  <span className='text-sm text-muted-foreground'>Brüt Maaş</span>
-                  <Receipt className='h-5 w-5 text-blue-500 dark:text-blue-400' />
-                </div>
-                <p className='text-2xl font-bold text-foreground'>{formatCurrency(result.gross)}</p>
-              </CardContent>
-            </Card>
+              <Card className='border-t-4 border-t-blue-500 dark:border-t-blue-400'>
+                <CardContent className='pt-6'>
+                  <div className='flex items-center justify-between mb-2'>
+                    <span className='text-sm text-muted-foreground'>Brüt Maaş</span>
+                    <Receipt className='h-5 w-5 text-blue-500 dark:text-blue-400' />
+                  </div>
+                  <p className='text-2xl font-bold text-foreground'>{formatCurrency(result.grossSalary)}</p>
+                  <p className='text-xs text-muted-foreground mt-1'>Temel hesaplama</p>
+                </CardContent>
+              </Card>
 
-            <Card className='border-t-4 border-t-purple-500 dark:border-t-purple-400'>
-              <CardContent className='pt-6'>
-                <div className='flex items-center justify-between mb-2'>
-                  <span className='text-sm text-muted-foreground'>İşveren Maliyeti</span>
-                  <Building2 className='h-5 w-5 text-purple-500 dark:text-purple-400' />
-                </div>
-                <p className='text-2xl font-bold text-foreground'>{formatCurrency(result.employerCosts.totalCost)}</p>
-              </CardContent>
-            </Card>
+              <Card className='border-t-4 border-t-red-500 dark:border-t-red-400'>
+                <CardContent className='pt-6'>
+                  <div className='flex items-center justify-between mb-2'>
+                    <span className='text-sm text-muted-foreground'>Toplam Kesinti</span>
+                    <AlertCircle className='h-5 w-5 text-red-500 dark:text-red-400' />
+                  </div>
+                  <p className='text-2xl font-bold text-foreground'>{formatCurrency(result.totalDeductions)}</p>
+                  <p className='text-xs text-muted-foreground mt-1'>
+                    {((result.totalDeductions / result.grossSalary) * 100).toFixed(1)}% brütün
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className='border-t-4 border-t-purple-500 dark:border-t-purple-400'>
+                <CardContent className='pt-6'>
+                  <div className='flex items-center justify-between mb-2'>
+                    <span className='text-sm text-muted-foreground'>İşveren Maliyeti</span>
+                    <Building2 className='h-5 w-5 text-purple-500 dark:text-purple-400' />
+                  </div>
+                  <p className='text-2xl font-bold text-foreground'>{formatCurrency(result.employerCost)}</p>
+                  <p className='text-xs text-muted-foreground mt-1'>
+                    +{(((result.employerCost - result.grossSalary) / result.grossSalary) * 100).toFixed(1)}% brütün üstü
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Detailed Breakdown */}
+            <div className='grid md:grid-cols-2 gap-6'>
+              {/* Employee Deductions */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className='flex items-center gap-2'>
+                    <Users className='h-5 w-5 text-blue-600 dark:text-blue-400' />
+                    Çalışan Kesintileri
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className='space-y-3'>
+                  <div className='flex justify-between items-center py-2 border-b'>
+                    <span className='text-sm'>SGK İşçi Payı (%14)</span>
+                    <span className='font-medium'>{formatCurrency(result.sgkEmployeeShare)}</span>
+                  </div>
+                  <div className='flex justify-between items-center py-2 border-b'>
+                    <span className='text-sm'>İşsizlik Sigortası (%1)</span>
+                    <span className='font-medium'>{formatCurrency(result.unemploymentInsurance)}</span>
+                  </div>
+                  <div className='flex justify-between items-center py-2 border-b'>
+                    <span className='text-sm'>Gelir Vergisi</span>
+                    <span className='font-medium'>{formatCurrency(result.incomeTax)}</span>
+                  </div>
+                  <div className='flex justify-between items-center py-2 border-b'>
+                    <span className='text-sm'>Damga Vergisi (%0.948)</span>
+                    <span className='font-medium'>{formatCurrency(result.stampTax)}</span>
+                  </div>
+                  <div className='flex justify-between items-center py-2 font-semibold text-lg'>
+                    <span>Toplam Kesinti</span>
+                    <span className='text-red-600 dark:text-red-400'>{formatCurrency(result.totalDeductions)}</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Employer Costs */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className='flex items-center gap-2'>
+                    <Building2 className='h-5 w-5 text-purple-600 dark:text-purple-400' />
+                    İşveren Maliyetleri
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className='space-y-3'>
+                  <div className='flex justify-between items-center py-2 border-b'>
+                    <span className='text-sm'>SGK İşveren Payı (%20.75)</span>
+                    <span className='font-medium'>{formatCurrency(result.employerSgkShare)}</span>
+                  </div>
+                  <div className='flex justify-between items-center py-2 border-b'>
+                    <span className='text-sm'>İşsizlik Sigortası (%2)</span>
+                    <span className='font-medium'>{formatCurrency(result.employerUnemploymentInsurance)}</span>
+                  </div>
+                  <div className='flex justify-between items-center py-2 font-semibold text-lg'>
+                    <span>Toplam İşveren Maliyeti</span>
+                    <span className='text-purple-600 dark:text-purple-400'>{formatCurrency(result.employerCost)}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
 
-          {/* Detailed Breakdown */}
-          <div className='grid md:grid-cols-2 gap-6'>
-            {/* Employee Deductions */}
-            <Card>
-              <CardHeader>
-                <CardTitle className='flex items-center gap-2'>
-                  <Users className='h-5 w-5 text-blue-600 dark:text-blue-400' />
-                  Çalışan Kesintileri
-                </CardTitle>
-              </CardHeader>
-              <CardContent className='space-y-3'>
-                <div className='flex justify-between items-center py-2 border-b'>
-                  <span className='text-sm'>SGK İşçi Payı ({formatPercentage(constants.sgkRates.employee)})</span>
-                  <span className='font-medium'>{formatCurrency(result.deductions.sgkEmployee)}</span>
-                </div>
-                <div className='flex justify-between items-center py-2 border-b'>
-                  <span className='text-sm'>
-                    İşsizlik Sigortası ({formatPercentage(constants.sgkRates.unemploymentEmployee)})
-                  </span>
-                  <span className='font-medium'>{formatCurrency(result.deductions.unemploymentEmployee)}</span>
-                </div>
-                <div className='flex justify-between items-center py-2 border-b'>
-                  <span className='text-sm'>Gelir Vergisi</span>
-                  <span className='font-medium'>{formatCurrency(result.deductions.incomeTax)}</span>
-                </div>
-                <div className='flex justify-between items-center py-2 border-b'>
-                  <span className='text-sm'>Damga Vergisi ({formatPercentage(constants.stampTaxRate)})</span>
-                  <span className='font-medium'>{formatCurrency(result.deductions.stampTax)}</span>
-                </div>
-                <div className='flex justify-between items-center py-2 font-semibold text-lg'>
-                  <span>Toplam Kesinti</span>
-                  <span className='text-red-600 dark:text-red-400'>
-                    {formatCurrency(result.deductions.totalDeduction)}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
+          {/* Information Sidebar */}
+          <div className='lg:col-span-1'>
+            <div className='sticky top-8 space-y-4'>
+              {/* Info Navigation Cards */}
+              <Card
+                className={`cursor-pointer transition-all duration-200 hover:shadow-lg border-2 ${
+                  showInfo ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/50' : 'border-border hover:border-blue-300'
+                }`}
+                onClick={() => {
+                  setShowInfo(!showInfo)
+                  setShowPaymentCalendar(false)
+                  setShowTaxBracketInfo(false)
+                  // Scroll to info panel after a brief delay to allow state update
+                  setTimeout(() => {
+                    const infoPanel = document.getElementById('info-panel')
+                    if (infoPanel && !showInfo) {
+                      infoPanel.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                    }
+                  }, 100)
+                }}
+              >
+                <CardContent className='p-4'>
+                  <div className='flex items-center gap-3'>
+                    <div
+                      className={`p-2 rounded-lg ${
+                        showInfo
+                          ? 'bg-blue-500 text-white'
+                          : 'bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400'
+                      }`}
+                    >
+                      <Info className='h-5 w-5' />
+                    </div>
+                    <div>
+                      <h3 className='font-semibold text-sm'>2025 Yılı Vergi Oranları</h3>
+                      <p className='text-xs text-muted-foreground'>SGK ve gelir vergisi oranları</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
-            {/* Employer Costs */}
-            <Card>
-              <CardHeader>
-                <CardTitle className='flex items-center gap-2'>
-                  <Building2 className='h-5 w-5 text-purple-600 dark:text-purple-400' />
-                  İşveren Maliyetleri
-                </CardTitle>
-              </CardHeader>
-              <CardContent className='space-y-3'>
-                <div className='flex justify-between items-center py-2 border-b'>
-                  <span className='text-sm'>
-                    SGK İşveren Payı (
-                    {formatPercentage(
-                      calculationMode.useSgkIncentive
-                        ? constants.sgkRates.employer
-                        : constants.sgkRates.employerWithIncentive,
-                    )}
-                    )
-                  </span>
-                  <span className='font-medium'>{formatCurrency(result.employerCosts.sgkEmployer)}</span>
-                </div>
-                <div className='flex justify-between items-center py-2 border-b'>
-                  <span className='text-sm'>
-                    İşsizlik Sigortası ({formatPercentage(constants.sgkRates.unemploymentEmployer)})
-                  </span>
-                  <span className='font-medium'>{formatCurrency(result.employerCosts.unemploymentEmployer)}</span>
-                </div>
-                {result.employerCosts.minimumWageSupport > 0 && (
-                  <div className='flex justify-between items-center py-2 border-b'>
-                    <span className='text-sm'>Asgari Ücret Desteği</span>
-                    <span className='font-medium text-green-600 dark:text-green-400'>
-                      -{formatCurrency(result.employerCosts.minimumWageSupport)}
+              <Card
+                className={`cursor-pointer transition-all duration-200 hover:shadow-lg border-2 ${
+                  showPaymentCalendar
+                    ? 'border-purple-500 bg-purple-50 dark:bg-purple-950/50'
+                    : 'border-border hover:border-purple-300'
+                }`}
+                onClick={() => {
+                  setShowPaymentCalendar(!showPaymentCalendar)
+                  setShowInfo(false)
+                  setShowTaxBracketInfo(false)
+                  // Scroll to payment calendar panel after a brief delay
+                  setTimeout(() => {
+                    const paymentPanel = document.getElementById('payment-calendar-panel')
+                    if (paymentPanel && !showPaymentCalendar) {
+                      paymentPanel.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                    }
+                  }, 100)
+                }}
+              >
+                <CardContent className='p-4'>
+                  <div className='flex items-center gap-3'>
+                    <div
+                      className={`p-2 rounded-lg ${
+                        showPaymentCalendar
+                          ? 'bg-purple-500 text-white'
+                          : 'bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400'
+                      }`}
+                    >
+                      <Calendar className='h-5 w-5' />
+                    </div>
+                    <div>
+                      <h3 className='font-semibold text-sm'>Ödeme Takvimi</h3>
+                      <p className='text-xs text-muted-foreground'>Vergi ve SGK ödeme tarihleri</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card
+                className={`cursor-pointer transition-all duration-200 hover:shadow-lg border-2 ${
+                  showTaxBracketInfo
+                    ? 'border-green-500 bg-green-50 dark:bg-green-950/50'
+                    : 'border-border hover:border-green-300'
+                }`}
+                onClick={() => {
+                  setShowTaxBracketInfo(!showTaxBracketInfo)
+                  setShowInfo(false)
+                  setShowPaymentCalendar(false)
+                  // Scroll to tax bracket panel after a brief delay
+                  setTimeout(() => {
+                    const taxPanel = document.getElementById('tax-bracket-panel')
+                    if (taxPanel && !showTaxBracketInfo) {
+                      taxPanel.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                    }
+                  }, 100)
+                }}
+              >
+                <CardContent className='p-4'>
+                  <div className='flex items-center gap-3'>
+                    <div
+                      className={`p-2 rounded-lg ${
+                        showTaxBracketInfo
+                          ? 'bg-green-500 text-white'
+                          : 'bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400'
+                      }`}
+                    >
+                      <AlertCircle className='h-5 w-5' />
+                    </div>
+                    <div>
+                      <h3 className='font-semibold text-sm'>Vergi Dilimleri</h3>
+                      <p className='text-xs text-muted-foreground'>Vergi dilimi hesaplaması</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Quick Summary Card */}
+              <Card className='bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800/50 dark:to-gray-700/30 border-gray-200 dark:border-gray-700'>
+                <CardHeader className='pb-3'>
+                  <CardTitle className='text-base flex items-center gap-2 text-gray-900 dark:text-gray-100'>
+                    <Banknote className='h-5 w-5 text-gray-600 dark:text-gray-400' />
+                    Hızlı Özet
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className='space-y-3'>
+                  <div className='flex justify-between items-center text-sm'>
+                    <span className='text-gray-600 dark:text-gray-400'>Net Maaş</span>
+                    <span className='font-semibold text-green-600 dark:text-green-400'>
+                      {formatCurrency(result.netSalary)}
                     </span>
                   </div>
-                )}
-                <div className='flex justify-between items-center py-2 font-semibold text-lg'>
-                  <span>Toplam İşveren Maliyeti</span>
-                  <span className='text-purple-600 dark:text-purple-400'>
-                    {formatCurrency(result.employerCosts.totalCost)}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
+                  <div className='flex justify-between items-center text-sm'>
+                    <span className='text-gray-600 dark:text-gray-400'>Toplam Kesinti</span>
+                    <span className='font-semibold text-red-600 dark:text-red-400'>
+                      {formatCurrency(result.totalDeductions)}
+                    </span>
+                  </div>
+                  <div className='flex justify-between items-center text-sm border-t border-gray-200 dark:border-gray-600 pt-2'>
+                    <span className='text-gray-600 dark:text-gray-400'>İşveren Maliyeti</span>
+                    <span className='font-semibold text-purple-600 dark:text-purple-400'>
+                      {formatCurrency(result.employerCost)}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
+        </div>
+      )}
 
-          {/* Info Buttons */}
-          <div className='flex flex-wrap gap-3 justify-center'>
-            <Button variant='outline' onClick={() => setShowInfo(!showInfo)} className='flex items-center gap-2'>
-              <Info className='h-4 w-4' />
-              2025 Yılı Vergi Oranları
-            </Button>
-
-            <Button
-              variant='outline'
-              onClick={() => setShowPaymentCalendar(!showPaymentCalendar)}
-              className='flex items-center gap-2'
-            >
-              <Calendar className='h-4 w-4' />
-              Ödeme Takvimi
-            </Button>
-
-            <Button
-              variant='outline'
-              onClick={() => setShowTaxBracketInfo(!showTaxBracketInfo)}
-              className='flex items-center gap-2'
-            >
-              <AlertCircle className='h-4 w-4' />
-              Vergi Dilimleri Açıklama
-            </Button>
-          </div>
+      {/* Scroll to Top Indicator */}
+      {(showInfo || showPaymentCalendar || showTaxBracketInfo) && (
+        <div className='fixed bottom-8 right-8 z-50'>
+          <Button
+            onClick={() => {
+              window.scrollTo({ top: 0, behavior: 'smooth' })
+            }}
+            className='rounded-full w-12 h-12 shadow-lg bg-primary hover:bg-primary/90'
+            size='icon'
+          >
+            <ChevronUp className='h-5 w-5' />
+          </Button>
         </div>
       )}
 
       {/* Information Panels */}
       {showInfo && (
-        <Card className='bg-blue-50 dark:bg-blue-950/50 border-blue-200 dark:border-blue-800'>
-          <CardHeader>
+        <Card
+          id='info-panel'
+          className='bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/50 dark:to-blue-900/30 border-blue-200 dark:border-blue-800 shadow-lg animate-in slide-in-from-top-2 duration-300'
+        >
+          <CardHeader className='pb-4'>
             <CardTitle className='flex items-center justify-between text-blue-900 dark:text-blue-100'>
-              <span>2025 Yılı Güncel Oranlar</span>
-              <Button variant='ghost' size='icon' onClick={() => setShowInfo(false)}>
-                <ChevronUp className='h-4 w-4' />
+              <div className='flex items-center gap-3'>
+                <div className='p-2 bg-blue-500 text-white rounded-lg'>
+                  <Info className='h-5 w-5' />
+                </div>
+                <span className='text-xl'>2025 Yılı Güncel Oranlar</span>
+              </div>
+              <Button
+                variant='ghost'
+                size='icon'
+                onClick={() => setShowInfo(false)}
+                className='hover:bg-blue-200 dark:hover:bg-blue-800'
+              >
+                <ChevronUp className='h-5 w-5' />
               </Button>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className='grid md:grid-cols-2 gap-6 text-sm text-blue-800 dark:text-blue-200'>
-              <div>
-                <h4 className='font-semibold mb-2 text-blue-900 dark:text-blue-100'>SGK Prim Oranları:</h4>
-                <ul className='space-y-1'>
-                  <li>• İşçi Payı: %14</li>
-                  <li>• İşveren Payı: %20.75 (Teşviksiz)</li>
-                  <li>• İşveren Payı: %15.75 (5 puan teşvikli)</li>
-                  <li>• İşsizlik Sigortası İşçi: %1</li>
-                  <li>• İşsizlik Sigortası İşveren: %2</li>
-                </ul>
+          <CardContent className='space-y-6'>
+            <div className='grid md:grid-cols-2 gap-6'>
+              <div className='bg-white dark:bg-gray-800/50 p-5 rounded-xl border border-blue-200 dark:border-blue-700'>
+                <h4 className='font-semibold mb-4 text-blue-900 dark:text-blue-100 flex items-center gap-2'>
+                  <div className='w-2 h-2 bg-blue-500 rounded-full'></div>
+                  SGK Prim Oranları
+                </h4>
+                <div className='space-y-3 text-sm'>
+                  <div className='flex justify-between items-center py-2 border-b border-blue-100 dark:border-blue-800'>
+                    <span className='text-blue-700 dark:text-blue-300'>İşçi Payı</span>
+                    <span className='font-semibold text-blue-900 dark:text-blue-100'>%14</span>
+                  </div>
+                  <div className='flex justify-between items-center py-2 border-b border-blue-100 dark:border-blue-800'>
+                    <span className='text-blue-700 dark:text-blue-300'>İşveren Payı (Teşviksiz)</span>
+                    <span className='font-semibold text-blue-900 dark:text-blue-100'>%20.75</span>
+                  </div>
+                  <div className='flex justify-between items-center py-2 border-b border-blue-100 dark:border-blue-800'>
+                    <span className='text-blue-700 dark:text-blue-300'>İşveren Payı (Teşvikli)</span>
+                    <span className='font-semibold text-blue-900 dark:text-blue-100'>%15.75</span>
+                  </div>
+                  <div className='flex justify-between items-center py-2 border-b border-blue-100 dark:border-blue-800'>
+                    <span className='text-blue-700 dark:text-blue-300'>İşsizlik İşçi</span>
+                    <span className='font-semibold text-blue-900 dark:text-blue-100'>%1</span>
+                  </div>
+                  <div className='flex justify-between items-center py-2'>
+                    <span className='text-blue-700 dark:text-blue-300'>İşsizlik İşveren</span>
+                    <span className='font-semibold text-blue-900 dark:text-blue-100'>%2</span>
+                  </div>
+                </div>
               </div>
-              <div>
-                <h4 className='font-semibold mb-2 text-blue-900 dark:text-blue-100'>Gelir Vergisi Dilimleri:</h4>
-                <ul className='space-y-1'>
-                  <li>• 158.000 TL'ye kadar: %15</li>
-                  <li>• 330.000 TL'ye kadar: %20</li>
-                  <li>• 870.000 TL'ye kadar: %27</li>
-                  <li>• 3.400.000 TL'ye kadar: %35</li>
-                  <li>• 3.400.000 TL üzeri: %40</li>
-                </ul>
+
+              <div className='bg-white dark:bg-gray-800/50 p-5 rounded-xl border border-blue-200 dark:border-blue-700'>
+                <h4 className='font-semibold mb-4 text-blue-900 dark:text-blue-100 flex items-center gap-2'>
+                  <div className='w-2 h-2 bg-blue-500 rounded-full'></div>
+                  Gelir Vergisi Dilimleri
+                </h4>
+                <div className='space-y-3 text-sm'>
+                  <div className='flex justify-between items-center py-2 border-b border-blue-100 dark:border-blue-800'>
+                    <span className='text-blue-700 dark:text-blue-300'>158.000 TL'ye kadar</span>
+                    <span className='font-semibold text-green-600 dark:text-green-400'>%15</span>
+                  </div>
+                  <div className='flex justify-between items-center py-2 border-b border-blue-100 dark:border-blue-800'>
+                    <span className='text-blue-700 dark:text-blue-300'>330.000 TL'ye kadar</span>
+                    <span className='font-semibold text-green-600 dark:text-green-400'>%20</span>
+                  </div>
+                  <div className='flex justify-between items-center py-2 border-b border-blue-100 dark:border-blue-800'>
+                    <span className='text-blue-700 dark:text-blue-300'>870.000 TL'ye kadar</span>
+                    <span className='font-semibold text-yellow-600 dark:text-yellow-400'>%27</span>
+                  </div>
+                  <div className='flex justify-between items-center py-2 border-b border-blue-100 dark:border-blue-800'>
+                    <span className='text-blue-700 dark:text-blue-300'>3.400.000 TL'ye kadar</span>
+                    <span className='font-semibold text-orange-600 dark:text-orange-400'>%35</span>
+                  </div>
+                  <div className='flex justify-between items-center py-2'>
+                    <span className='text-blue-700 dark:text-blue-300'>3.400.000 TL üzeri</span>
+                    <span className='font-semibold text-red-600 dark:text-red-400'>%40</span>
+                  </div>
+                </div>
               </div>
             </div>
-            <div className='mt-4 text-sm text-blue-800 dark:text-blue-200'>
-              <p>• Damga Vergisi: Binde 9,48</p>
-              <p>• Asgari ücret gelir ve damga vergisinden muaftır</p>
-              <p>
-                • SGK Taban/Tavan: {formatCurrency(constants.sgkFloor)} / {formatCurrency(constants.sgkCeiling)}
-              </p>
+
+            <div className='bg-gradient-to-r from-blue-500/10 to-blue-600/10 dark:from-blue-400/10 dark:to-blue-500/10 p-4 rounded-xl border border-blue-200 dark:border-blue-700'>
+              <h5 className='font-semibold mb-3 text-blue-900 dark:text-blue-100'>Diğer Önemli Bilgiler</h5>
+              <div className='grid md:grid-cols-3 gap-4 text-sm'>
+                <div className='flex flex-col items-center text-center'>
+                  <span className='text-blue-700 dark:text-blue-300'>Damga Vergisi</span>
+                  <span className='font-semibold text-blue-900 dark:text-blue-100'>Binde 9,48</span>
+                </div>
+                <div className='flex flex-col items-center text-center'>
+                  <span className='text-blue-700 dark:text-blue-300'>SGK Taban</span>
+                  <span className='font-semibold text-blue-900 dark:text-blue-100'>22.104 TL</span>
+                </div>
+                <div className='flex flex-col items-center text-center'>
+                  <span className='text-blue-700 dark:text-blue-300'>SGK Tavan</span>
+                  <span className='font-semibold text-blue-900 dark:text-blue-100'>165.780 TL</span>
+                </div>
+              </div>
+              <div className='mt-4 p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg border border-yellow-300 dark:border-yellow-700'>
+                <p className='text-sm text-yellow-800 dark:text-yellow-200 font-medium text-center'>
+                  📝 Asgari ücret gelir ve damga vergisinden muaftır
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -641,15 +845,25 @@ export function SalaryCalculator() {
 
       {/* Payment Calendar Panel */}
       {showPaymentCalendar && (
-        <Card className='bg-purple-50 dark:bg-purple-950/50 border-purple-200 dark:border-purple-800'>
-          <CardHeader>
+        <Card
+          id='payment-calendar-panel'
+          className='bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/50 dark:to-purple-900/30 border-purple-200 dark:border-purple-800 shadow-lg animate-in slide-in-from-top-2 duration-300'
+        >
+          <CardHeader className='pb-4'>
             <CardTitle className='flex items-center justify-between text-purple-900 dark:text-purple-100'>
-              <div className='flex items-center gap-2'>
-                <Calendar className='h-5 w-5 text-purple-600 dark:text-purple-400' />
-                Yıllık Vergi ve SGK Ödeme Takvimi
+              <div className='flex items-center gap-3'>
+                <div className='p-2 bg-purple-500 text-white rounded-lg'>
+                  <Calendar className='h-5 w-5' />
+                </div>
+                <span className='text-xl'>Yıllık Vergi ve SGK Ödeme Takvimi</span>
               </div>
-              <Button variant='ghost' size='icon' onClick={() => setShowPaymentCalendar(false)}>
-                <ChevronUp className='h-4 w-4' />
+              <Button
+                variant='ghost'
+                size='icon'
+                onClick={() => setShowPaymentCalendar(false)}
+                className='hover:bg-purple-200 dark:hover:bg-purple-800'
+              >
+                <ChevronUp className='h-5 w-5' />
               </Button>
             </CardTitle>
           </CardHeader>
@@ -715,15 +929,25 @@ export function SalaryCalculator() {
 
       {/* Tax Bracket Info Panel */}
       {showTaxBracketInfo && (
-        <Card className='bg-green-50 dark:bg-green-950/50 border-green-200 dark:border-green-800'>
-          <CardHeader>
+        <Card
+          id='tax-bracket-panel'
+          className='bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/50 dark:to-green-900/30 border-green-200 dark:border-green-800 shadow-lg animate-in slide-in-from-top-2 duration-300'
+        >
+          <CardHeader className='pb-4'>
             <CardTitle className='flex items-center justify-between text-green-900 dark:text-green-100'>
-              <div className='flex items-center gap-2'>
-                <AlertCircle className='h-5 w-5 text-green-600 dark:text-green-400' />
-                Gelir Vergisi Dilimleri Nasıl Çalışır?
+              <div className='flex items-center gap-3'>
+                <div className='p-2 bg-green-500 text-white rounded-lg'>
+                  <AlertCircle className='h-5 w-5' />
+                </div>
+                <span className='text-xl'>Gelir Vergisi Dilimleri Nasıl Çalışır?</span>
               </div>
-              <Button variant='ghost' size='icon' onClick={() => setShowTaxBracketInfo(false)}>
-                <ChevronUp className='h-4 w-4' />
+              <Button
+                variant='ghost'
+                size='icon'
+                onClick={() => setShowTaxBracketInfo(false)}
+                className='hover:bg-green-200 dark:hover:bg-green-800'
+              >
+                <ChevronUp className='h-5 w-5' />
               </Button>
             </CardTitle>
           </CardHeader>
@@ -753,28 +977,36 @@ export function SalaryCalculator() {
             <div className='bg-white dark:bg-gray-800 p-4 rounded-lg border border-green-200 dark:border-green-700'>
               <h4 className='font-semibold text-gray-800 dark:text-gray-200 mb-2'>2025 Vergi Dilimleri</h4>
               <div className='space-y-2'>
-                {constants.incomeTaxBrackets.map((bracket, index) => (
-                  <div
-                    key={index}
-                    className='flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600'
-                  >
-                    <span className='text-sm text-gray-700 dark:text-gray-300'>
-                      {index === 0 ? '0' : formatCurrency(constants.incomeTaxBrackets[index - 1].max)} -
-                      {bracket.max === Infinity ? '∞' : formatCurrency(bracket.max)} TL
-                    </span>
-                    <span
-                      className={`text-sm font-semibold px-3 py-1 rounded ${
-                        bracket.rate <= 0.2
-                          ? 'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400'
-                          : bracket.rate <= 0.3
-                            ? 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-400'
-                            : 'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-400'
-                      }`}
-                    >
-                      %{(bracket.rate * 100).toFixed(0)}
-                    </span>
-                  </div>
-                ))}
+                <div className='flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600'>
+                  <span className='text-sm text-gray-700 dark:text-gray-300'>0 - 158.000 TL</span>
+                  <span className='text-sm font-semibold px-3 py-1 rounded bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400'>
+                    %15
+                  </span>
+                </div>
+                <div className='flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600'>
+                  <span className='text-sm text-gray-700 dark:text-gray-300'>158.001 - 330.000 TL</span>
+                  <span className='text-sm font-semibold px-3 py-1 rounded bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-400'>
+                    %20
+                  </span>
+                </div>
+                <div className='flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600'>
+                  <span className='text-sm text-gray-700 dark:text-gray-300'>330.001 - 870.000 TL</span>
+                  <span className='text-sm font-semibold px-3 py-1 rounded bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-400'>
+                    %27
+                  </span>
+                </div>
+                <div className='flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600'>
+                  <span className='text-sm text-gray-700 dark:text-gray-300'>870.001 - 3.400.000 TL</span>
+                  <span className='text-sm font-semibold px-3 py-1 rounded bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-400'>
+                    %35
+                  </span>
+                </div>
+                <div className='flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600'>
+                  <span className='text-sm text-gray-700 dark:text-gray-300'>3.400.001 TL ve üzeri</span>
+                  <span className='text-sm font-semibold px-3 py-1 rounded bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-400'>
+                    %40
+                  </span>
+                </div>
               </div>
             </div>
 

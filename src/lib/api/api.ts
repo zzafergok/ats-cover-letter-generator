@@ -22,25 +22,70 @@ import {
   RefreshResponse,
   ContactFormData,
   ContactResponse,
+  TemplateFilters,
   RegisterResponse,
   CVUploadResponse,
   CVUploadsResponse,
   ProvincesResponse,
   DistrictsResponse,
+  ATSAnalysesFilter,
   DetailedCVResponse,
   HighSchoolsResponse,
   CoverLetterTemplate,
   DetailedCVsResponse,
+  ATSOptimizationData,
+  ATSAnalysesResponse,
+  ATSAnalysisResponse,
   UniversitiesResponse,
+  ATSMatchAnalysisData,
+  SalaryLimitsResponse,
+  ContactLimitResponse,
+  AuthProfileUpdateData,
+  AuthSessionsResponse,
+  SalaryCalculationData,
+  TemplateCustomPdfData,
+  AuthResetPasswordData,
+  LocationStatsResponse,
+  CVGeneratorCVResponse,
   CVDetailedGenerateData,
+  AuthChangePasswordData,
+  CVGeneratorCVsResponse,
+  ATSOptimizationResponse,
+  ATSCompleteAnalysisData,
+  HighSchoolStatsResponse,
+  UniversityStatsResponse,
+  StandardSuccessResponse,
+  ATSMatchAnalysisResponse,
+  SeveranceCalculationData,
   CoverLetterBasicResponse,
+  SeveranceCeilingResponse,
+  AuthProfileUpdateResponse,
   CoverLetterBasicsResponse,
+  ATSJobPostingAnalysisData,
+  SalaryCalculationResponse,
+  CVGeneratorGenerationData,
   CoverLetterBasicUpdateData,
+  SeveranceConstantsResponse,
   CoverLetterDetailedResponse,
+  ATSCompleteAnalysisResponse,
   CoverLetterBasicGenerateData,
+  ATSApplyOptimizationResponse,
   CoverLetterDetailedsResponse,
+  SeveranceSaveCalculationData,
+  SeveranceCalculationResponse,
   CoverLetterDetailedUpdateData,
+  ATSJobPostingAnalysisResponse,
+  SalaryTaxConfigurationResponse,
+  CVGeneratorGenerationResponse,
+  CVGeneratorRegenerateResponse,
+  TemplateCustomPdfDataWithTitle,
   CoverLetterDetailedGenerateData,
+  SeveranceSaveCalculationResponse,
+  SeveranceSavedCalculationResponse,
+  SeveranceSavedCalculationsResponse,
+  CVGeneratorTemplatesSimpleResponse,
+  TemplateCreateCoverLetterDataDetailed,
+  TemplateCreateCoverLetterResponseDetailed,
 } from '@/types/api.types'
 
 // Cover Letter API Servisleri - API dokumentasyonuna göre güncellenmiş
@@ -63,12 +108,8 @@ export const coverLetterApi = {
     downloadPdf: (id: string): Promise<Blob> =>
       apiRequest.get(`/cover-letter-basic/${id}/download/pdf`, { responseType: 'blob' }),
 
-    downloadCustomPdf: (data: {
-      content: string
-      positionTitle: string
-      companyName: string
-      language?: 'TURKISH' | 'ENGLISH'
-    }): Promise<Blob> => apiRequest.post('/cover-letter-basic/download/custom-pdf', data, { responseType: 'blob' }),
+    downloadCustomPdf: (data: TemplateCustomPdfData): Promise<Blob> =>
+      apiRequest.post('/cover-letter-basic/download/custom-pdf', data, { responseType: 'blob' }),
   },
 
   // Detailed Cover Letter servisleri
@@ -89,24 +130,15 @@ export const coverLetterApi = {
     downloadPdf: (id: string): Promise<Blob> =>
       apiRequest.get(`/cover-letter-detailed/${id}/download/pdf`, { responseType: 'blob' }),
 
-    downloadCustomPdf: (data: {
-      content: string
-      positionTitle: string
-      companyName: string
-      language?: 'TURKISH' | 'ENGLISH'
-    }): Promise<Blob> => apiRequest.post('/cover-letter-detailed/download/custom-pdf', data, { responseType: 'blob' }),
+    downloadCustomPdf: (data: TemplateCustomPdfData): Promise<Blob> =>
+      apiRequest.post('/cover-letter-detailed/download/custom-pdf', data, { responseType: 'blob' }),
   },
 }
 
 // Template Cover Letter Custom PDF
 export const templateCoverLetterApi = {
-  downloadCustomPdf: (data: {
-    content: string
-    positionTitle: string
-    companyName: string
-    templateTitle?: string
-    language?: 'TURKISH' | 'ENGLISH'
-  }): Promise<Blob> => apiRequest.post('/templates/download/custom-pdf', data, { responseType: 'blob' }),
+  downloadCustomPdf: (data: TemplateCustomPdfDataWithTitle): Promise<Blob> =>
+    apiRequest.post('/templates/download/custom-pdf', data, { responseType: 'blob' }),
 }
 
 export const authApi = {
@@ -119,11 +151,11 @@ export const authApi = {
     apiRequest.post('/auth/login', credentials, { skipAuth: true }),
 
   // Email doğrulama
-  verifyEmail: (token: string): Promise<{ success: boolean; message: string }> =>
+  verifyEmail: (token: string): Promise<StandardSuccessResponse> =>
     apiRequest.post('/auth/verify-email', { token }, { skipAuth: true }),
 
   // Email doğrulama tekrar gönder
-  resendVerification: (email: string): Promise<{ success: boolean; message: string }> =>
+  resendVerification: (email: string): Promise<StandardSuccessResponse> =>
     apiRequest.post('/auth/resend-verification', { email }, { skipAuth: true }),
 
   // Token yenileme
@@ -131,41 +163,32 @@ export const authApi = {
     apiRequest.post('/auth/refresh', { refreshToken }, { skipAuth: true }),
 
   // Çıkış yap
-  logout: (): Promise<{ success: boolean; message: string }> => apiRequest.post('/auth/logout'),
+  logout: (): Promise<StandardSuccessResponse> => apiRequest.post('/auth/logout'),
 
   // Tüm oturumları sonlandır
-  logoutAll: (): Promise<{ success: boolean; message: string }> => apiRequest.post('/auth/logout-all'),
+  logoutAll: (): Promise<StandardSuccessResponse> => apiRequest.post('/auth/logout-all'),
 
   // Şifre unuttum
-  forgotPassword: (email: string): Promise<{ success: boolean; message: string }> =>
+  forgotPassword: (email: string): Promise<StandardSuccessResponse> =>
     apiRequest.post('/auth/forgot-password', { email }, { skipAuth: true }),
 
   // Şifre sıfırla
-  resetPassword: (data: {
-    token: string
-    newPassword: string
-    confirmPassword: string
-  }): Promise<{ success: boolean; message: string }> =>
+  resetPassword: (data: AuthResetPasswordData): Promise<StandardSuccessResponse> =>
     apiRequest.post('/auth/reset-password', data, { skipAuth: true }),
 
   // Mevcut kullanıcı bilgisi
   getCurrentUser: (): Promise<{ success: boolean; data: AuthUser }> => apiRequest.get('/auth/me'),
 
   // Profil güncelle
-  updateProfile: (data: {
-    firstName: string
-    lastName: string
-  }): Promise<{ success: boolean; data: AuthUser; message?: string }> => apiRequest.put('/auth/profile', data),
+  updateProfile: (data: AuthProfileUpdateData): Promise<AuthProfileUpdateResponse> =>
+    apiRequest.put('/auth/profile', data),
 
   // Şifre değiştir
-  changePassword: (data: {
-    currentPassword: string
-    newPassword: string
-    confirmPassword: string
-  }): Promise<{ success: boolean; message: string }> => apiRequest.put('/auth/change-password', data),
+  changePassword: (data: AuthChangePasswordData): Promise<StandardSuccessResponse> =>
+    apiRequest.put('/auth/change-password', data),
 
   // Kullanıcı oturumları
-  getSessions: (): Promise<{ success: boolean; data: any[] }> => apiRequest.get('/auth/sessions'),
+  getSessions: (): Promise<AuthSessionsResponse> => apiRequest.get('/auth/sessions'),
 }
 
 // User Profile API Servisleri
@@ -273,8 +296,7 @@ export const contactApi = {
 
   getMessages: (): Promise<{ success: boolean; data: any[] }> => apiRequest.get('/contact/messages'),
 
-  checkLimit: (): Promise<{ success: boolean; data: { remainingRequests: number; resetTime: string } }> =>
-    apiRequest.get('/contact/limit', { skipAuth: true }),
+  checkLimit: (): Promise<ContactLimitResponse> => apiRequest.get('/contact/limit', { skipAuth: true }),
 }
 
 // CV Upload Services - API dokumentasyonuna göre güncellenmiş
@@ -300,118 +322,28 @@ export const cvUploadApi = {
 // CV Template Generation Services - Yeni CV generator servisleri
 export const cvGeneratorApi = {
   // Mevcut template'leri al
-  getTemplates: (): Promise<{
-    success: boolean
-    data: Array<{
-      id: string
-      name: string
-      description: string
-      language: string
-    }>
-  }> => apiRequest.get('/cv-generator/templates'),
+  getTemplates: (): Promise<CVGeneratorTemplatesSimpleResponse> => apiRequest.get('/cv-generator/templates'),
 
   // Template'den CV oluştur
-  generate: (data: {
-    templateType: 'basic_hr' | 'office_manager' | 'simple_classic' | 'stylish_accounting' | 'minimalist_turkish'
-    data: {
-      personalInfo: {
-        fullName: string
-        address?: string
-        city?: string
-        state?: string
-        zipCode?: string
-        phone?: string
-        email: string
-      }
-      objective?: string
-      experience?: Array<{
-        jobTitle: string
-        company: string
-        location?: string
-        startDate: string
-        endDate?: string
-        description?: string
-      }>
-      education?: Array<{
-        degree: string
-        university: string
-        location?: string
-        graduationDate?: string
-        details?: string
-      }>
-      communication?: string
-      leadership?: string
-      references?: Array<{
-        name: string
-        company: string
-        contact: string
-      }>
-    }
-  }): Promise<{
-    success: boolean
-    message: string
-    data: {
-      id: string
-      templateType: string
-      generationStatus: 'COMPLETED' | 'PENDING' | 'PROCESSING' | 'FAILED'
-      createdAt: string
-      updatedAt: string
-    }
-  }> => apiRequest.post('/cv-generator/generate', data),
+  generate: (data: CVGeneratorGenerationData): Promise<CVGeneratorGenerationResponse> =>
+    apiRequest.post('/cv-generator/generate', data),
 
   // Kullanıcının oluşturduğu CV'leri al
-  getGeneratedCVs: (): Promise<{
-    success: boolean
-    data: Array<{
-      id: string
-      templateType: string
-      generationStatus: 'COMPLETED' | 'PENDING' | 'PROCESSING' | 'FAILED'
-      createdAt: string
-      updatedAt: string
-    }>
-    limitInfo: {
-      current: number
-      maximum: number
-      canCreate: boolean
-      type: string
-    }
-  }> => apiRequest.get('/cv-generator'),
+  getGeneratedCVs: (): Promise<CVGeneratorCVsResponse> => apiRequest.get('/cv-generator'),
 
   // Belirli bir CV'yi al
-  getGeneratedCV: (
-    cvId: string,
-  ): Promise<{
-    success: boolean
-    data: {
-      id: string
-      templateType: string
-      generationStatus: 'COMPLETED' | 'PENDING' | 'PROCESSING' | 'FAILED'
-      createdAt: string
-      updatedAt: string
-    }
-  }> => apiRequest.get(`/cv-generator/${cvId}`),
+  getGeneratedCV: (cvId: string): Promise<CVGeneratorCVResponse> => apiRequest.get(`/cv-generator/${cvId}`),
 
   // CV'yi PDF olarak indir
   downloadPdf: (cvId: string): Promise<Blob> =>
     apiRequest.get(`/cv-generator/${cvId}/download`, { responseType: 'blob' }),
 
   // CV'yi yeniden oluştur
-  regenerate: (
-    cvId: string,
-  ): Promise<{
-    success: boolean
-    message: string
-    data: {
-      id: string
-      templateType: string
-      generationStatus: 'COMPLETED' | 'PENDING' | 'PROCESSING' | 'FAILED'
-      createdAt: string
-      updatedAt: string
-    }
-  }> => apiRequest.post(`/cv-generator/${cvId}/regenerate`),
+  regenerate: (cvId: string): Promise<CVGeneratorRegenerateResponse> =>
+    apiRequest.post(`/cv-generator/${cvId}/regenerate`),
 
   // CV'yi sil
-  delete: (cvId: string): Promise<{ success: boolean; message: string }> => apiRequest.delete(`/cv-generator/${cvId}`),
+  delete: (cvId: string): Promise<StandardSuccessResponse> => apiRequest.delete(`/cv-generator/${cvId}`),
 }
 
 // Legacy CV API - Geriye dönük uyumluluk için
@@ -479,10 +411,7 @@ export const locationApi = {
   },
 
   // Lokasyon istatistikleri
-  getStats: (): Promise<{
-    success: boolean
-    data: { totalProvinces: number; totalDistricts: number; isLoaded: boolean }
-  }> => apiRequest.get('/locations/stats', { skipAuth: true }),
+  getStats: (): Promise<LocationStatsResponse> => apiRequest.get('/locations/stats', { skipAuth: true }),
 }
 
 // School API Servisleri - Güncel API format
@@ -503,11 +432,10 @@ export const schoolApi = {
     apiRequest.get(`/high-schools/${id}`, { skipAuth: true }),
 
   // Lise istatistikleri
-  getHighSchoolStats: (): Promise<{ success: boolean; data: { total: number; cities: number; isLoaded: boolean } }> =>
-    apiRequest.get('/high-schools/stats', { skipAuth: true }),
+  getHighSchoolStats: (): Promise<HighSchoolStatsResponse> => apiRequest.get('/high-schools/stats', { skipAuth: true }),
 
   // Lise verilerini yenile
-  reloadHighSchools: (): Promise<{ success: boolean; message: string }> =>
+  reloadHighSchools: (): Promise<StandardSuccessResponse> =>
     apiRequest.post('/high-schools/reload', {}, { skipAuth: true }),
 
   // Üniversite servisleri
@@ -530,32 +458,17 @@ export const schoolApi = {
     apiRequest.get(`/universities/${id}`, { skipAuth: true }),
 
   // Üniversite istatistikleri
-  getUniversityStats: (): Promise<{
-    success: boolean
-    data: {
-      total: number
-      state: number
-      foundation: number
-      private: number
-      cities: number
-      isLoaded: boolean
-      lastUpdated: string
-    }
-  }> => apiRequest.get('/universities/stats', { skipAuth: true }),
+  getUniversityStats: (): Promise<UniversityStatsResponse> => apiRequest.get('/universities/stats', { skipAuth: true }),
 
   // Üniversite verilerini yenile
-  refreshUniversities: (): Promise<{ success: boolean; message: string }> =>
+  refreshUniversities: (): Promise<StandardSuccessResponse> =>
     apiRequest.post('/universities/refresh', {}, { skipAuth: true }),
 }
 
 // Template API Servisleri - API dokumentasyonuna göre güncellenmiş
 export const templateApi = {
   // Tüm template'leri al (filtreleme seçenekleri ile)
-  getAll: (params?: {
-    industry?: 'TECHNOLOGY' | 'FINANCE' | 'HEALTHCARE' | 'EDUCATION' | 'MARKETING'
-    category?: string
-    language?: 'TURKISH' | 'ENGLISH'
-  }): Promise<{ success: boolean; data: CoverLetterTemplate[]; message?: string }> => {
+  getAll: (params?: TemplateFilters): Promise<{ success: boolean; data: CoverLetterTemplate[]; message?: string }> => {
     const queryParams = new URLSearchParams()
     if (params?.industry) queryParams.append('industry', params.industry)
     if (params?.category) queryParams.append('category', params.category)
@@ -580,194 +493,111 @@ export const templateApi = {
     apiRequest.get(`/templates/${templateId}`),
 
   // Template'den cover letter oluştur
-  createCoverLetter: (data: {
-    templateId: string
-    positionTitle: string
-    companyName: string
-    personalizations: {
-      whyPosition?: string
-      whyCompany?: string
-      additionalSkills?: string
-    }
-  }): Promise<{
-    success: boolean
-    data: { content: string; templateId: string; positionTitle: string; companyName: string }
-    message?: string
-  }> => apiRequest.post('/templates/create-cover-letter', data),
+  createCoverLetter: (
+    data: TemplateCreateCoverLetterDataDetailed,
+  ): Promise<TemplateCreateCoverLetterResponseDetailed> => apiRequest.post('/templates/create-cover-letter', data),
 
   // Template'leri başlat (Admin)
-  initialize: (): Promise<{ success: boolean; message: string }> => apiRequest.post('/templates/initialize'),
+  initialize: (): Promise<StandardSuccessResponse> => apiRequest.post('/templates/initialize'),
 }
 
 // Salary Calculator API Servisleri - SALARY_API.md'ye göre
 export const salaryApi = {
   // Genel maaş hesaplama
-  calculate: (data: {
-    grossSalary?: number
-    netSalary?: number
-    year?: number
-    month?: number
-    isMarried?: boolean
-    dependentCount?: number
-    isDisabled?: boolean
-    disabilityDegree?: 1 | 2 | 3
-  }): Promise<{
-    success: boolean
-    data: {
-      grossSalary: number
-      netSalary: number
-      sgkEmployeeShare: number
-      unemploymentInsurance: number
-      incomeTax: number
-      stampTax: number
-      totalDeductions: number
-      employerCost: number
-      employerSgkShare: number
-      employerUnemploymentInsurance: number
-      breakdown: {
-        taxableIncome: number
-        appliedTaxBracket: {
-          minAmount: number
-          maxAmount: number
-          rate: number
-          cumulativeTax: number
-        }
-        minimumWageExemption: number
-        minimumLivingAllowance: number
-        effectiveTaxRate: number
-      }
-    }
-    message?: string
-  }> => apiRequest.post('/salary/calculate', data, { skipAuth: true }),
+  calculate: (data: SalaryCalculationData): Promise<SalaryCalculationResponse> =>
+    apiRequest.post('/salary/calculate', data, { skipAuth: true }),
 
   // Brüt'ten net'e hesaplama
-  grossToNet: (data: {
-    grossSalary: number
-    year?: number
-    month?: number
-    isMarried?: boolean
-    dependentCount?: number
-    isDisabled?: boolean
-    disabilityDegree?: 1 | 2 | 3
-  }): Promise<{
-    success: boolean
-    data: {
-      grossSalary: number
-      netSalary: number
-      sgkEmployeeShare: number
-      unemploymentInsurance: number
-      incomeTax: number
-      stampTax: number
-      totalDeductions: number
-      employerCost: number
-      employerSgkShare: number
-      employerUnemploymentInsurance: number
-      breakdown: {
-        taxableIncome: number
-        appliedTaxBracket: {
-          minAmount: number
-          maxAmount: number
-          rate: number
-          cumulativeTax: number
-        }
-        minimumWageExemption: number
-        minimumLivingAllowance: number
-        effectiveTaxRate: number
-      }
-    }
-    message?: string
-  }> => apiRequest.post('/salary/gross-to-net', data, { skipAuth: true }),
+  grossToNet: (data: SalaryCalculationData): Promise<SalaryCalculationResponse> =>
+    apiRequest.post('/salary/gross-to-net', data, { skipAuth: true }),
 
   // Net'ten brüt'e hesaplama
-  netToGross: (data: {
-    netSalary: number
-    year?: number
-    month?: number
-    maxIterations?: number
-    precision?: number
-    isMarried?: boolean
-    dependentCount?: number
-    isDisabled?: boolean
-    disabilityDegree?: 1 | 2 | 3
-  }): Promise<{
-    success: boolean
-    data: {
-      grossSalary: number
-      netSalary: number
-      sgkEmployeeShare: number
-      unemploymentInsurance: number
-      incomeTax: number
-      stampTax: number
-      totalDeductions: number
-      employerCost: number
-      employerSgkShare: number
-      employerUnemploymentInsurance: number
-      breakdown: {
-        taxableIncome: number
-        appliedTaxBracket: {
-          minAmount: number
-          maxAmount: number
-          rate: number
-          cumulativeTax: number
-        }
-        minimumWageExemption: number
-        minimumLivingAllowance: number
-        effectiveTaxRate: number
-      }
-    }
-    message?: string
-  }> => apiRequest.post('/salary/net-to-gross', data, { skipAuth: true }),
+  netToGross: (data: SalaryCalculationData): Promise<SalaryCalculationResponse> =>
+    apiRequest.post('/salary/net-to-gross', data, { skipAuth: true }),
 
   // Maaş limitleri
-  getLimits: (
-    year?: number,
-  ): Promise<{
-    success: boolean
-    data: {
-      minGrossSalary: number
-      maxGrossSalary: number
-      minNetSalary: number
-      maxNetSalary: number
-    }
-    message?: string
-  }> => {
+  getLimits: (year?: number): Promise<SalaryLimitsResponse> => {
     const queryParams = year ? `?year=${year}` : ''
     return apiRequest.get(`/salary/limits${queryParams}`, { skipAuth: true })
   },
 
   // Vergi konfigürasyonu
-  getTaxConfiguration: (
-    year?: number,
-  ): Promise<{
-    success: boolean
-    data: {
-      year: number
-      brackets: Array<{
-        minAmount: number
-        maxAmount: number
-        rate: number
-        cumulativeTax: number
-      }>
-      sgkRates: {
-        employeeRate: number
-        employerRate: number
-        employerDiscountedRate: number
-        unemploymentEmployeeRate: number
-        unemploymentEmployerRate: number
-        lowerLimit: number
-        upperLimit: number
-      }
-      stampTaxRate: number
-      minimumWage: {
-        gross: number
-        net: number
-        daily: number
-        hourly: number
-      }
-    }
-    message?: string
-  }> => {
+  getTaxConfiguration: (year?: number): Promise<SalaryTaxConfigurationResponse> => {
     const queryParams = year ? `?year=${year}` : ''
     return apiRequest.get(`/salary/tax-configuration${queryParams}`, { skipAuth: true })
   },
+}
+
+// ATS Optimization API Servisleri - API dokumentasyonuna göre
+export const atsApi = {
+  // İş ilanı analizi
+  analyzeJobPosting: (data: ATSJobPostingAnalysisData): Promise<ATSJobPostingAnalysisResponse> =>
+    apiRequest.post('/ats/analyze-job-posting', data),
+
+  // CV-Job uyum analizi
+  analyzeMatch: (jobAnalysisId: string, data: ATSMatchAnalysisData): Promise<ATSMatchAnalysisResponse> =>
+    apiRequest.post(`/ats/analyze-match/${jobAnalysisId}`, data),
+
+  // CV optimizasyon
+  optimize: (matchAnalysisId: string, data: ATSOptimizationData): Promise<ATSOptimizationResponse> =>
+    apiRequest.post(`/ats/optimize/${matchAnalysisId}`, data),
+
+  // Tam ATS analizi (tek istekte tüm süreç)
+  completeAnalysis: (data: ATSCompleteAnalysisData): Promise<ATSCompleteAnalysisResponse> =>
+    apiRequest.post('/ats/complete-analysis', data),
+
+  // Optimizasyonu profile uygula
+  applyOptimization: (optimizationId: string): Promise<ATSApplyOptimizationResponse> =>
+    apiRequest.post(`/ats/apply-optimization/${optimizationId}`),
+
+  // Kullanıcının ATS analizlerini listele
+  getMyAnalyses: (params?: ATSAnalysesFilter): Promise<ATSAnalysesResponse> => {
+    const queryParams = new URLSearchParams()
+    if (params?.page) queryParams.append('page', params.page.toString())
+    if (params?.limit) queryParams.append('limit', params.limit.toString())
+    if (params?.type) queryParams.append('type', params.type)
+
+    const queryString = queryParams.toString()
+    return apiRequest.get(`/ats/my-analyses${queryString ? `?${queryString}` : ''}`)
+  },
+
+  // Belirli bir analizi getir
+  getAnalysis: (analysisId: string): Promise<ATSAnalysisResponse> => apiRequest.get(`/ats/analysis/${analysisId}`),
+
+  // Analizi sil
+  deleteAnalysis: (analysisId: string): Promise<StandardSuccessResponse> =>
+    apiRequest.delete(`/ats/analysis/${analysisId}`),
+}
+
+// Severance Calculator API Servisleri
+export const severanceApi = {
+  // Kıdem ve İhbar Tazminatı hesaplama
+  calculate: (data: SeveranceCalculationData): Promise<SeveranceCalculationResponse> =>
+    apiRequest.post('/severance/calculate', data, { skipAuth: true }),
+
+  // Kıdem tazminatı sabitleri ve kuralları
+  getConstants: (year?: number): Promise<SeveranceConstantsResponse> => {
+    const queryParams = year ? `?year=${year}` : ''
+    return apiRequest.get(`/severance/constants${queryParams}`, { skipAuth: true })
+  },
+
+  // Kıdem tazminatı tavanı sorgulama
+  getSeveranceCeiling: (date: string): Promise<SeveranceCeilingResponse> =>
+    apiRequest.get(`/severance/ceiling?date=${date}`, { skipAuth: true }),
+
+  // Geçmiş hesaplamaları kaydet (opsiyonel - kullanıcı girişi gerektiriyorsa)
+  saveCalculation: (data: SeveranceSaveCalculationData): Promise<SeveranceSaveCalculationResponse> =>
+    apiRequest.post('/severance/save-calculation', data),
+
+  // Kaydedilen hesaplamaları listele
+  getSavedCalculations: (): Promise<SeveranceSavedCalculationsResponse> =>
+    apiRequest.get('/severance/saved-calculations'),
+
+  // Kaydedilen hesaplamayı getir
+  getSavedCalculation: (id: string): Promise<SeveranceSavedCalculationResponse> =>
+    apiRequest.get(`/severance/saved-calculations/${id}`),
+
+  // Kaydedilen hesaplamayı sil
+  deleteSavedCalculation: (id: string): Promise<StandardSuccessResponse> =>
+    apiRequest.delete(`/severance/saved-calculations/${id}`),
 }

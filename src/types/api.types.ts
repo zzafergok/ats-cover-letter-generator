@@ -808,6 +808,130 @@ export interface CVGeneratorTemplatesResponse {
   data: CVGeneratorTemplate[]
 }
 
+// Additional CV Generator Types - Missing inline types
+export interface CVGeneratorTemplatesSimpleResponse {
+  success: boolean
+  data: Array<{
+    id: string
+    name: string
+    description: string
+    language: string
+  }>
+}
+
+export interface CVGeneratorGenerationData {
+  templateType: 'basic_hr' | 'office_manager' | 'simple_classic' | 'stylish_accounting' | 'minimalist_turkish'
+  data: {
+    personalInfo: {
+      fullName: string
+      address?: string
+      city?: string
+      state?: string
+      zipCode?: string
+      phone?: string
+      email: string
+    }
+    objective?: string
+    experience?: Array<{
+      jobTitle: string
+      company: string
+      location?: string
+      startDate: string
+      endDate?: string
+      description?: string
+    }>
+    education?: Array<{
+      degree: string
+      university: string
+      location?: string
+      graduationDate?: string
+      details?: string
+    }>
+    communication?: string
+    leadership?: string
+    references?: Array<{
+      name: string
+      company: string
+      contact: string
+    }>
+  }
+}
+
+export interface CVGeneratorGenerationResponse {
+  success: boolean
+  message: string
+  data: {
+    id: string
+    templateType: string
+    generationStatus: 'COMPLETED' | 'PENDING' | 'PROCESSING' | 'FAILED'
+    createdAt: string
+    updatedAt: string
+  }
+}
+
+export interface CVGeneratorCVsResponse {
+  success: boolean
+  data: Array<{
+    id: string
+    templateType: string
+    generationStatus: 'COMPLETED' | 'PENDING' | 'PROCESSING' | 'FAILED'
+    createdAt: string
+    updatedAt: string
+  }>
+  limitInfo: {
+    current: number
+    maximum: number
+    canCreate: boolean
+    type: string
+  }
+}
+
+export interface CVGeneratorCVResponse {
+  success: boolean
+  data: {
+    id: string
+    templateType: string
+    generationStatus: 'COMPLETED' | 'PENDING' | 'PROCESSING' | 'FAILED'
+    createdAt: string
+    updatedAt: string
+  }
+}
+
+export interface CVGeneratorRegenerateResponse {
+  success: boolean
+  message: string
+  data: {
+    id: string
+    templateType: string
+    generationStatus: 'COMPLETED' | 'PENDING' | 'PROCESSING' | 'FAILED'
+    createdAt: string
+    updatedAt: string
+  }
+}
+
+// Template Cover Letter Creation Types - Missing inline types
+export interface TemplateCreateCoverLetterDataDetailed {
+  templateId: string
+  positionTitle: string
+  companyName: string
+  personalizations: {
+    whyPosition?: string
+    whyCompany?: string
+    additionalSkills?: string
+  }
+}
+
+export interface TemplateCreateCoverLetterResponseDetailed {
+  success: boolean
+  data: {
+    content: string
+    templateId: string
+    positionTitle: string
+    companyName: string
+  }
+  message?: string
+}
+
 // DOCX Template PDF System Types
 export interface DOCXTemplate {
   id: string
@@ -874,4 +998,552 @@ export interface DOCXTemplatePDFResponse {
       processingTimeMs: number
     }
   }
+}
+
+// ATS Optimization API Types - API dokumentasyonuna göre
+export interface ATSJobPostingAnalysisData {
+  jobPostingText?: string
+  jobPostingUrl?: string
+  companyName?: string
+  positionTitle?: string
+}
+
+export interface ATSJobAnalysis {
+  id: string
+  userId: string
+  companyName: string
+  positionTitle: string
+  requiredSkills: string[]
+  preferredSkills: string[]
+  requiredExperience: Array<{
+    skillArea: string
+    minimumYears: number
+    isRequired: boolean
+    description: string
+  }>
+  keywords: Array<{
+    keyword: string
+    category: 'TECHNICAL' | 'SOFT_SKILL' | 'INDUSTRY' | 'ROLE'
+    importance: 'HIGH' | 'MEDIUM' | 'LOW'
+    frequency: number
+  }>
+  atsKeywords: string[]
+  seniorityLevel: 'ENTRY' | 'JUNIOR' | 'MID' | 'SENIOR' | 'LEAD' | 'EXECUTIVE'
+  industryType: string
+  analysisStatus: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED'
+  createdAt: string
+}
+
+export interface ATSJobPostingAnalysisResponse {
+  success: boolean
+  data: {
+    jobAnalysis: ATSJobAnalysis
+  }
+  message?: string
+}
+
+export interface ATSMatchAnalysisData {
+  useUserProfile?: boolean
+  cvData?: any
+}
+
+export interface ATSMatchAnalysis {
+  id: string
+  userId: string
+  jobAnalysisId: string
+  overallScore: number
+  skillsMatch: {
+    score: number
+    totalRequired: number
+    matched: number
+    missing: string[]
+    extra: string[]
+  }
+  experienceMatch: {
+    score: number
+    totalYearsRequired: number
+    totalYearsUser: number
+    relevantExperiences: Array<{
+      company: string
+      position: string
+      relevanceScore: number
+      matchingSkills: string[]
+    }>
+  }
+  keywordMatch: {
+    score: number
+    totalKeywords: number
+    matchedKeywords: number
+    missingHighPriority: string[]
+    missingMediumPriority: string[]
+  }
+  missingSkills: string[]
+  recommendations: Array<{
+    type: 'SKILL_GAP' | 'EXPERIENCE_GAP' | 'KEYWORD_OPTIMIZATION' | 'FORMAT_IMPROVEMENT'
+    priority: 'HIGH' | 'MEDIUM' | 'LOW'
+    title: string
+    description: string
+    estimatedImpact: number
+  }>
+  matchStatus: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED'
+}
+
+export interface ATSMatchAnalysisResponse {
+  success: boolean
+  data: {
+    matchAnalysis: ATSMatchAnalysis
+  }
+  message?: string
+}
+
+export interface ATSOptimizationData {
+  optimizationLevel: 'BASIC' | 'ADVANCED' | 'COMPREHENSIVE'
+  targetSections: Array<{
+    section: 'SKILLS' | 'EXPERIENCE' | 'EDUCATION' | 'OBJECTIVE' | 'KEYWORDS'
+    priority: 'HIGH' | 'MEDIUM' | 'LOW'
+  }>
+  preserveOriginal?: boolean
+}
+
+export interface ATSOptimization {
+  id: string
+  userId: string
+  matchAnalysisId: string
+  beforeScore: number
+  afterScore: number
+  improvementPercentage: number
+  changes: Array<{
+    section: string
+    changeType: 'ADDED' | 'MODIFIED' | 'REMOVED' | 'REORDERED'
+    newValue: string
+    reason: string
+    keywords: string[]
+  }>
+  atsCompliance: {
+    score: number
+    passedChecks: string[]
+    failedChecks: string[]
+    recommendations: Array<{
+      category: string
+      recommendation: string
+      impact: 'HIGH' | 'MEDIUM' | 'LOW'
+    }>
+  }
+  optimizationStatus: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED'
+}
+
+export interface ATSOptimizationResponse {
+  success: boolean
+  data: {
+    optimization: ATSOptimization
+  }
+  message?: string
+}
+
+export interface ATSCompleteAnalysisData {
+  jobPostingAnalysis: {
+    jobPostingText?: string
+    jobPostingUrl?: string
+    companyName?: string
+    positionTitle?: string
+  }
+  optimizationLevel: 'BASIC' | 'ADVANCED' | 'COMPREHENSIVE'
+  targetSections: Array<{
+    section: 'SKILLS' | 'EXPERIENCE' | 'EDUCATION' | 'OBJECTIVE' | 'KEYWORDS'
+    priority: 'HIGH' | 'MEDIUM' | 'LOW'
+  }>
+}
+
+export interface ATSCompleteAnalysisResponse {
+  success: boolean
+  data: {
+    jobAnalysis: any
+    matchAnalysis: any
+    optimization: any
+  }
+  message?: string
+}
+
+export interface ATSApplyOptimizationResponse {
+  success: boolean
+  data: {
+    applied: boolean
+  }
+  message?: string
+}
+
+export interface ATSAnalysesFilter {
+  page?: number
+  limit?: number
+  type?: 'job_analysis' | 'match_analysis' | 'optimization'
+}
+
+export interface ATSAnalysisItem {
+  id: string
+  type: 'job_analysis' | 'match_analysis' | 'optimization'
+  companyName: string
+  positionTitle: string
+  score?: number
+  createdAt: string
+}
+
+export interface ATSAnalysesResponse {
+  success: boolean
+  data: {
+    analyses: ATSAnalysisItem[]
+    pagination: {
+      page: number
+      limit: number
+      total: number
+      totalPages: number
+    }
+  }
+  message?: string
+}
+
+export interface ATSAnalysisResponse {
+  success: boolean
+  data: any
+  message?: string
+}
+
+// Severance Calculator API Types
+export interface SeveranceCalculationData {
+  workStartDate: string // ISO date string
+  workEndDate: string // ISO date string
+  monthlyGrossSalary: number
+  cumulativeTaxBase?: number
+  calculationBasisDays?: number // default: 30
+}
+
+export interface SeveranceCalculationResult {
+  // Çalışma bilgileri
+  workStartDate: string
+  workEndDate: string
+  totalWorkDays: number
+  totalWorkYears: number
+  totalWorkMonths: number
+  totalWorkDaysRemainder: number
+
+  // Maaş bilgileri
+  monthlyGrossSalary: number
+  dailyGrossWage: number
+  cumulativeTaxBase: number
+  appliedSeveranceCeiling: number
+
+  // Kıdem tazminatı
+  severanceEligibleDays: number
+  severanceGrossAmount: number
+  severanceStampTax: number
+  severanceNetAmount: number
+  severanceEligible: boolean
+
+  // İhbar tazminatı
+  noticeEligibleDays: number
+  noticeGrossAmount: number
+  noticeIncomeTax: number
+  noticeStampTax: number
+  noticeNetAmount: number
+  noticeExemptionApplied: number
+
+  // Toplam
+  totalGrossAmount: number
+  totalTaxes: number
+  totalNetAmount: number
+
+  // Hesaplama detayları
+  calculationDetails: {
+    severanceCalculationBasis: string
+    noticeCalculationBasis: string
+    taxYear: number
+    stampTaxRate: number
+    incomeTaxBrackets: Array<{
+      min: number
+      max: number
+      rate: number
+      appliedAmount: number
+      taxAmount: number
+    }>
+  }
+}
+
+export interface SeveranceCalculationResponse {
+  success: boolean
+  data: SeveranceCalculationResult
+  message?: string
+}
+
+export interface SeveranceConstants {
+  year: number
+  // Kıdem tazminatı tavanları
+  severanceCeilingH1: number // Ocak-Haziran
+  severanceCeilingH2: number // Temmuz-Aralık
+
+  // Vergi oranları
+  stampTaxRate: number
+  incomeTaxBrackets: Array<{
+    min: number
+    max: number
+    rate: number
+  }>
+
+  // Kıdem tazminatı kuralları
+  minimumWorkDaysForSeverance: number // 365 gün
+  severanceDaysPerYear: number // 30 gün
+
+  // İhbar tazminatı kuralları
+  noticeRules: {
+    lessThan6Months: number // 2 hafta
+    lessThan18Months: number // 4 hafta
+    lessThan3Years: number // 6 hafta
+    moreThan3Years: number // 8 hafta
+  }
+
+  // İhbar tazminatı muafiyet tutarı
+  noticeExemptionAmount: number
+}
+
+export interface SeveranceConstantsResponse {
+  success: boolean
+  data: SeveranceConstants
+  message?: string
+}
+
+export interface SeveranceCeilingData {
+  date: string
+  ceilingAmount: number
+  period: 'H1' | 'H2' // Hangi yarıyıl
+  year: number
+}
+
+export interface SeveranceCeilingResponse {
+  success: boolean
+  data: SeveranceCeilingData
+  message?: string
+}
+
+export interface SeveranceSaveCalculationData {
+  calculationName?: string
+  workStartDate: string
+  workEndDate: string
+  monthlyGrossSalary: number
+  cumulativeTaxBase?: number
+  calculationResult: any
+}
+
+export interface SeveranceSaveCalculationResponse {
+  success: boolean
+  data: {
+    id: string
+    calculationName: string
+    createdAt: string
+  }
+  message?: string
+}
+
+export interface SeveranceSavedCalculationItem {
+  id: string
+  calculationName: string
+  workStartDate: string
+  workEndDate: string
+  monthlyGrossSalary: number
+  totalNetAmount: number
+  createdAt: string
+}
+
+export interface SeveranceSavedCalculationsResponse {
+  success: boolean
+  data: SeveranceSavedCalculationItem[]
+  message?: string
+}
+
+export interface SeveranceSavedCalculationDetail {
+  id: string
+  calculationName: string
+  workStartDate: string
+  workEndDate: string
+  monthlyGrossSalary: number
+  cumulativeTaxBase: number
+  calculationResult: any
+  createdAt: string
+}
+
+export interface SeveranceSavedCalculationResponse {
+  success: boolean
+  data: SeveranceSavedCalculationDetail
+  message?: string
+}
+
+// Salary Calculator Types - Existing types expanded
+export interface SalaryCalculationData {
+  grossSalary?: number
+  netSalary?: number
+  year?: number
+  month?: number
+  isMarried?: boolean
+  dependentCount?: number
+  isDisabled?: boolean
+  disabilityDegree?: 1 | 2 | 3
+}
+
+export interface SalaryCalculationResult {
+  grossSalary: number
+  netSalary: number
+  sgkEmployeeShare: number
+  unemploymentInsurance: number
+  incomeTax: number
+  stampTax: number
+  totalDeductions: number
+  employerCost: number
+  employerSgkShare: number
+  employerUnemploymentInsurance: number
+  breakdown: {
+    taxableIncome: number
+    appliedTaxBracket: {
+      minAmount: number
+      maxAmount: number
+      rate: number
+      cumulativeTax: number
+    }
+    minimumWageExemption: number
+    minimumLivingAllowance: number
+    effectiveTaxRate: number
+  }
+}
+
+export interface SalaryCalculationResponse {
+  success: boolean
+  data: SalaryCalculationResult
+  message?: string
+}
+
+export interface SalaryLimitsResponse {
+  success: boolean
+  data: {
+    minGrossSalary: number
+    maxGrossSalary: number
+    minNetSalary: number
+    maxNetSalary: number
+  }
+  message?: string
+}
+
+export interface SalaryTaxConfiguration {
+  year: number
+  brackets: Array<{
+    minAmount: number
+    maxAmount: number
+    rate: number
+    cumulativeTax: number
+  }>
+  sgkRates: {
+    employeeRate: number
+    employerRate: number
+    employerDiscountedRate: number
+    unemploymentEmployeeRate: number
+    unemploymentEmployerRate: number
+    lowerLimit: number
+    upperLimit: number
+  }
+  stampTaxRate: number
+  minimumWage: {
+    gross: number
+    net: number
+    daily: number
+    hourly: number
+  }
+}
+
+export interface SalaryTaxConfigurationResponse {
+  success: boolean
+  data: SalaryTaxConfiguration
+  message?: string
+}
+
+// Template API Response Types - Inline types'ı tanımlamak için
+export interface TemplateCustomPdfData {
+  content: string
+  positionTitle: string
+  companyName: string
+  language?: 'TURKISH' | 'ENGLISH'
+}
+
+export interface TemplateCustomPdfDataWithTitle extends TemplateCustomPdfData {
+  templateTitle?: string
+}
+
+// Contact Limit Response Type
+export interface ContactLimitResponse {
+  success: boolean
+  data: { remainingRequests: number; resetTime: string }
+}
+
+// Auth Profile Update Data
+export interface AuthProfileUpdateData {
+  firstName: string
+  lastName: string
+}
+
+export interface AuthProfileUpdateResponse {
+  success: boolean
+  data: AuthUser
+  message?: string
+}
+
+// Auth Change Password Data
+export interface AuthChangePasswordData {
+  currentPassword: string
+  newPassword: string
+  confirmPassword: string
+}
+
+// Auth Reset Password Data
+export interface AuthResetPasswordData {
+  token: string
+  newPassword: string
+  confirmPassword: string
+}
+
+// Auth Sessions Response
+export interface AuthSessionsResponse {
+  success: boolean
+  data: any[]
+}
+
+// Location Stats Response
+export interface LocationStatsResponse {
+  success: boolean
+  data: { totalProvinces: number; totalDistricts: number; isLoaded: boolean }
+}
+
+// School Stats Responses
+export interface HighSchoolStatsResponse {
+  success: boolean
+  data: { total: number; cities: number; isLoaded: boolean }
+}
+
+export interface UniversityStatsResponse {
+  success: boolean
+  data: {
+    total: number
+    state: number
+    foundation: number
+    private: number
+    cities: number
+    isLoaded: boolean
+    lastUpdated: string
+  }
+}
+
+// Template Filter Types
+export interface TemplateFilters {
+  industry?: 'TECHNOLOGY' | 'FINANCE' | 'HEALTHCARE' | 'EDUCATION' | 'MARKETING'
+  category?: string
+  language?: 'TURKISH' | 'ENGLISH'
+}
+
+// Standard Success Response
+export interface StandardSuccessResponse {
+  success: boolean
+  message: string
 }

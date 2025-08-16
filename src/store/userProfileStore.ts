@@ -2,7 +2,16 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { userProfileApi } from '@/lib/api/api'
-import type { UserProfile, Education, WorkExperience, Course, Certificate, Hobby, Skill } from '@/types/api.types'
+import type {
+  UserProfile,
+  Education,
+  WorkExperience,
+  Course,
+  Certificate,
+  Hobby,
+  Skill,
+  Project,
+} from '@/types/api.types'
 
 interface UserProfileState {
   profile: UserProfile | null
@@ -54,6 +63,11 @@ interface UserProfileActions {
   addReference: (data: { name: string; company: string; contact: string }) => Promise<void>
   updateReference: (index: number, data: { name: string; company: string; contact: string }) => Promise<void>
   deleteReference: (index: number) => Promise<void>
+
+  // Proje işlemleri
+  addProject: (data: Omit<Project, 'id'>) => Promise<Project>
+  updateProject: (id: string, data: Partial<Omit<Project, 'id'>>) => Promise<Project>
+  deleteProject: (id: string) => Promise<void>
 
   // Utility actions
   clearError: () => void
@@ -700,6 +714,70 @@ export const useUserProfileStore = create<UserProfileStore>()(
           })
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || 'Referans silinirken hata oluştu'
+          set({ isLoading: false, error: errorMessage })
+        }
+      },
+
+      // Proje işlemleri
+      addProject: async (data) => {
+        set({ isLoading: true, error: null })
+        try {
+          const response = await userProfileApi.project.add(data)
+          set((state) => ({
+            profile: state.profile
+              ? {
+                  ...state.profile,
+                  projects: [...(state.profile.projects || []).filter(Boolean), response.data],
+                }
+              : null,
+            isLoading: false,
+          }))
+          return response.data
+        } catch (error: any) {
+          const errorMessage = error.response?.data?.message || 'Proje bilgisi eklenirken hata oluştu'
+          set({ isLoading: false, error: errorMessage })
+          throw error
+        }
+      },
+
+      updateProject: async (id, data) => {
+        set({ isLoading: true, error: null })
+        try {
+          const response = await userProfileApi.project.update(id, data)
+          set((state) => ({
+            profile: state.profile
+              ? {
+                  ...state.profile,
+                  projects: (state.profile.projects || [])
+                    .filter(Boolean)
+                    .map((project) => (project && project.id === id ? response.data : project)),
+                }
+              : null,
+            isLoading: false,
+          }))
+          return response.data
+        } catch (error: any) {
+          const errorMessage = error.response?.data?.message || 'Proje bilgisi güncellenirken hata oluştu'
+          set({ isLoading: false, error: errorMessage })
+          throw error
+        }
+      },
+
+      deleteProject: async (id) => {
+        set({ isLoading: true, error: null })
+        try {
+          await userProfileApi.project.delete(id)
+          set((state) => ({
+            profile: state.profile
+              ? {
+                  ...state.profile,
+                  projects: (state.profile.projects || []).filter((project) => project && project.id !== id),
+                }
+              : null,
+            isLoading: false,
+          }))
+        } catch (error: any) {
+          const errorMessage = error.response?.data?.message || 'Proje bilgisi silinirken hata oluştu'
           set({ isLoading: false, error: errorMessage })
         }
       },

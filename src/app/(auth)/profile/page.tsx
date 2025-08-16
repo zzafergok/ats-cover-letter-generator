@@ -2,7 +2,20 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { User, GraduationCap, Briefcase, Award, BookOpen, Star, X, ArrowLeft, Languages, Users } from 'lucide-react'
+import {
+  User,
+  GraduationCap,
+  Briefcase,
+  Award,
+  BookOpen,
+  Star,
+  X,
+  ArrowLeft,
+  Languages,
+  Users,
+  Heart,
+  FolderOpen,
+} from 'lucide-react'
 
 import { useUserProfileStore } from '@/store/userProfileStore'
 
@@ -21,14 +34,18 @@ import { CoursesTab } from '@/components/ui/profile/CoursesTab'
 import { CertificatesTab } from '@/components/ui/profile/CertificatesTab'
 import { LanguagesTab } from '@/components/ui/profile/LanguagesTab'
 import { ReferencesTab } from '@/components/ui/profile/ReferencesTab'
+import { HobbiesTab } from '@/components/ui/profile/HobbiesTab'
+import { ProjectsTab } from '@/components/ui/profile/ProjectsTab'
 import { ConfirmDeleteModal } from '@/components/ui/profile/ConfirmDeleteModal'
 import { CourseModal } from '@/components/ui/profile/CourseModal'
 import { CertificateModal } from '@/components/ui/profile/CertificateModal'
 import { LanguageModal } from '@/components/ui/profile/LanguageModal'
 import { ReferenceModal } from '@/components/ui/profile/ReferenceModal'
+import { HobbyModal } from '@/components/ui/profile/HobbyModal'
+import { ProjectModal } from '@/components/ui/profile/ProjectModal'
 import { ProfileCompletionBar } from '@/components/ui/profile/ProfileCompletionBar'
 
-import type { Education, WorkExperience, Skill, Course, Certificate } from '@/types/api.types'
+import type { Education, WorkExperience, Skill, Course, Certificate, Hobby, Project } from '@/types/api.types'
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -61,6 +78,12 @@ export default function ProfilePage() {
     addReference,
     updateReference,
     deleteReference,
+    addHobby,
+    updateHobby,
+    deleteHobby,
+    addProject,
+    updateProject,
+    deleteProject,
   } = useUserProfileStore()
 
   const [activeTab, setActiveTab] = useState('overview')
@@ -73,11 +96,23 @@ export default function ProfilePage() {
     certificate: false,
     language: false,
     reference: false,
+    hobby: false,
+    project: false,
   })
 
   const [deleteConfirmModal, setDeleteConfirmModal] = useState<{
     isOpen: boolean
-    type: 'skill' | 'education' | 'experience' | 'course' | 'certificate' | 'language' | 'reference' | null
+    type:
+      | 'skill'
+      | 'education'
+      | 'experience'
+      | 'course'
+      | 'certificate'
+      | 'language'
+      | 'reference'
+      | 'hobby'
+      | 'project'
+      | null
     id: string
     name: string
   }>({
@@ -214,8 +249,47 @@ export default function ProfilePage() {
     }
   }
 
+  // Hobi işlemleri
+  const handleSaveHobby = async (data: Omit<Hobby, 'id'>) => {
+    try {
+      if (editingItem && editingItem.type === 'hobby') {
+        await updateHobby(editingItem.id, data)
+      } else {
+        await addHobby(data)
+      }
+      closeModal('hobby')
+    } catch (error) {
+      console.error('Hobi kaydedilirken hata:', error)
+      throw error
+    }
+  }
+
+  // Proje işlemleri
+  const handleSaveProject = async (data: Omit<Project, 'id'>) => {
+    try {
+      if (editingItem && editingItem.type === 'project') {
+        await updateProject(editingItem.id, data)
+      } else {
+        await addProject(data)
+      }
+      closeModal('project')
+    } catch (error) {
+      console.error('Proje kaydedilirken hata:', error)
+      throw error
+    }
+  }
+
   const openDeleteConfirmModal = (
-    type: 'skill' | 'education' | 'experience' | 'course' | 'certificate' | 'language' | 'reference',
+    type:
+      | 'skill'
+      | 'education'
+      | 'experience'
+      | 'course'
+      | 'certificate'
+      | 'language'
+      | 'reference'
+      | 'hobby'
+      | 'project',
     id: string,
     name: string,
   ) => {
@@ -266,6 +340,12 @@ export default function ProfilePage() {
           await deleteReference(referenceIndex)
           break
         }
+        case 'hobby':
+          await deleteHobby(deleteConfirmModal.id)
+          break
+        case 'project':
+          await deleteProject(deleteConfirmModal.id)
+          break
       }
       closeDeleteConfirmModal()
     } catch (error) {
@@ -318,7 +398,7 @@ export default function ProfilePage() {
 
         {/* Profile Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className='space-y-6'>
-          <TabsList className='grid w-full grid-cols-9 lg:w-fit'>
+          <TabsList className='grid w-full grid-cols-11 lg:w-fit'>
             <TabsTrigger value='overview' className='flex items-center space-x-2'>
               <User className='h-4 w-4' />
               <span className='hidden sm:inline'>Genel</span>
@@ -350,6 +430,14 @@ export default function ProfilePage() {
             <TabsTrigger value='references' className='flex items-center space-x-2'>
               <Users className='h-4 w-4' />
               <span className='hidden sm:inline'>Referanslar</span>
+            </TabsTrigger>
+            <TabsTrigger value='hobbies' className='flex items-center space-x-2'>
+              <Heart className='h-4 w-4' />
+              <span className='hidden sm:inline'>Hobiler</span>
+            </TabsTrigger>
+            <TabsTrigger value='projects' className='flex items-center space-x-2'>
+              <FolderOpen className='h-4 w-4' />
+              <span className='hidden sm:inline'>Projeler</span>
             </TabsTrigger>
           </TabsList>
 
@@ -428,6 +516,26 @@ export default function ProfilePage() {
               onDeleteReference={(id, name) => openDeleteConfirmModal('reference', id, name)}
             />
           </TabsContent>
+
+          {/* Hobbies Tab */}
+          <TabsContent value='hobbies' className='space-y-6'>
+            <HobbiesTab
+              profile={profile}
+              onOpenModal={() => openModal('hobby')}
+              onOpenEditModal={(id, data) => openEditModal('hobby', id, data)}
+              onDeleteHobby={(id, name) => openDeleteConfirmModal('hobby', id, name)}
+            />
+          </TabsContent>
+
+          {/* Projects Tab */}
+          <TabsContent value='projects' className='space-y-6'>
+            <ProjectsTab
+              profile={profile}
+              onOpenModal={() => openModal('project')}
+              onOpenEditModal={(id, data) => openEditModal('project', id, data)}
+              onDeleteProject={(id, name) => openDeleteConfirmModal('project', id, name)}
+            />
+          </TabsContent>
         </Tabs>
       </div>
 
@@ -492,6 +600,22 @@ export default function ProfilePage() {
         isLoading={isLoading}
       />
 
+      <HobbyModal
+        isOpen={modalStates.hobby}
+        onClose={() => closeModal('hobby')}
+        onSave={handleSaveHobby}
+        hobby={editingItem?.type === 'hobby' ? (editingItem.data as Hobby) : null}
+        isLoading={isLoading}
+      />
+
+      <ProjectModal
+        isOpen={modalStates.project}
+        onClose={() => closeModal('project')}
+        onSave={handleSaveProject}
+        project={editingItem?.type === 'project' ? (editingItem.data as Project) : null}
+        isLoading={isLoading}
+      />
+
       {/* Delete Confirmation Modal */}
       <ConfirmDeleteModal
         isOpen={deleteConfirmModal.isOpen}
@@ -513,7 +637,11 @@ export default function ProfilePage() {
                       ? 'dili'
                       : deleteConfirmModal.type === 'reference'
                         ? 'referansı'
-                        : 'öğeyi'
+                        : deleteConfirmModal.type === 'hobby'
+                          ? 'hobiyi'
+                          : deleteConfirmModal.type === 'project'
+                            ? 'projeyi'
+                            : 'öğeyi'
         } silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`}
         itemName={deleteConfirmModal.name}
         isLoading={isLoading}

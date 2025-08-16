@@ -75,7 +75,6 @@ export interface UserProfile {
   phone?: string
   address?: string
   city?: string
-  country?: string
   github?: string
   linkedin?: string
   medium?: string
@@ -97,6 +96,7 @@ export interface UserProfile {
   certificates: Certificate[]
   hobbies: Hobby[]
   skills: Skill[]
+  projects: Project[]
   languages?: Array<{
     language: string
     level: string
@@ -106,7 +106,6 @@ export interface UserProfile {
     company: string
     contact: string
   }>
-  projects?: Project[]
 }
 
 export type EducationType = 'LISE' | 'ONLISANS' | 'LISANS' | 'YUKSEKLISANS'
@@ -184,12 +183,14 @@ export interface Skill {
 export interface Project {
   id: string
   name: string
-  description?: string
-  technologies?: string[]
-  url?: string
-  startDate?: string
-  endDate?: string
-  isActive?: boolean
+  description: string
+  technologies: string
+  link?: string
+  startMonth?: number
+  startYear?: number
+  endMonth?: number
+  endYear?: number
+  isCurrent?: boolean
 }
 
 // CV type tanımları - API dokumentasyonuna göre güncellenmiş

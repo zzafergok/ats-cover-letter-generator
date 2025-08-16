@@ -29,10 +29,10 @@ interface ProfileHeaderProps {
 const profileSchema = z.object({
   firstName: z.string().min(1, 'Ad zorunludur'),
   lastName: z.string().min(1, 'Soyad zorunludur'),
+  email: z.string().email('Geçerli bir email adresi giriniz'),
   phone: z.string().optional(),
   address: z.string().optional(),
   city: z.string().optional(),
-  country: z.string().optional(),
   github: z.string().url('Geçerli bir GitHub URL giriniz').optional().or(z.literal('')),
   linkedin: z.string().url('Geçerli bir LinkedIn URL giriniz').optional().or(z.literal('')),
   medium: z.string().url('Geçerli bir Medium URL giriniz').optional().or(z.literal('')),
@@ -66,10 +66,10 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
     defaultValues: {
       firstName: '',
       lastName: '',
+      email: '',
       phone: '',
       address: '',
       city: '',
-      country: '',
       github: '',
       linkedin: '',
       medium: '',
@@ -136,10 +136,10 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
       const formData = {
         firstName: profile.firstName || '',
         lastName: profile.lastName || '',
+        email: profile.email || '',
         phone: profile.phone || '',
         address: profile.address || '',
         city: profile.city || '',
-        country: profile.country || '',
         github: profile.github || '',
         linkedin: profile.linkedin || '',
         medium: profile.medium || '',
@@ -183,10 +183,10 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
       reset({
         firstName: profile.firstName || '',
         lastName: profile.lastName || '',
+        email: profile.email || '',
         phone: profile.phone || '',
         address: profile.address || '',
         city: profile.city || '',
-        country: profile.country || '',
         github: profile.github || '',
         linkedin: profile.linkedin || '',
         medium: profile.medium || '',
@@ -287,9 +287,7 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
                   {profile?.city && (
                     <div className='flex items-center space-x-1'>
                       <MapPin className='h-4 w-4' />
-                      <span>
-                        {profile.city}, {profile.country}
-                      </span>
+                      <span>{profile.city}</span>
                     </div>
                   )}
                 </div>
@@ -348,6 +346,16 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
                     />
                     {errors.lastName && <p className='text-sm text-red-500 mt-1'>{errors.lastName.message}</p>}
                   </div>
+                </div>
+
+                <div>
+                  <Label>E-posta *</Label>
+                  <Controller
+                    name='email'
+                    control={control}
+                    render={({ field }) => <Input {...field} placeholder='E-posta adresiniz' type='email' />}
+                  />
+                  {errors.email && <p className='text-sm text-red-500 mt-1'>{errors.email.message}</p>}
                 </div>
 
                 <div>
@@ -443,16 +451,6 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
                     {!selectedProvinceCode && <p className='text-xs text-muted-foreground mt-1'>Önce şehir seçin</p>}
                     {errors.address && <p className='text-sm text-red-500 mt-1'>{errors.address.message}</p>}
                   </div>
-                </div>
-
-                <div>
-                  <Label>Ülke</Label>
-                  <Controller
-                    name='country'
-                    control={control}
-                    render={({ field }) => <Input {...field} placeholder='Ülkeniz' />}
-                  />
-                  {errors.country && <p className='text-sm text-red-500 mt-1'>{errors.country.message}</p>}
                 </div>
 
                 <div className='grid grid-cols-2 gap-4'>

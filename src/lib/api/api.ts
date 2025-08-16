@@ -4,6 +4,7 @@ import {
   Hobby,
   Skill,
   Course,
+  Project,
   SavedCV,
   AuthUser,
   CVUpload,
@@ -287,6 +288,21 @@ export const userProfileApi = {
 
     delete: (id: string): Promise<{ success: boolean; message: string }> =>
       apiRequest.delete(`/user-profile/skill/${id}`),
+  },
+
+  // Proje işlemleri
+  project: {
+    add: (data: Omit<Project, 'id'>): Promise<{ success: boolean; data: Project; message?: string }> =>
+      apiRequest.post('/user-profile/project', data),
+
+    update: (
+      id: string,
+      data: Partial<Omit<Project, 'id'>>,
+    ): Promise<{ success: boolean; data: Project; message?: string }> =>
+      apiRequest.put(`/user-profile/project/${id}`, data),
+
+    delete: (id: string): Promise<{ success: boolean; message: string }> =>
+      apiRequest.delete(`/user-profile/project/${id}`),
   },
 }
 

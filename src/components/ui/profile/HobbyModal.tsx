@@ -8,69 +8,62 @@ import { z } from 'zod'
 import { X } from 'lucide-react'
 import { Button } from '@/components/core/button'
 import { Input } from '@/components/core/input'
+import { Textarea } from '@/components/core/textarea'
 import { Label } from '@/components/core/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/core/card'
 
-interface Reference {
-  name: string
-  company: string
-  contact: string
-}
+import type { Hobby } from '@/types/api.types'
 
-interface ReferenceModalProps {
+interface HobbyModalProps {
   isOpen: boolean
   onClose: () => void
-  onSave: (data: Reference) => Promise<void>
-  reference?: Reference | null
+  onSave: (data: Omit<Hobby, 'id'>) => Promise<void>
+  hobby?: Hobby | null
   isLoading?: boolean
 }
 
-const referenceSchema = z.object({
-  name: z.string().min(1, 'İsim zorunludur'),
-  company: z.string().min(1, 'Şirket adı zorunludur'),
-  contact: z.string().min(1, 'İletişim bilgisi zorunludur'),
+const hobbySchema = z.object({
+  name: z.string().min(1, 'Hobi adı zorunludur'),
+  description: z.string().optional(),
 })
 
-type ReferenceFormData = z.infer<typeof referenceSchema>
+type HobbyFormData = z.infer<typeof hobbySchema>
 
-export function ReferenceModal({ isOpen, onClose, onSave, reference, isLoading }: ReferenceModalProps) {
+export function HobbyModal({ isOpen, onClose, onSave, hobby, isLoading }: HobbyModalProps) {
   const {
     control,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<ReferenceFormData>({
-    resolver: zodResolver(referenceSchema),
+  } = useForm<HobbyFormData>({
+    resolver: zodResolver(hobbySchema),
     defaultValues: {
       name: '',
-      company: '',
-      contact: '',
+      description: '',
     },
   })
 
-  // Form'u referans bilgisiyle doldur
+  // Form'u hobi bilgisiyle doldur
   useEffect(() => {
-    if (reference) {
+    if (hobby) {
       reset({
-        name: reference.name,
-        company: reference.company,
-        contact: reference.contact,
+        name: hobby.name,
+        description: hobby.description || '',
       })
     } else {
       reset({
         name: '',
-        company: '',
-        contact: '',
+        description: '',
       })
     }
-  }, [reference, reset])
+  }, [hobby, reset])
 
-  const onSubmit = async (data: ReferenceFormData) => {
+  const onSubmit = async (data: HobbyFormData) => {
     try {
       await onSave(data)
       handleClose()
     } catch (error) {
-      console.error('Referans kaydedilirken hata:', error)
+      console.error('Hobi kaydedilirken hata:', error)
     }
   }
 
@@ -85,7 +78,7 @@ export function ReferenceModal({ isOpen, onClose, onSave, reference, isLoading }
     <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'>
       <Card className='w-full max-w-2xl max-h-[90vh] overflow-y-auto'>
         <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-4'>
-          <CardTitle>{reference ? 'Referans Düzenle' : 'Yeni Referans Ekle'}</CardTitle>
+          <CardTitle>{hobby ? 'Hobi Düzenle' : 'Yeni Hobi Ekle'}</CardTitle>
           <Button variant='ghost' size='sm' onClick={handleClose}>
             <X className='h-4 w-4' />
           </Button>
@@ -94,35 +87,25 @@ export function ReferenceModal({ isOpen, onClose, onSave, reference, isLoading }
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
             <div>
-              <Label htmlFor='name'>Ad Soyad *</Label>
+              <Label htmlFor='name'>Hobi Adı *</Label>
               <Controller
                 name='name'
                 control={control}
-                render={({ field }) => <Input {...field} id='name' placeholder='Referansın adı soyadı' />}
+                render={({ field }) => <Input {...field} id='name' placeholder='Örn: Kitap okuma, Müzik dinleme' />}
               />
               {errors.name && <p className='text-sm text-red-500 mt-1'>{errors.name.message}</p>}
             </div>
 
             <div>
-              <Label htmlFor='company'>Şirket/Kurum *</Label>
+              <Label htmlFor='description'>Açıklama</Label>
               <Controller
-                name='company'
-                control={control}
-                render={({ field }) => <Input {...field} id='company' placeholder='Çalıştığı şirket veya kurum' />}
-              />
-              {errors.company && <p className='text-sm text-red-500 mt-1'>{errors.company.message}</p>}
-            </div>
-
-            <div>
-              <Label htmlFor='contact'>İletişim Bilgisi *</Label>
-              <Controller
-                name='contact'
+                name='description'
                 control={control}
                 render={({ field }) => (
-                  <Input {...field} id='contact' placeholder='Telefon numarası veya e-posta adresi' />
+                  <Textarea {...field} id='description' placeholder='Hobi hakkında detaylı açıklama...' rows={3} />
                 )}
               />
-              {errors.contact && <p className='text-sm text-red-500 mt-1'>{errors.contact.message}</p>}
+              {errors.description && <p className='text-sm text-red-500 mt-1'>{errors.description.message}</p>}
             </div>
 
             <div className='flex justify-end space-x-2 pt-4'>
@@ -133,7 +116,7 @@ export function ReferenceModal({ isOpen, onClose, onSave, reference, isLoading }
                 {(isLoading || isSubmitting) && (
                   <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2' />
                 )}
-                {reference ? 'Güncelle' : 'Ekle'}
+                {hobby ? 'Güncelle' : 'Ekle'}
               </Button>
             </div>
           </form>

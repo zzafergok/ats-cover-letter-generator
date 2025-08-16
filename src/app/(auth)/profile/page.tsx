@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { User, GraduationCap, Briefcase, Award, BookOpen, Star, X, ArrowLeft, FileText } from 'lucide-react'
+import { User, GraduationCap, Briefcase, Award, BookOpen, Star, X, ArrowLeft, Languages, Users } from 'lucide-react'
 
 import { useUserProfileStore } from '@/store/userProfileStore'
 
@@ -19,10 +19,13 @@ import { ExperienceTab } from '@/components/ui/profile/ExperienceTab'
 import { SkillsTab } from '@/components/ui/profile/SkillsTab'
 import { CoursesTab } from '@/components/ui/profile/CoursesTab'
 import { CertificatesTab } from '@/components/ui/profile/CertificatesTab'
-import { TemplatesTab } from '@/components/ui/profile/TemplatesTab'
+import { LanguagesTab } from '@/components/ui/profile/LanguagesTab'
+import { ReferencesTab } from '@/components/ui/profile/ReferencesTab'
 import { ConfirmDeleteModal } from '@/components/ui/profile/ConfirmDeleteModal'
 import { CourseModal } from '@/components/ui/profile/CourseModal'
 import { CertificateModal } from '@/components/ui/profile/CertificateModal'
+import { LanguageModal } from '@/components/ui/profile/LanguageModal'
+import { ReferenceModal } from '@/components/ui/profile/ReferenceModal'
 import { ProfileCompletionBar } from '@/components/ui/profile/ProfileCompletionBar'
 
 import type { Education, WorkExperience, Skill, Course, Certificate } from '@/types/api.types'
@@ -52,6 +55,12 @@ export default function ProfilePage() {
     addCertificate,
     updateCertificate,
     deleteCertificate,
+    addLanguage,
+    updateLanguage,
+    deleteLanguage,
+    addReference,
+    updateReference,
+    deleteReference,
   } = useUserProfileStore()
 
   const [activeTab, setActiveTab] = useState('overview')
@@ -62,11 +71,13 @@ export default function ProfilePage() {
     skill: false,
     course: false,
     certificate: false,
+    language: false,
+    reference: false,
   })
 
   const [deleteConfirmModal, setDeleteConfirmModal] = useState<{
     isOpen: boolean
-    type: 'skill' | 'education' | 'experience' | 'course' | 'certificate' | null
+    type: 'skill' | 'education' | 'experience' | 'course' | 'certificate' | 'language' | 'reference' | null
     id: string
     name: string
   }>({
@@ -171,8 +182,40 @@ export default function ProfilePage() {
     }
   }
 
+  // Dil işlemleri
+  const handleSaveLanguage = async (data: { language: string; level: string }) => {
+    try {
+      if (editingItem && editingItem.type === 'language') {
+        const index = parseInt(editingItem.id.split('-').pop() || '0')
+        await updateLanguage(index, data)
+      } else {
+        await addLanguage(data)
+      }
+      closeModal('language')
+    } catch (error) {
+      console.error('Dil kaydedilirken hata:', error)
+      throw error
+    }
+  }
+
+  // Referans işlemleri
+  const handleSaveReference = async (data: { name: string; company: string; contact: string }) => {
+    try {
+      if (editingItem && editingItem.type === 'reference') {
+        const index = parseInt(editingItem.id.split('-').pop() || '0')
+        await updateReference(index, data)
+      } else {
+        await addReference(data)
+      }
+      closeModal('reference')
+    } catch (error) {
+      console.error('Referans kaydedilirken hata:', error)
+      throw error
+    }
+  }
+
   const openDeleteConfirmModal = (
-    type: 'skill' | 'education' | 'experience' | 'course' | 'certificate',
+    type: 'skill' | 'education' | 'experience' | 'course' | 'certificate' | 'language' | 'reference',
     id: string,
     name: string,
   ) => {
@@ -213,6 +256,16 @@ export default function ProfilePage() {
         case 'certificate':
           await deleteCertificate(deleteConfirmModal.id)
           break
+        case 'language': {
+          const languageIndex = parseInt(deleteConfirmModal.id.split('-').pop() || '0')
+          await deleteLanguage(languageIndex)
+          break
+        }
+        case 'reference': {
+          const referenceIndex = parseInt(deleteConfirmModal.id.split('-').pop() || '0')
+          await deleteReference(referenceIndex)
+          break
+        }
       }
       closeDeleteConfirmModal()
     } catch (error) {
@@ -265,7 +318,7 @@ export default function ProfilePage() {
 
         {/* Profile Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className='space-y-6'>
-          <TabsList className='grid w-full grid-cols-7 lg:w-fit'>
+          <TabsList className='grid w-full grid-cols-9 lg:w-fit'>
             <TabsTrigger value='overview' className='flex items-center space-x-2'>
               <User className='h-4 w-4' />
               <span className='hidden sm:inline'>Genel</span>
@@ -290,15 +343,19 @@ export default function ProfilePage() {
               <Award className='h-4 w-4' />
               <span className='hidden sm:inline'>Sertifikalar</span>
             </TabsTrigger>
-            <TabsTrigger value='templates' className='flex items-center space-x-2'>
-              <FileText className='h-4 w-4' />
-              <span className='hidden sm:inline'>CV Şablonları</span>
+            <TabsTrigger value='languages' className='flex items-center space-x-2'>
+              <Languages className='h-4 w-4' />
+              <span className='hidden sm:inline'>Diller</span>
+            </TabsTrigger>
+            <TabsTrigger value='references' className='flex items-center space-x-2'>
+              <Users className='h-4 w-4' />
+              <span className='hidden sm:inline'>Referanslar</span>
             </TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
           <TabsContent value='overview' className='space-y-6'>
-            <OverviewTab profile={profile} />
+            <OverviewTab profile={profile} onUpdateProfile={updateProfile} />
           </TabsContent>
 
           {/* Education Tab */}
@@ -328,6 +385,7 @@ export default function ProfilePage() {
               onOpenModal={() => openModal('skill')}
               onOpenEditModal={(id, data) => openEditModal('skill', id, data)}
               onDeleteSkill={(id, name) => openDeleteConfirmModal('skill', id, name)}
+              onUpdateProfile={updateProfile}
             />
           </TabsContent>
 
@@ -351,9 +409,24 @@ export default function ProfilePage() {
             />
           </TabsContent>
 
-          {/* Templates Tab */}
-          <TabsContent value='templates' className='space-y-6'>
-            <TemplatesTab />
+          {/* Languages Tab */}
+          <TabsContent value='languages' className='space-y-6'>
+            <LanguagesTab
+              profile={profile}
+              onOpenModal={() => openModal('language')}
+              onOpenEditModal={(id, data) => openEditModal('language', id, data)}
+              onDeleteLanguage={(id, name) => openDeleteConfirmModal('language', id, name)}
+            />
+          </TabsContent>
+
+          {/* References Tab */}
+          <TabsContent value='references' className='space-y-6'>
+            <ReferencesTab
+              profile={profile}
+              onOpenModal={() => openModal('reference')}
+              onOpenEditModal={(id, data) => openEditModal('reference', id, data)}
+              onDeleteReference={(id, name) => openDeleteConfirmModal('reference', id, name)}
+            />
           </TabsContent>
         </Tabs>
       </div>
@@ -399,13 +472,49 @@ export default function ProfilePage() {
         isLoading={isLoading}
       />
 
+      <LanguageModal
+        isOpen={modalStates.language}
+        onClose={() => closeModal('language')}
+        onSave={handleSaveLanguage}
+        language={editingItem?.type === 'language' ? (editingItem.data as { language: string; level: string }) : null}
+        isLoading={isLoading}
+      />
+
+      <ReferenceModal
+        isOpen={modalStates.reference}
+        onClose={() => closeModal('reference')}
+        onSave={handleSaveReference}
+        reference={
+          editingItem?.type === 'reference'
+            ? (editingItem.data as { name: string; company: string; contact: string })
+            : null
+        }
+        isLoading={isLoading}
+      />
+
       {/* Delete Confirmation Modal */}
       <ConfirmDeleteModal
         isOpen={deleteConfirmModal.isOpen}
         onClose={closeDeleteConfirmModal}
         onConfirm={handleConfirmDelete}
         title='Silme Onayı'
-        message={`Bu ${deleteConfirmModal.type === 'skill' ? 'yeteneği' : deleteConfirmModal.type === 'education' ? 'eğitimi' : deleteConfirmModal.type === 'experience' ? 'deneyimi' : deleteConfirmModal.type === 'course' ? 'kursu' : 'sertifikayı'} silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`}
+        message={`Bu ${
+          deleteConfirmModal.type === 'skill'
+            ? 'yeteneği'
+            : deleteConfirmModal.type === 'education'
+              ? 'eğitimi'
+              : deleteConfirmModal.type === 'experience'
+                ? 'deneyimi'
+                : deleteConfirmModal.type === 'course'
+                  ? 'kursu'
+                  : deleteConfirmModal.type === 'certificate'
+                    ? 'sertifikayı'
+                    : deleteConfirmModal.type === 'language'
+                      ? 'dili'
+                      : deleteConfirmModal.type === 'reference'
+                        ? 'referansı'
+                        : 'öğeyi'
+        } silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.`}
         itemName={deleteConfirmModal.name}
         isLoading={isLoading}
       />

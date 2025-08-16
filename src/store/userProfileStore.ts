@@ -45,6 +45,16 @@ interface UserProfileActions {
   updateSkill: (id: string, data: Partial<Omit<Skill, 'id'>>) => Promise<Skill>
   deleteSkill: (id: string) => Promise<void>
 
+  // Dil işlemleri
+  addLanguage: (data: { language: string; level: string }) => Promise<void>
+  updateLanguage: (index: number, data: { language: string; level: string }) => Promise<void>
+  deleteLanguage: (index: number) => Promise<void>
+
+  // Referans işlemleri
+  addReference: (data: { name: string; company: string; contact: string }) => Promise<void>
+  updateReference: (index: number, data: { name: string; company: string; contact: string }) => Promise<void>
+  deleteReference: (index: number) => Promise<void>
+
   // Utility actions
   clearError: () => void
   reset: () => void
@@ -548,6 +558,148 @@ export const useUserProfileStore = create<UserProfileStore>()(
           }))
         } catch (error: any) {
           const errorMessage = error.response?.data?.message || 'Yetenek bilgisi silinirken hata oluştu'
+          set({ isLoading: false, error: errorMessage })
+        }
+      },
+
+      // Dil işlemleri
+      addLanguage: async (data) => {
+        set({ isLoading: true, error: null })
+        try {
+          set((state) => {
+            if (!state.profile) return { isLoading: false }
+
+            const currentLanguages = state.profile.languages || []
+            const updatedLanguages = [...currentLanguages, data]
+
+            return {
+              profile: {
+                ...state.profile,
+                languages: updatedLanguages,
+              },
+              isLoading: false,
+            }
+          })
+        } catch (error: any) {
+          const errorMessage = error.response?.data?.message || 'Dil eklenirken hata oluştu'
+          set({ isLoading: false, error: errorMessage })
+          throw error
+        }
+      },
+
+      updateLanguage: async (index, data) => {
+        set({ isLoading: true, error: null })
+        try {
+          set((state) => {
+            if (!state.profile || !state.profile.languages) return { isLoading: false }
+
+            const updatedLanguages = [...state.profile.languages]
+            updatedLanguages[index] = data
+
+            return {
+              profile: {
+                ...state.profile,
+                languages: updatedLanguages,
+              },
+              isLoading: false,
+            }
+          })
+        } catch (error: any) {
+          const errorMessage = error.response?.data?.message || 'Dil güncellenirken hata oluştu'
+          set({ isLoading: false, error: errorMessage })
+          throw error
+        }
+      },
+
+      deleteLanguage: async (index) => {
+        set({ isLoading: true, error: null })
+        try {
+          set((state) => {
+            if (!state.profile || !state.profile.languages) return { isLoading: false }
+
+            const updatedLanguages = state.profile.languages.filter((_, i) => i !== index)
+
+            return {
+              profile: {
+                ...state.profile,
+                languages: updatedLanguages,
+              },
+              isLoading: false,
+            }
+          })
+        } catch (error: any) {
+          const errorMessage = error.response?.data?.message || 'Dil silinirken hata oluştu'
+          set({ isLoading: false, error: errorMessage })
+        }
+      },
+
+      // Referans işlemleri
+      addReference: async (data) => {
+        set({ isLoading: true, error: null })
+        try {
+          set((state) => {
+            if (!state.profile) return { isLoading: false }
+
+            const currentReferences = state.profile.references || []
+            const updatedReferences = [...currentReferences, data]
+
+            return {
+              profile: {
+                ...state.profile,
+                references: updatedReferences,
+              },
+              isLoading: false,
+            }
+          })
+        } catch (error: any) {
+          const errorMessage = error.response?.data?.message || 'Referans eklenirken hata oluştu'
+          set({ isLoading: false, error: errorMessage })
+          throw error
+        }
+      },
+
+      updateReference: async (index, data) => {
+        set({ isLoading: true, error: null })
+        try {
+          set((state) => {
+            if (!state.profile || !state.profile.references) return { isLoading: false }
+
+            const updatedReferences = [...state.profile.references]
+            updatedReferences[index] = data
+
+            return {
+              profile: {
+                ...state.profile,
+                references: updatedReferences,
+              },
+              isLoading: false,
+            }
+          })
+        } catch (error: any) {
+          const errorMessage = error.response?.data?.message || 'Referans güncellenirken hata oluştu'
+          set({ isLoading: false, error: errorMessage })
+          throw error
+        }
+      },
+
+      deleteReference: async (index) => {
+        set({ isLoading: true, error: null })
+        try {
+          set((state) => {
+            if (!state.profile || !state.profile.references) return { isLoading: false }
+
+            const updatedReferences = state.profile.references.filter((_, i) => i !== index)
+
+            return {
+              profile: {
+                ...state.profile,
+                references: updatedReferences,
+              },
+              isLoading: false,
+            }
+          })
+        } catch (error: any) {
+          const errorMessage = error.response?.data?.message || 'Referans silinirken hata oluştu'
           set({ isLoading: false, error: errorMessage })
         }
       },

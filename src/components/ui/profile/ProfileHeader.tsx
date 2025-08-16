@@ -32,8 +32,10 @@ const profileSchema = z.object({
   phone: z.string().optional(),
   address: z.string().optional(),
   city: z.string().optional(),
+  country: z.string().optional(),
   github: z.string().url('Geçerli bir GitHub URL giriniz').optional().or(z.literal('')),
   linkedin: z.string().url('Geçerli bir LinkedIn URL giriniz').optional().or(z.literal('')),
+  medium: z.string().url('Geçerli bir Medium URL giriniz').optional().or(z.literal('')),
   portfolioWebsite: z.string().url('Geçerli bir website URL giriniz').optional().or(z.literal('')),
   aboutMe: z.string().optional(),
   avatarColor: z.string().optional(),
@@ -67,8 +69,10 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
       phone: '',
       address: '',
       city: '',
+      country: '',
       github: '',
       linkedin: '',
+      medium: '',
       portfolioWebsite: '',
       aboutMe: '',
       avatarColor: '#3B82F6',
@@ -135,8 +139,10 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
         phone: profile.phone || '',
         address: profile.address || '',
         city: profile.city || '',
+        country: profile.country || '',
         github: profile.github || '',
         linkedin: profile.linkedin || '',
+        medium: profile.medium || '',
         portfolioWebsite: profile.portfolioWebsite || '',
         aboutMe: profile.aboutMe || '',
         avatarColor: profile.avatarColor || '#3B82F6',
@@ -180,8 +186,10 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
         phone: profile.phone || '',
         address: profile.address || '',
         city: profile.city || '',
+        country: profile.country || '',
         github: profile.github || '',
         linkedin: profile.linkedin || '',
+        medium: profile.medium || '',
         portfolioWebsite: profile.portfolioWebsite || '',
         aboutMe: profile.aboutMe || '',
         avatarColor: profile.avatarColor || '#3B82F6',
@@ -298,6 +306,13 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
                   )}
                   {profile?.github && (
                     <a href={profile.github} target='_blank' rel='noopener noreferrer'>
+                      <Button variant='outline' size='sm'>
+                        <Globe className='h-4 w-4' />
+                      </Button>
+                    </a>
+                  )}
+                  {profile?.medium && (
+                    <a href={profile.medium} target='_blank' rel='noopener noreferrer'>
                       <Button variant='outline' size='sm'>
                         <Globe className='h-4 w-4' />
                       </Button>
@@ -430,6 +445,16 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
                   </div>
                 </div>
 
+                <div>
+                  <Label>Ülke</Label>
+                  <Controller
+                    name='country'
+                    control={control}
+                    render={({ field }) => <Input {...field} placeholder='Ülkeniz' />}
+                  />
+                  {errors.country && <p className='text-sm text-red-500 mt-1'>{errors.country.message}</p>}
+                </div>
+
                 <div className='grid grid-cols-2 gap-4'>
                   <div>
                     <Label>LinkedIn</Label>
@@ -451,16 +476,27 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
                   </div>
                 </div>
 
-                <div>
-                  <Label>Portfolyo Website</Label>
-                  <Controller
-                    name='portfolioWebsite'
-                    control={control}
-                    render={({ field }) => <Input {...field} placeholder='Portfolyo website URLsi' />}
-                  />
-                  {errors.portfolioWebsite && (
-                    <p className='text-sm text-red-500 mt-1'>{errors.portfolioWebsite.message}</p>
-                  )}
+                <div className='grid grid-cols-2 gap-4'>
+                  <div>
+                    <Label>Medium</Label>
+                    <Controller
+                      name='medium'
+                      control={control}
+                      render={({ field }) => <Input {...field} placeholder='Medium profil URLsi' />}
+                    />
+                    {errors.medium && <p className='text-sm text-red-500 mt-1'>{errors.medium.message}</p>}
+                  </div>
+                  <div>
+                    <Label>Portfolyo Website</Label>
+                    <Controller
+                      name='portfolioWebsite'
+                      control={control}
+                      render={({ field }) => <Input {...field} placeholder='Portfolyo website URLsi' />}
+                    />
+                    {errors.portfolioWebsite && (
+                      <p className='text-sm text-red-500 mt-1'>{errors.portfolioWebsite.message}</p>
+                    )}
+                  </div>
                 </div>
 
                 <div>

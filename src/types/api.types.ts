@@ -78,16 +78,35 @@ export interface UserProfile {
   country?: string
   github?: string
   linkedin?: string
+  medium?: string
   portfolioWebsite?: string
   aboutMe?: string
   profilePictureUrl?: string
   avatarColor?: string
+  communication?: string
+  leadership?: string
+  technicalSkills?: {
+    frontend?: string[]
+    backend?: string[]
+    database?: string[]
+    tools?: string[]
+  }
   educations: Education[]
   experiences: WorkExperience[]
   courses: Course[]
   certificates: Certificate[]
   hobbies: Hobby[]
   skills: Skill[]
+  languages?: Array<{
+    language: string
+    level: string
+  }>
+  references?: Array<{
+    name: string
+    company: string
+    contact: string
+  }>
+  projects?: Project[]
 }
 
 export type EducationType = 'LISE' | 'ONLISANS' | 'LISANS' | 'YUKSEKLISANS'
@@ -160,6 +179,17 @@ export interface Skill {
   level?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT'
   yearsOfExperience?: number
   description?: string
+}
+
+export interface Project {
+  id: string
+  name: string
+  description?: string
+  technologies?: string[]
+  url?: string
+  startDate?: string
+  endDate?: string
+  isActive?: boolean
 }
 
 // CV type tanımları - API dokumentasyonuna göre güncellenmiş

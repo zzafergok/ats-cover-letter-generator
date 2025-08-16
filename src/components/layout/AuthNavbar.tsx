@@ -19,9 +19,6 @@ import {
   Layout,
   List,
   FileUser,
-  Bot,
-  BarChart3,
-  Zap,
   Calculator,
   Building2,
 } from 'lucide-react'
@@ -85,26 +82,6 @@ export function AuthHeader() {
       href: '/cv',
       icon: FileUser,
       description: 'ATS uyumlu ve profesyonel CV oluşturun',
-      submenu: [
-        {
-          name: 'ATS Uyumlu CV',
-          href: '/cv/ats',
-          icon: Bot,
-          description: 'Başvuru takip sistemleri için optimize edilmiş CV',
-        },
-        {
-          name: 'CV Analizi',
-          href: '/cv/analysis',
-          icon: BarChart3,
-          description: "CV'nizin ATS uyumluluğunu analiz edin",
-        },
-        {
-          name: 'CV Optimizasyonu',
-          href: '/cv/optimize',
-          icon: Zap,
-          description: "CV'nizi iş ilanlarına göre optimize edin",
-        },
-      ],
     },
     {
       name: t('navigation.coverLetter'),

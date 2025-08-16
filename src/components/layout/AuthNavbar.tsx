@@ -15,7 +15,6 @@ import {
   X,
   ChevronDown,
   FileText,
-  Users,
   Layout,
   List,
   FileUser,
@@ -128,12 +127,6 @@ export function AuthHeader() {
           description: 'Kıdem ve ihbar tazminatı hesaplama',
         },
       ],
-    },
-    {
-      name: t('navigation.users'),
-      href: '/users',
-      icon: Users,
-      description: t('navigation.usersDescription'),
     },
   ]
 

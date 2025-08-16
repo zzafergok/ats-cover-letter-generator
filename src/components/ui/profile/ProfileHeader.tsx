@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Mail, Phone, MapPin, Globe, Edit3, User, Palette, Save, X } from 'lucide-react'
+import { Mail, Phone, MapPin, Globe, Edit3, Palette, Save, X, Linkedin, Github, PenTool } from 'lucide-react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -16,6 +16,7 @@ import { Input } from '@/components/core/input'
 import { Textarea } from '@/components/core/textarea'
 import { Label } from '@/components/core/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/core/select'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/core/tooltip'
 
 import type { UserProfile, Province, District } from '@/types/api.types'
 
@@ -294,36 +295,66 @@ export function ProfileHeader({ profile, isLoading, onUpdateProfile }: ProfileHe
 
                 {profile?.aboutMe && <p className='text-muted-foreground leading-relaxed'>{profile.aboutMe}</p>}
 
-                <div className='flex space-x-3'>
-                  {profile?.linkedin && (
-                    <a href={profile.linkedin} target='_blank' rel='noopener noreferrer'>
-                      <Button variant='outline' size='sm'>
-                        <User className='h-4 w-4' />
-                      </Button>
-                    </a>
-                  )}
-                  {profile?.github && (
-                    <a href={profile.github} target='_blank' rel='noopener noreferrer'>
-                      <Button variant='outline' size='sm'>
-                        <Globe className='h-4 w-4' />
-                      </Button>
-                    </a>
-                  )}
-                  {profile?.medium && (
-                    <a href={profile.medium} target='_blank' rel='noopener noreferrer'>
-                      <Button variant='outline' size='sm'>
-                        <Globe className='h-4 w-4' />
-                      </Button>
-                    </a>
-                  )}
-                  {profile?.portfolioWebsite && (
-                    <a href={profile.portfolioWebsite} target='_blank' rel='noopener noreferrer'>
-                      <Button variant='outline' size='sm'>
-                        <Globe className='h-4 w-4' />
-                      </Button>
-                    </a>
-                  )}
-                </div>
+                <TooltipProvider>
+                  <div className='flex space-x-3'>
+                    {profile?.linkedin && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <a href={profile.linkedin} target='_blank' rel='noopener noreferrer'>
+                            <Button variant='outline' size='sm'>
+                              <Linkedin className='h-4 w-4' />
+                            </Button>
+                          </a>
+                        </TooltipTrigger>
+                        <TooltipContent side='bottom'>
+                          <p>LinkedIn Profilini Görüntüle</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
+                    {profile?.github && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <a href={profile.github} target='_blank' rel='noopener noreferrer'>
+                            <Button variant='outline' size='sm'>
+                              <Github className='h-4 w-4' />
+                            </Button>
+                          </a>
+                        </TooltipTrigger>
+                        <TooltipContent side='bottom'>
+                          <p>GitHub Profilini Görüntüle</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
+                    {profile?.medium && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <a href={profile.medium} target='_blank' rel='noopener noreferrer'>
+                            <Button variant='outline' size='sm'>
+                              <PenTool className='h-4 w-4' />
+                            </Button>
+                          </a>
+                        </TooltipTrigger>
+                        <TooltipContent side='bottom'>
+                          <p>Medium Profilini Görüntüle</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
+                    {profile?.portfolioWebsite && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <a href={profile.portfolioWebsite} target='_blank' rel='noopener noreferrer'>
+                            <Button variant='outline' size='sm'>
+                              <Globe className='h-4 w-4' />
+                            </Button>
+                          </a>
+                        </TooltipTrigger>
+                        <TooltipContent side='bottom'>
+                          <p>Portfolyo Website'ini Görüntüle</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
+                  </div>
+                </TooltipProvider>
               </div>
             ) : (
               <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>

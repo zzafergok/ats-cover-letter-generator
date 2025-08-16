@@ -24,25 +24,31 @@ export function ProfileCompletionBar({ profile }: ProfileCompletionBarProps) {
         key: 'basicInfo',
         label: 'Temel Bilgiler',
         isCompleted: !!(profile.firstName && profile.lastName && profile.email),
-        weight: 20,
+        weight: 15,
       },
       {
         key: 'about',
         label: 'Hakkımda',
         isCompleted: !!(profile.aboutMe && profile.aboutMe.trim().length > 0),
-        weight: 15,
+        weight: 12,
       },
       {
-        key: 'phone',
-        label: 'Telefon',
+        key: 'contact',
+        label: 'İletişim Bilgileri',
         isCompleted: !!(profile.phone && profile.phone.trim().length > 0),
-        weight: 10,
+        weight: 8,
       },
       {
         key: 'location',
-        label: 'Konum',
+        label: 'Konum Bilgileri',
         isCompleted: !!(profile.city && profile.city.trim().length > 0),
-        weight: 10,
+        weight: 8,
+      },
+      {
+        key: 'socialMedia',
+        label: 'Sosyal Medya',
+        isCompleted: !!(profile.linkedin || profile.github || profile.medium || profile.portfolioWebsite),
+        weight: 7,
       },
       {
         key: 'education',
@@ -60,19 +66,49 @@ export function ProfileCompletionBar({ profile }: ProfileCompletionBarProps) {
         key: 'skills',
         label: 'Yetenekler',
         isCompleted: !!(profile.skills && profile.skills.length >= 3),
-        weight: 10,
+        weight: 8,
+      },
+      {
+        key: 'technicalSkills',
+        label: 'Teknik Beceriler',
+        isCompleted: !!(
+          profile.technicalSkills &&
+          ((profile.technicalSkills.frontend && profile.technicalSkills.frontend.length > 0) ||
+            (profile.technicalSkills.backend && profile.technicalSkills.backend.length > 0) ||
+            (profile.technicalSkills.database && profile.technicalSkills.database.length > 0) ||
+            (profile.technicalSkills.tools && profile.technicalSkills.tools.length > 0))
+        ),
+        weight: 5,
+      },
+      {
+        key: 'softSkills',
+        label: 'Soft Skills',
+        isCompleted: !!(profile.communication || profile.leadership),
+        weight: 3,
+      },
+      {
+        key: 'languages',
+        label: 'Diller',
+        isCompleted: !!(profile.languages && profile.languages.length > 0),
+        weight: 2,
+      },
+      {
+        key: 'projects',
+        label: 'Projeler',
+        isCompleted: !!(profile.projects && profile.projects.length > 0),
+        weight: 1,
       },
       {
         key: 'courses',
         label: 'Kurslar',
         isCompleted: !!(profile.courses && profile.courses.length > 0),
-        weight: 2.5,
+        weight: 0.5,
       },
       {
         key: 'certificates',
         label: 'Sertifikalar',
         isCompleted: !!(profile.certificates && profile.certificates.length > 0),
-        weight: 2.5,
+        weight: 0.5,
       },
     ]
   }

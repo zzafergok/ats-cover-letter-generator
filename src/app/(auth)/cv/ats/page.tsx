@@ -95,14 +95,14 @@ export default function ATSCVPage() {
         </Card>
 
         {/* ATS Validation Card */}
-        <Card className='hover:shadow-lg transition-shadow duration-300 border-2 hover:border-primary/20'>
+        <Card className='hover:shadow-lg transition-shadow duration-300 border-2 hover:border-muted/20 opacity-75'>
           <CardHeader>
             <div className='flex items-center gap-3'>
-              <div className='w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center'>
-                <BarChart3 className='w-6 h-6 text-primary' />
+              <div className='w-12 h-12 bg-muted/20 rounded-xl flex items-center justify-center'>
+                <BarChart3 className='w-6 h-6 text-muted-foreground' />
               </div>
               <div>
-                <CardTitle className='text-xl'>ATS Analizi</CardTitle>
+                <CardTitle className='text-xl text-muted-foreground'>ATS Analizi</CardTitle>
                 <CardDescription>CV'nizi analiz edin</CardDescription>
               </div>
             </div>
@@ -122,21 +122,21 @@ export default function ATSCVPage() {
                 <span>İyileştirme önerileri</span>
               </div>
             </div>
-            <Link href='/cv/ats/validate' className='block'>
-              <Button className='w-full'>ATS Analizi</Button>
-            </Link>
+            <Button className='w-full' disabled>
+              Yakında
+            </Button>
           </CardContent>
         </Card>
 
         {/* CV Optimization Card */}
-        <Card className='hover:shadow-lg transition-shadow duration-300 border-2 hover:border-primary/20'>
+        <Card className='hover:shadow-lg transition-shadow duration-300 border-2 hover:border-muted/20 opacity-75'>
           <CardHeader>
             <div className='flex items-center gap-3'>
-              <div className='w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center'>
-                <Zap className='w-6 h-6 text-primary' />
+              <div className='w-12 h-12 bg-muted/20 rounded-xl flex items-center justify-center'>
+                <Zap className='w-6 h-6 text-muted-foreground' />
               </div>
               <div>
-                <CardTitle className='text-xl'>Optimizasyon</CardTitle>
+                <CardTitle className='text-xl text-muted-foreground'>Optimizasyon</CardTitle>
                 <CardDescription>CV'nizi optimize edin</CardDescription>
               </div>
             </div>
@@ -156,9 +156,9 @@ export default function ATSCVPage() {
                 <span>Eşleşme yüzdesi artırma</span>
               </div>
             </div>
-            <Link href='/cv/ats/optimize' className='block'>
-              <Button className='w-full'>CV Optimizasyonu</Button>
-            </Link>
+            <Button className='w-full' disabled>
+              Yakında
+            </Button>
           </CardContent>
         </Card>
       </div>

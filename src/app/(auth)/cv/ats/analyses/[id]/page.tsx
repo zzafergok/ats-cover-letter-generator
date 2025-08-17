@@ -23,8 +23,9 @@ import {
   AlertTriangle,
   XCircle,
 } from 'lucide-react'
-import { atsApi } from '@/lib/api/api'
+import { atsApi, userProfileApi } from '@/lib/api/api'
 import { ATSJobPostingAnalysisResponse } from '@/types/api.types'
+import { useToast } from '@/store/toastStore'
 
 export default function AnalysisDetailPage() {
   const params = useParams()
@@ -35,6 +36,8 @@ export default function AnalysisDetailPage() {
   const [showAllRequiredSkills, setShowAllRequiredSkills] = useState(false)
   const [showAllPreferredSkills, setShowAllPreferredSkills] = useState(false)
   const [showAllAtsKeywords, setShowAllAtsKeywords] = useState(false)
+  const [isApplyingToProfile, setIsApplyingToProfile] = useState(false)
+  const toast = useToast()
 
   const analysisId = params.id as string
 
@@ -202,6 +205,100 @@ export default function AnalysisDetailPage() {
     } catch (error) {
       console.error('PDF oluşturulurken hata:', error)
       alert('PDF oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.')
+    }
+  }
+
+  const handleApplyToProfile = async () => {
+    if (!analysis) return
+
+    setIsApplyingToProfile(true)
+    try {
+      // Extract skills from the analysis to apply to user profile
+      const skillsToAdd = [
+        ...(analysis.data.requiredSkills || []),
+        ...(analysis.data.preferredSkills || []),
+        ...(analysis.data.atsKeywords || []),
+      ].filter((skill, index, array) => array.indexOf(skill) === index) // Remove duplicates
+
+      if (skillsToAdd.length === 0) {
+        toast.info('Profilinize eklenecek beceri bulunamadı')
+        return
+      }
+
+      // Categorize skills based on common patterns
+      const categorizeSkill = (
+        skillName: string,
+      ): 'TECHNICAL' | 'SOFT_SKILL' | 'LANGUAGE' | 'TOOL' | 'FRAMEWORK' | 'OTHER' => {
+        const lowerSkill = skillName.toLowerCase()
+        if (
+          lowerSkill.includes('react') ||
+          lowerSkill.includes('vue') ||
+          lowerSkill.includes('angular') ||
+          lowerSkill.includes('next') ||
+          lowerSkill.includes('framework')
+        ) {
+          return 'FRAMEWORK'
+        }
+        if (
+          lowerSkill.includes('javascript') ||
+          lowerSkill.includes('typescript') ||
+          lowerSkill.includes('python') ||
+          lowerSkill.includes('java') ||
+          lowerSkill.includes('programming')
+        ) {
+          return 'TECHNICAL'
+        }
+        if (
+          lowerSkill.includes('communication') ||
+          lowerSkill.includes('leadership') ||
+          lowerSkill.includes('teamwork') ||
+          lowerSkill.includes('problem solving') ||
+          lowerSkill.includes('management')
+        ) {
+          return 'SOFT_SKILL'
+        }
+        if (
+          lowerSkill.includes('git') ||
+          lowerSkill.includes('docker') ||
+          lowerSkill.includes('tool') ||
+          lowerSkill.includes('ide') ||
+          lowerSkill.includes('editor')
+        ) {
+          return 'TOOL'
+        }
+        return 'OTHER'
+      }
+
+      // Prepare skills array for bulk addition
+      const skillsData = skillsToAdd.map((skillName) => ({
+        name: skillName,
+        category: categorizeSkill(skillName),
+        level: 'INTERMEDIATE' as const, // Default level
+      }))
+
+      // Add skills to profile using bulk API call
+      const response = await userProfileApi.skill.add({
+        skills: skillsData,
+      })
+
+      if (response.success) {
+        toast.success(`${skillsToAdd.length} beceri başarıyla profilinize eklendi!`)
+      } else {
+        toast.warning('Bazı beceriler eklenirken sorun oluştu')
+      }
+    } catch (error: unknown) {
+      console.error('Profil güncellenirken hata:', error)
+      const errorResponse = error as { response?: { status?: number; data?: { message?: string } }; message?: string }
+
+      if (errorResponse?.response?.status === 409) {
+        toast.info('Bazı beceriler zaten profilinizde mevcut')
+      } else if (errorResponse?.response?.data?.message) {
+        toast.error(errorResponse.response.data.message)
+      } else {
+        toast.error('Profil güncellenirken bir hata oluştu')
+      }
+    } finally {
+      setIsApplyingToProfile(false)
     }
   }
 
@@ -557,9 +654,9 @@ export default function AnalysisDetailPage() {
                 <FileText className='w-4 h-4 mr-2' />
                 Yeni Analiz
               </Button>
-              <Button>
+              <Button onClick={handleApplyToProfile} disabled={isApplyingToProfile}>
                 <User className='w-4 h-4 mr-2' />
-                Profile Uygula
+                {isApplyingToProfile ? 'Uygulanıyor...' : 'Profile Uygula'}
               </Button>
             </div>
           </div>

@@ -50,7 +50,7 @@ interface UserProfileActions {
   deleteHobby: (id: string) => Promise<void>
 
   // Yetenek işlemleri
-  addSkill: (data: Omit<Skill, 'id'>) => Promise<Skill>
+  addSkill: (data: Omit<Skill, 'id'> | { skills: Omit<Skill, 'id'>[] }) => Promise<Skill | Skill[]>
   updateSkill: (id: string, data: Partial<Omit<Skill, 'id'>>) => Promise<Skill>
   deleteSkill: (id: string) => Promise<void>
 
@@ -526,7 +526,10 @@ export const useUserProfileStore = create<UserProfileStore>()(
             profile: state.profile
               ? {
                   ...state.profile,
-                  skills: [...(state.profile.skills || []).filter(Boolean), response.data],
+                  skills: [
+                    ...(state.profile.skills || []).filter(Boolean),
+                    ...(Array.isArray(response.data) ? response.data : [response.data]),
+                  ],
                 }
               : null,
             isLoading: false,

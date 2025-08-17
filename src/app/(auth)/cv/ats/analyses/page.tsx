@@ -6,6 +6,7 @@ import { Button } from '@/components/core/button'
 import { Badge } from '@/components/core/badge'
 import { Alert, AlertDescription } from '@/components/core/alert'
 import { LoadingSpinner } from '@/components/core/loading-spinner'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/core/select'
 import { BarChart3, Calendar, Trash2, Eye, TrendingUp, FileText, Filter, ChevronLeft, ChevronRight } from 'lucide-react'
 import { atsApi } from '@/lib/api/api'
 import { ATSAnalysesResponse, ATSAnalysesFilter } from '@/types/api.types'
@@ -123,37 +124,45 @@ export default function ATSAnalysesPage() {
           <div className='flex flex-wrap gap-4'>
             <div className='flex items-center gap-2'>
               <label className='text-sm font-medium'>Tip:</label>
-              <select
-                value={filters.type || ''}
-                onChange={(e) =>
+              <Select
+                value={filters.type || 'all'}
+                onValueChange={(value) =>
                   setFilters((prev) => ({
                     ...prev,
-                    type: (e.target.value as ATSAnalysesFilter['type']) || undefined,
+                    type: value === 'all' ? undefined : (value as ATSAnalysesFilter['type']),
                     page: 1,
                   }))
                 }
-                className='px-3 py-1 border dark:border-border rounded-md text-sm bg-background dark:bg-background'
               >
-                <option value=''>Tümü</option>
-                <option value='job_analysis'>İş İlanı Analizi</option>
-                <option value='match_analysis'>Uyum Analizi</option>
-                <option value='optimization'>Optimizasyon</option>
-                <option value='complete_analysis'>Komple Analiz</option>
-              </select>
+                <SelectTrigger className='w-48'>
+                  <SelectValue placeholder='Tümü' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='all'>Tümü</SelectItem>
+                  <SelectItem value='job_analysis'>İş İlanı Analizi</SelectItem>
+                  <SelectItem value='match_analysis'>Uyum Analizi</SelectItem>
+                  <SelectItem value='optimization'>Optimizasyon</SelectItem>
+                  <SelectItem value='complete_analysis'>Komple Analiz</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className='flex items-center gap-2'>
               <label className='text-sm font-medium'>Sayfa başına:</label>
-              <select
-                value={filters.limit}
-                onChange={(e) => setFilters((prev) => ({ ...prev, limit: Number(e.target.value), page: 1 }))}
-                className='px-3 py-1 border dark:border-border rounded-md text-sm bg-background dark:bg-background'
+              <Select
+                value={filters.limit?.toString() || '10'}
+                onValueChange={(value) => setFilters((prev) => ({ ...prev, limit: Number(value), page: 1 }))}
               >
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={20}>20</option>
-                <option value={50}>50</option>
-              </select>
+                <SelectTrigger className='w-24'>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='5'>5</SelectItem>
+                  <SelectItem value='10'>10</SelectItem>
+                  <SelectItem value='20'>20</SelectItem>
+                  <SelectItem value='50'>50</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </CardContent>

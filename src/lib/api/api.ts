@@ -276,7 +276,9 @@ export const userProfileApi = {
 
   // Yetenek işlemleri
   skill: {
-    add: (data: Omit<Skill, 'id'>): Promise<{ success: boolean; data: Skill; message?: string }> =>
+    add: (
+      data: Omit<Skill, 'id'> | { skills: Omit<Skill, 'id'>[] },
+    ): Promise<{ success: boolean; data: Skill | Skill[]; message?: string }> =>
       apiRequest.post('/user-profile/skill', data),
 
     update: (

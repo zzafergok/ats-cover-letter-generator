@@ -1042,34 +1042,47 @@ export interface ATSJobPostingAnalysisData {
 export interface ATSJobAnalysis {
   id: string
   userId: string
+  jobPostingUrl?: string
+  jobPostingText: string
   companyName: string
   positionTitle: string
   requiredSkills: string[]
   preferredSkills: string[]
   requiredExperience: Array<{
     skillArea: string
-    minimumYears: number
+    minimumYears?: number
+    maximumYears?: number
     isRequired: boolean
     description: string
   }>
+  educationRequirements?: Array<{
+    field: string
+    level: string
+    isRequired: boolean
+    alternatives?: string[]
+  }>
   keywords: Array<{
     keyword: string
-    category: 'TECHNICAL' | 'SOFT_SKILL' | 'INDUSTRY' | 'ROLE'
+    category: 'TECHNICAL' | 'SOFT_SKILL' | 'INDUSTRY' | 'ROLE' | 'FRAMEWORK' | 'OTHER'
     importance: 'HIGH' | 'MEDIUM' | 'LOW'
     frequency: number
+    context?: string
   }>
   atsKeywords: string[]
   seniorityLevel: 'ENTRY' | 'JUNIOR' | 'MID' | 'SENIOR' | 'LEAD' | 'EXECUTIVE'
   industryType: string
+  location?: string
+  workMode?: 'ONSITE' | 'REMOTE' | 'HYBRID'
+  employmentType?: 'FULL_TIME' | 'PART_TIME' | 'CONTRACT'
+  salaryRange?: any
   analysisStatus: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED'
   createdAt: string
+  updatedAt: string
 }
 
 export interface ATSJobPostingAnalysisResponse {
   success: boolean
-  data: {
-    jobAnalysis: ATSJobAnalysis
-  }
+  data: ATSJobAnalysis
   message?: string
 }
 
@@ -1108,6 +1121,7 @@ export interface ATSMatchAnalysis {
     missingHighPriority: string[]
     missingMediumPriority: string[]
   }
+  matchedSkills: string[]
   missingSkills: string[]
   recommendations: Array<{
     type: 'SKILL_GAP' | 'EXPERIENCE_GAP' | 'KEYWORD_OPTIMIZATION' | 'FORMAT_IMPROVEMENT'
@@ -1183,6 +1197,8 @@ export interface ATSCompleteAnalysisData {
     section: 'SKILLS' | 'EXPERIENCE' | 'EDUCATION' | 'OBJECTIVE' | 'KEYWORDS'
     priority: 'HIGH' | 'MEDIUM' | 'LOW'
   }>
+  useUserProfile?: boolean
+  cvData?: string | null
 }
 
 export interface ATSCompleteAnalysisResponse {
@@ -1206,16 +1222,22 @@ export interface ATSApplyOptimizationResponse {
 export interface ATSAnalysesFilter {
   page?: number
   limit?: number
-  type?: 'job_analysis' | 'match_analysis' | 'optimization'
+  type?: 'job_analysis' | 'match_analysis' | 'optimization' | 'complete_analysis'
 }
 
 export interface ATSAnalysisItem {
   id: string
-  type: 'job_analysis' | 'match_analysis' | 'optimization'
-  companyName: string
-  positionTitle: string
+  name?: string // Analysis name like "Microsoft_Frontend-Developer"
+  type: 'JOB_POSTING' | 'MATCH_ANALYSIS' | 'OPTIMIZATION' | 'COMPLETE_ANALYSIS' | 'job_analysis'
+  companyName?: string
+  positionTitle?: string
+  jobTitle?: string // For backward compatibility
   score?: number
+  overallScore?: number // For match analysis results
+  status?: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED'
+  analysisStatus?: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED' // API response uses this
   createdAt: string
+  updatedAt?: string
 }
 
 export interface ATSAnalysesResponse {
@@ -1227,6 +1249,11 @@ export interface ATSAnalysesResponse {
       limit: number
       total: number
       totalPages: number
+    }
+    summary: {
+      jobAnalyses: number
+      matchAnalyses: number
+      optimizations: number
     }
   }
   message?: string

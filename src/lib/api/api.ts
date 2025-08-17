@@ -36,7 +36,6 @@ import {
   DetailedCVsResponse,
   ATSOptimizationData,
   ATSAnalysesResponse,
-  ATSAnalysisResponse,
   UniversitiesResponse,
   ATSMatchAnalysisData,
   SalaryLimitsResponse,
@@ -578,11 +577,12 @@ export const atsApi = {
   },
 
   // Belirli bir analizi getir
-  getAnalysis: (analysisId: string): Promise<ATSAnalysisResponse> => apiRequest.get(`/ats/analysis/${analysisId}`),
+  getAnalysis: (analysisId: string): Promise<ATSJobPostingAnalysisResponse> =>
+    apiRequest.get(`/ats/job-analysis/${analysisId}`),
 
   // Analizi sil
   deleteAnalysis: (analysisId: string): Promise<StandardSuccessResponse> =>
-    apiRequest.delete(`/ats/analysis/${analysisId}`),
+    apiRequest.delete(`/ats/job-analysis/${analysisId}`),
 }
 
 // Severance Calculator API Servisleri

@@ -12,7 +12,7 @@ export default function ATSCVPage() {
       {/* Header */}
       <div className='text-center space-y-4'>
         <div className='flex items-center justify-center gap-3'>
-          <div className='w-16 h-16 bg-primary/10 rounded-xl flex items-center justify-center'>
+          <div className='w-16 h-16 bg-primary/10 dark:bg-primary/20 rounded-xl flex items-center justify-center'>
             <Bot className='w-8 h-8 text-primary' />
           </div>
           <div>
@@ -30,7 +30,7 @@ export default function ATSCVPage() {
         <Card className='hover:shadow-lg transition-shadow duration-300 border-2 hover:border-primary/20'>
           <CardHeader>
             <div className='flex items-center gap-3'>
-              <div className='w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center'>
+              <div className='w-12 h-12 bg-primary/10 dark:bg-primary/20 rounded-xl flex items-center justify-center'>
                 <Upload className='w-6 h-6 text-primary' />
               </div>
               <div>
@@ -64,7 +64,7 @@ export default function ATSCVPage() {
         <Card className='hover:shadow-lg transition-shadow duration-300 border-2 hover:border-primary/20'>
           <CardHeader>
             <div className='flex items-center gap-3'>
-              <div className='w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center'>
+              <div className='w-12 h-12 bg-primary/10 dark:bg-primary/20 rounded-xl flex items-center justify-center'>
                 <FileText className='w-6 h-6 text-primary' />
               </div>
               <div>
@@ -94,16 +94,16 @@ export default function ATSCVPage() {
           </CardContent>
         </Card>
 
-        {/* ATS Validation Card */}
-        <Card className='hover:shadow-lg transition-shadow duration-300 border-2 hover:border-muted/20 opacity-75'>
+        {/* ATS Job Analysis Card */}
+        <Card className='hover:shadow-lg transition-shadow duration-300 border-2 hover:border-primary/20'>
           <CardHeader>
             <div className='flex items-center gap-3'>
-              <div className='w-12 h-12 bg-muted/20 rounded-xl flex items-center justify-center'>
-                <BarChart3 className='w-6 h-6 text-muted-foreground' />
+              <div className='w-12 h-12 bg-primary/10 dark:bg-primary/20 rounded-xl flex items-center justify-center'>
+                <BarChart3 className='w-6 h-6 text-primary' />
               </div>
               <div>
-                <CardTitle className='text-xl text-muted-foreground'>ATS Analizi</CardTitle>
-                <CardDescription>CV'nizi analiz edin</CardDescription>
+                <CardTitle className='text-xl'>İş İlanı Analizi</CardTitle>
+                <CardDescription>İş ilanını analiz edin</CardDescription>
               </div>
             </div>
           </CardHeader>
@@ -111,54 +111,101 @@ export default function ATSCVPage() {
             <div className='space-y-2 text-sm text-muted-foreground'>
               <div className='flex items-center gap-2'>
                 <Target className='w-4 h-4' />
-                <span>ATS uyumluluk skoru</span>
+                <span>Anahtar kelime çıkarma</span>
               </div>
               <div className='flex items-center gap-2'>
                 <Target className='w-4 h-4' />
-                <span>Anahtar kelime analizi</span>
+                <span>Gerekli becerileri tespit</span>
               </div>
               <div className='flex items-center gap-2'>
                 <Target className='w-4 h-4' />
-                <span>İyileştirme önerileri</span>
+                <span>ATS optimizasyon hazırlığı</span>
               </div>
             </div>
-            <Button className='w-full' disabled>
-              Yakında
-            </Button>
+            <Link href='/cv/ats/job-analysis' className='block'>
+              <Button className='w-full'>İş İlanı Analizi</Button>
+            </Link>
           </CardContent>
         </Card>
 
-        {/* CV Optimization Card */}
-        <Card className='hover:shadow-lg transition-shadow duration-300 border-2 hover:border-muted/20 opacity-75'>
+        {/* Quick ATS Analysis Card */}
+        <Card className='hover:shadow-lg transition-shadow duration-300 border-2 hover:border-green-600/20 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20'>
           <CardHeader>
             <div className='flex items-center gap-3'>
-              <div className='w-12 h-12 bg-muted/20 rounded-xl flex items-center justify-center'>
-                <Zap className='w-6 h-6 text-muted-foreground' />
+              <div className='w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center'>
+                <Zap className='w-6 h-6 text-green-600 dark:text-green-400' />
               </div>
               <div>
-                <CardTitle className='text-xl text-muted-foreground'>Optimizasyon</CardTitle>
-                <CardDescription>CV'nizi optimize edin</CardDescription>
+                <CardTitle className='text-xl text-green-800 dark:text-green-300'>Hızlı ATS Analizi</CardTitle>
+                <CardDescription className='text-green-700 dark:text-green-400'>
+                  Tek adımda komple analiz
+                </CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent className='space-y-4'>
-            <div className='space-y-2 text-sm text-muted-foreground'>
+            <div className='space-y-2 text-sm text-green-700 dark:text-green-400'>
               <div className='flex items-center gap-2'>
                 <TrendingUp className='w-4 h-4' />
-                <span>İş ilanına özel optimizasyon</span>
+                <span>İş ilanı + CV uyum analizi</span>
               </div>
               <div className='flex items-center gap-2'>
                 <TrendingUp className='w-4 h-4' />
-                <span>Anahtar kelime önerileri</span>
+                <span>Otomatik optimizasyon önerileri</span>
               </div>
               <div className='flex items-center gap-2'>
                 <TrendingUp className='w-4 h-4' />
-                <span>Eşleşme yüzdesi artırma</span>
+                <span>Profile direkt uygulama</span>
               </div>
             </div>
-            <Button className='w-full' disabled>
-              Yakında
-            </Button>
+            <Link href='/cv/ats/complete-analysis' className='block'>
+              <Button className='w-full bg-green-600 hover:bg-green-700'>
+                <Zap className='w-4 h-4 mr-2' />
+                Hızlı Analiz
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Navigation Cards */}
+      <div className='grid grid-cols-1 md:grid-cols-1 gap-6 mt-8'>
+        {/* My Analyses Card */}
+        <Card className='hover:shadow-lg transition-shadow duration-300 border-2 hover:border-blue-600/20 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20'>
+          <CardHeader>
+            <div className='flex items-center gap-3'>
+              <div className='w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center'>
+                <BarChart3 className='w-6 h-6 text-blue-600 dark:text-blue-400' />
+              </div>
+              <div>
+                <CardTitle className='text-xl text-blue-800 dark:text-blue-300'>Analizlerim</CardTitle>
+                <CardDescription className='text-blue-700 dark:text-blue-400'>
+                  Geçmiş analiz sonuçlarınızı görün
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className='space-y-4'>
+            <div className='space-y-2 text-sm text-blue-700 dark:text-blue-400'>
+              <div className='flex items-center gap-2'>
+                <CheckCircle className='w-4 h-4' />
+                <span>Tüm analiz geçmişi</span>
+              </div>
+              <div className='flex items-center gap-2'>
+                <CheckCircle className='w-4 h-4' />
+                <span>Detaylı sonuçlar</span>
+              </div>
+              <div className='flex items-center gap-2'>
+                <CheckCircle className='w-4 h-4' />
+                <span>İstatistikler ve trendler</span>
+              </div>
+            </div>
+            <Link href='/cv/ats/analyses' className='block'>
+              <Button className='w-full bg-blue-600 hover:bg-blue-700'>
+                <BarChart3 className='w-4 h-4 mr-2' />
+                Analizlerime Git
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       </div>

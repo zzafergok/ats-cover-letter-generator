@@ -846,39 +846,3 @@ export function RichTextEditor({
     </>
   )
 }
-
-// Helper function for creating a basic rich text editor
-export function createBasicRichTextEditor(props: Partial<RichTextEditorProps> = {}) {
-  return (
-    <RichTextEditor
-      toolbarConfig={{
-        formatting: true,
-        alignment: false,
-        lists: true,
-        links: true,
-        media: false,
-        tables: false,
-        advanced: true,
-      }}
-      enablePreview={false}
-      enableFullscreen={false}
-      enableWordCount={true}
-      height={200}
-      {...props}
-    />
-  )
-}
-
-// Helper function for creating a full-featured rich text editor
-export function createFullRichTextEditor(props: Partial<RichTextEditorProps> = {}) {
-  return (
-    <RichTextEditor
-      enableAutoSave={true}
-      enablePreview={true}
-      enableFullscreen={true}
-      enableWordCount={true}
-      height={400}
-      {...props}
-    />
-  )
-}
